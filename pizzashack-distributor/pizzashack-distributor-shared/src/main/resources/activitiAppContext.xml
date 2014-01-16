@@ -18,18 +18,27 @@
           http://www.springframework.org/schema/data/jpa
           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
+	<bean id="placeholderConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:activiti.properties</value>
+			</list>
+		</property>
+	</bean>
+
 	<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
-		<property name="jobExecutorActivate" value="true" />
-		<property name="databaseSchemaUpdate" value="true"/>
-		<property name="databaseType" value="h2"/>
-		<property name="history" value="full" />
-		<property name="mailServerHost" value="smtp.gmail.com" />
-		<property name="mailServerPort" value="465" />
-		<property name="mailServerUsername" value="david.yuan124@gmail.com" />
-		<property name="mailServerPassword" value="eBaojy104" />
-		<property name="mailServerUseSSL" value="true" />
+		<property name="jobExecutorActivate" value="${activiti.jobExecutorActivate}" />
+		<property name="databaseSchemaUpdate" value="${activiti.databaseSchemaUpdate}"/>
+		<property name="databaseType" value="${activiti.databaseType}"/>
+		<property name="history" value="${activiti.history}" />
+		<property name="mailServerHost" value="${activiti.mailServerHost}" />
+		<property name="mailServerPort" value="${activiti.mailServerPort}" />
+		<property name="mailServerUsername" value="${activiti.mailServerUsername}" />
+		<property name="mailServerPassword" value="${activiti.mailServerPassword}" />
+		<property name="mailServerUseSSL" value="${activiti.mailServerUseSSL}" />
 		<property name="customPostDeployers">
 			<list>
 				<bean class="org.activiti.engine.impl.rules.RulesDeployer" />
