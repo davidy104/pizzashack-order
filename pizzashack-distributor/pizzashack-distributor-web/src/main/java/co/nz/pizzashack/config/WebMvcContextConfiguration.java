@@ -6,6 +6,7 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -28,6 +29,7 @@ import co.nz.pizzashack.support.SessionAttributeProcessor;
 
 @Configuration
 @EnableWebMvc
+@ComponentScan(basePackages = "co.nz.pizzashack")
 public class WebMvcContextConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override

@@ -16,7 +16,7 @@ public interface UserDS {
 
 	UserDto getUserByName(String username) throws Exception;
 
-	Set<UserDto> getAllUsers() throws Exception;
+	Set<UserDto> getAllUsers(UserDto searchConditions) throws Exception;
 
 	void updateUser(Long userId, UserDto userDto) throws Exception;
 

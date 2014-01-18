@@ -1,5 +1,6 @@
 package co.nz.pizzashack.ds;
 
+import static co.nz.pizzashack.data.predicates.StaffPredicates.findByComplicatedConditions;
 import static co.nz.pizzashack.data.predicates.StaffPredicates.findByStaffIdentity;
 import static co.nz.pizzashack.data.predicates.StaffPredicates.findByStaffName;
 import static co.nz.pizzashack.data.predicates.UserPredicates.findByUsername;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.User;
 import org.apache.commons.collections.IteratorUtils;
+import org.drools.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,14 @@ import co.nz.pizzashack.data.StaffLoadStrategies;
 import co.nz.pizzashack.data.converter.DepartmentConverter;
 import co.nz.pizzashack.data.converter.StaffConverter;
 import co.nz.pizzashack.data.converter.UserConverter;
+import co.nz.pizzashack.data.dto.IndividualDto;
 import co.nz.pizzashack.data.dto.StaffDto;
 import co.nz.pizzashack.data.dto.UserDto;
 import co.nz.pizzashack.data.model.DepartmentModel;
 import co.nz.pizzashack.data.model.StaffDepartmentModel;
 import co.nz.pizzashack.data.model.StaffModel;
+import co.nz.pizzashack.data.model.StaffModel.StaffLevel;
+import co.nz.pizzashack.data.model.StaffModel.StaffRole;
 import co.nz.pizzashack.data.model.UserModel;
 import co.nz.pizzashack.data.repository.DepartmentRepository;
 import co.nz.pizzashack.data.repository.StaffDepartmentRepository;
@@ -204,15 +209,113 @@ public class StaffDSImpl implements StaffDS {
 		return staffSet;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void deleteStaff(Long staffId) throws Exception {
-		// TODO Auto-generated method stub
+	public Set<StaffDto> getAllStaffs(StaffDto searchConditions)
+			throws Exception {
+		LOGGER.info("getAllStaffs start:{} ", searchConditions);
+		Set<StaffDto> resultSet = null;
+		List<StaffModel> staffModelList = null;
+		if (searchConditions == null) {
+			staffModelList = staffRepository.findAll();
+		} else {
+			IndividualDto individual = searchConditions.getIndividual();
+			Integer level = null;
+			Integer role = null;
+
+			String levelStr = searchConditions.getLevel();
+			String roleStr = searchConditions.getRole();
+			if (!StringUtils.isEmpty(levelStr)) {
+				if (levelStr.equals("junior")) {
+					level = StaffLevel.junior.value();
+				} else if (levelStr.equals("intermedior")) {
+					level = StaffLevel.intermedior.value();
+				} else if (levelStr.equals("senior")) {
+					level = StaffLevel.senior.value();
+				}
+			}
+
+			if (!StringUtils.isEmpty(roleStr)) {
+				if (roleStr.equals("operator")) {
+					role = StaffRole.operator.value();
+				} else if (roleStr.equals("manager")) {
+					role = StaffRole.manager.value();
+				}
+			}
+
+			Iterable<StaffModel> iterable = staffRepository
+					.findAll(findByComplicatedConditions(individual, role,
+							level));
+			if (iterable != null) {
+				staffModelList = IteratorUtils.toList(iterable.iterator());
+			}
+
+		}
+
+		if (staffModelList != null && staffModelList.size() > 0) {
+			resultSet = new HashSet<StaffDto>();
+			for (StaffModel staffModel : staffModelList) {
+				resultSet.add(staffConverter.toDto(staffModel));
+			}
+		}
+		LOGGER.info("getAllStaffs end:{} ");
+		return resultSet;
 	}
 
 	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
+	public void deleteStaff(Long staffId) throws Exception {
+		LOGGER.info("deleteStaff start:{} ", staffId);
+		StaffModel foundModel = staffRepository.findOne(staffId);
+		if (foundModel == null) {
+			throw new NotFoundException("Staff not found by staffId[" + staffId
+					+ "]");
+		}
+
+		List<StaffDepartmentModel> staffDepartmentModels = foundModel
+				.getStaffDepartments();
+		UserModel user = foundModel.getUser();
+
+		if (staffDepartmentModels != null) {
+			LOGGER.info("start delete membership between staff and department");
+			for (StaffDepartmentModel staffDepartmentModel : staffDepartmentModels) {
+				DepartmentModel department = staffDepartmentModel
+						.getDepartmentModel();
+				if (user != null) {
+					List<User> userList = identityService
+							.createUserQuery()
+							.memberOfGroup(
+									String.valueOf(department.getDeptId()))
+							.list();
+
+					for (User memberUser : userList) {
+						if (memberUser.getId().equals(
+								String.valueOf(user.getUserId()))) {
+							LOGGER.info("delete membership from ["
+									+ department.getDeptName() + "] for user["
+									+ user.getUsername() + "]");
+							identityService.deleteMembership(
+									String.valueOf(user.getUserId()),
+									String.valueOf(department.getDeptId()));
+						}
+					}
+				}
+				staffDepartmentRepository.delete(staffDepartmentModel);
+			}
+		}
+
+		if (user != null) {
+			identityService.deleteUser(String.valueOf(user.getUserId()));
+			userRepository.delete(user);
+		}
+		staffRepository.delete(foundModel);
+		LOGGER.info("deleteStaff end:{} ");
+	}
+
+	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
 	public void updateStaff(Long staffId, Set<Long> updatedDeptIds)
 			throws Exception {
-		// TODO Auto-generated method stub
 
 	}
 

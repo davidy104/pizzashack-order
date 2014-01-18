@@ -18,7 +18,8 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-public class PizzashackDistributorWebInitializer implements WebApplicationInitializer {
+public class PizzashackDistributorWebInitializer implements
+		WebApplicationInitializer {
 
 	private static final String DISPATCHER_SERVLET_NAME = "dispatcher";
 
@@ -61,7 +62,8 @@ public class PizzashackDistributorWebInitializer implements WebApplicationInitia
 
 	private void registerListener(ServletContext servletContext) {
 		AnnotationConfigWebApplicationContext rootContext = createContext(
-				ApplicationConfiguration.class, ViewConfiguration.class);
+				ApplicationConfiguration.class, ViewConfiguration.class,
+				InfrastructureContextConfiguration.class);
 		servletContext.addListener(new ContextLoaderListener(rootContext));
 
 	}

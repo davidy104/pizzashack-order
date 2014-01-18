@@ -1,5 +1,7 @@
 package co.nz.pizzashack.data.dto
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
@@ -7,6 +9,7 @@ import groovy.transform.ToString
 @EqualsAndHashCode(includes=["deptName"])
 class DepartmentDto implements Serializable{
 	Long deptId
+	@NotEmpty
 	String deptName
 	String createDate
 }

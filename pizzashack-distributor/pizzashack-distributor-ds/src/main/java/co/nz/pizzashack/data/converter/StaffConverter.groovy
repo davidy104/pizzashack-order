@@ -116,8 +116,8 @@ class StaffConverter implements GeneralConverter<StaffDto, StaffModel> {
 	@Override
 	StaffModel toModel(StaffDto dto) {
 		log.info "toModel start:{} $dto"
-		IndividualModel individual = IndividualModel.getBuilder(dto.firstName,dto.lastName, dto.indentity, dto.email).build()
-		StaffModel model = StaffModel.getBuilder(individual).build()
+		IndividualModel individual = new IndividualModel(firstName:dto.firstName,lastName:dto.lastName,identity:dto.identity,email:dto.email)
+		StaffModel model = new StaffModel(individual:individual)
 
 		if(dto.createDate){
 			model.createDate = GeneralUtils.strToDate(dto.createDate, 'yyyy-MM-dd')

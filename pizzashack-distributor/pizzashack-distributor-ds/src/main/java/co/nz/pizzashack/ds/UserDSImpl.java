@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +54,7 @@ public class UserDSImpl implements UserDS {
 		LOGGER.info("password:{}", password);
 		UserDto added = null;
 		UserModel userModel = userRepository.findOne(findByUsername(username));
-		if (userModel != null
-				|| identityService.createUserQuery().userId(username).count() > 0) {
+		if (userModel != null) {
 			throw new DuplicatedException("User already existed with name["
 					+ username + "]");
 		}
@@ -64,8 +64,11 @@ public class UserDSImpl implements UserDS {
 		userModel.setCreateTime(new Date());
 
 		userModel = userRepository.save(userModel);
-		User wfUser = identityService.newUser(String.valueOf(userModel
-				.getUserId()));
+
+		Long userId = userModel.getUserId();
+		LOGGER.info("userId:{} ", userId);
+
+		User wfUser = identityService.newUser(String.valueOf(userId));
 		identityService.saveUser(wfUser);
 
 		added = userConverter.toDto(userModel);
@@ -80,8 +83,9 @@ public class UserDSImpl implements UserDS {
 		LOGGER.info("username:{}", username);
 		LOGGER.info("password:{}", password);
 		UserDto found = null;
+		String encodePwd = GeneralUtils.pwdEncode(password);
 		UserModel userModel = userRepository.findOne(findByUsernameAndPassword(
-				username, password));
+				username, encodePwd));
 		if (userModel == null) {
 			throw new AuthenticationException("User not existed");
 		}
@@ -117,11 +121,23 @@ public class UserDSImpl implements UserDS {
 		return found;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<UserDto> getAllUsers() throws Exception {
+	public Set<UserDto> getAllUsers(UserDto searchConditions) throws Exception {
 		LOGGER.info("getAllUsers start:{}");
 		Set<UserDto> resultSet = null;
-		List<UserModel> userModelList = userRepository.findAll();
+		List<UserModel> userModelList = null;
+		if (searchConditions != null) {
+			String username = searchConditions.getUsername();
+			Iterable<UserModel> iterable = userRepository
+					.findAll(findByUsername(username));
+			if (iterable != null) {
+				userModelList = IteratorUtils.toList(iterable.iterator());
+			}
+		} else {
+			userModelList = userRepository.findAll();
+		}
+
 		if (userModelList != null && userModelList.size() > 0) {
 			resultSet = new HashSet<UserDto>();
 			for (UserModel userModel : userModelList) {
@@ -144,7 +160,8 @@ public class UserDSImpl implements UserDS {
 			userModel.setUsername(userDto.getUsername());
 		}
 		if (!StringUtils.isEmpty(userDto.getPassword())) {
-			userModel.setPassword(userDto.getPassword());
+			userModel
+					.setPassword(GeneralUtils.pwdEncode(userDto.getPassword()));
 		}
 		LOGGER.info("updateUser end:{} ", userModel);
 	}

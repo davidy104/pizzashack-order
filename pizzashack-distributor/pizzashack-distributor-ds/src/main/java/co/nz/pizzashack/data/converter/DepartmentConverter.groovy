@@ -27,7 +27,7 @@ class DepartmentConverter implements GeneralConverter<DepartmentDto, DepartmentM
 	@Override
 	DepartmentModel toModel(DepartmentDto dto) {
 		log.info "toModel start:{} $dto"
-		DepartmentModel model = DepartmentModel.getBuilder(dto.deptName).built()
+		DepartmentModel model = new DepartmentModel(deptName:dto.deptName)
 		if(dto.createDate){
 			model.createDate = GeneralUtils.strToDate(dto.createDate, 'yyyy-MM-dd')
 		}

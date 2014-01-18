@@ -29,8 +29,7 @@ class UserConverter implements GeneralConverter<UserDto, UserModel> {
 	UserModel toModel(UserDto dto)  {
 		log.info "toModel start:{} $dto"
 		String encodePwd = GeneralUtils.pwdEncode(dto.password)
-		UserModel model = UserModel.getBuilder(dto.username,
-				encodePwd).build()
+		UserModel model = new UserModel(username:dto.username,password:encodePwd)
 		if (dto.createTime) {
 			model.createTime = GeneralUtils.strToDate(dto.createTime)
 		}

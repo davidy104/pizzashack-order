@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -95,11 +96,25 @@ public class DepartmentDSImpl implements DepartmentDS {
 		return found;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<DepartmentDto> getAllDepartments() throws Exception {
+	public Set<DepartmentDto> getAllDepartments(DepartmentDto searchConditions)
+			throws Exception {
 		LOGGER.info("getAllDepartments start:{}");
 		Set<DepartmentDto> departmentSet = null;
-		List<DepartmentModel> modelList = departmentRepository.findAll();
+		List<DepartmentModel> modelList = null;
+
+		if (searchConditions != null) {
+			String deptName = searchConditions.getDeptName();
+			Iterable<DepartmentModel> iterable = departmentRepository
+					.findAll(findByDeptname(deptName));
+			if (iterable != null) {
+				modelList = IteratorUtils.toList(iterable.iterator());
+			}
+		} else {
+			modelList = departmentRepository.findAll();
+		}
+
 		if (modelList != null && modelList.size() > 0) {
 			departmentSet = new HashSet<DepartmentDto>();
 			for (DepartmentModel model : modelList) {

@@ -12,7 +12,8 @@ public interface DepartmentDS {
 
 	DepartmentDto getDepartmentDtoByName(String deptName) throws Exception;
 
-	Set<DepartmentDto> getAllDepartments() throws Exception;
+	Set<DepartmentDto> getAllDepartments(DepartmentDto searchConditions)
+			throws Exception;
 
 	void deleteDepartment(Long deptId) throws Exception;
 
