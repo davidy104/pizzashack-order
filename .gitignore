@@ -5,5 +5,5 @@ target
 .DS_Store
 bin
 .metadata
-*.properties
+activiti.properties
 
