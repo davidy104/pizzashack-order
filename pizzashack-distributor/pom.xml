@@ -804,5 +804,6 @@
     <module>pizzashack-distributor-repository</module>
     <module>pizzashack-distributor-ds</module>
     <module>pizzashack-distributor-integration</module>
+    <module>pizzashack-distributor-web</module>
   </modules>
 </project>

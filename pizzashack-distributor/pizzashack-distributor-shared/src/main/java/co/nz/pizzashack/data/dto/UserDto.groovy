@@ -1,5 +1,7 @@
 package co.nz.pizzashack.data.dto
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
@@ -7,17 +9,13 @@ import groovy.transform.ToString
 @EqualsAndHashCode(includes=["username"])
 class UserDto implements Serializable{
 	Long userId
+
+	@NotEmpty
 	String username
+
+	@NotEmpty
 	String password
 	String createTime
-	Set<RoleDto> roles
-
-	void addRole(RoleDto role){
-		if(!roles){
-			roles = new HashSet<RoleDto>()
-		}
-		roles << role
-	}
 
 	static Builder getBuilder(String username, String password) {
 		return new Builder(username, password)

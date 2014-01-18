@@ -1,18 +1,13 @@
 package co.nz.pizzashack.data.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,24 +35,6 @@ public class UserModel implements Serializable {
 	@Column(name = "CREATE_TIME")
 	@Temporal(value = TemporalType.TIME)
 	private Date createTime;
-
-	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, mappedBy = "userRolePK.user")
-	private List<UserRoleModel> userRoleModels;
-
-	public void addUserRole(UserRoleModel userRole) {
-		if (userRoleModels == null) {
-			userRoleModels = new ArrayList<UserRoleModel>();
-		}
-		userRoleModels.add(userRole);
-	}
-
-	public List<UserRoleModel> getUserRoleModels() {
-		return userRoleModels;
-	}
-
-	public void setUserRoleModels(List<UserRoleModel> userRoleModels) {
-		this.userRoleModels = userRoleModels;
-	}
 
 	public Long getUserId() {
 		return userId;
