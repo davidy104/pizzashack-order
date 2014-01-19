@@ -1,17 +1,24 @@
 package co.nz.pizzashack.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import co.nz.pizzashack.data.dto.StaffDto;
+import co.nz.pizzashack.data.dto.UserDto;
 import co.nz.pizzashack.ds.StaffDS;
 
 @Controller
@@ -54,5 +61,35 @@ public class StaffController extends BaseController {
 		model.addAttribute(MODEL_ATTRIBUTE_STAFFS, staffs);
 		model.addAttribute(MODEL_ATTRIBUTE_STAFF, new StaffDto());
 		return STAFF_INDEX_VIEW;
+	}
+
+	@RequestMapping(value = "/create", method = RequestMethod.GET)
+	public String showCreate(Model model) throws Exception {
+		LOGGER.info("showCreate start: {}");
+		List<String> roles = new ArrayList<String>();
+		roles.add("operator");
+		roles.add("manager");
+		model.addAttribute(UserController.MODEL_ATTRIBUTE_USER, new UserDto());
+		model.addAttribute(MODEL_ATTRIBUTE_STAFF, new StaffDto());
+		model.addAttribute("roles", roles);
+		return CREATE_STAFF_VIEW;
+	}
+
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public String create(
+			@Valid @ModelAttribute(MODEL_ATTRIBUTE_STAFF) StaffDto staffDto,
+			BindingResult result, RedirectAttributes redirect) throws Exception {
+		LOGGER.info("create start:{}", staffDto);
+
+		if (result.hasErrors()) {
+			LOGGER.debug("Form was submitted with validation errors. Rendering form view.");
+			return CREATE_STAFF_VIEW;
+		}
+
+		StaffDto addedDto = staffDs.createStaff(staffDto, null);
+		LOGGER.info("result: {}", addedDto);
+		addFeedbackMessage(redirect, FEEDBACK_MESSAGE_KEY_STAFF_CREATED,
+				addedDto.getStaffId());
+		return createRedirectViewPath(REQUEST_STAFF_INDEX_MAPPING_VIEW);
 	}
 }

@@ -1,6 +1,8 @@
 package co.nz.pizzashack.data.dto
 
 import groovy.transform.ToString
+
+import org.hibernate.validator.constraints.NotEmpty
 @ToString(includeNames = true, includeFields=true)
 class StaffDto implements Serializable {
 	Long staffId
@@ -8,9 +10,12 @@ class StaffDto implements Serializable {
 	IndividualDto individual = new IndividualDto()
 	String createDate
 	Set<DepartmentDto> departments
+
+	@NotEmpty
 	String role
 	String level
-	UserDto user
+	@Delegate
+	UserDto user= new UserDto()
 
 	void addDepartment(DepartmentDto department){
 		if(!departments){

@@ -77,6 +77,19 @@ public class UserController extends BaseController {
 		return CREATE_USER_VIEW;
 	}
 
+	@RequestMapping(value = "/createUser", method = RequestMethod.POST)
+	public UserDto createUser(
+			@Valid @ModelAttribute(MODEL_ATTRIBUTE_USER) UserDto userDto)
+			throws Exception {
+		LOGGER.info("createUser start:{}", userDto);
+
+		UserDto addedDto = userDs.createUser(userDto.getUsername(),
+				userDto.getPassword());
+
+		LOGGER.info("result: {}", addedDto);
+		return addedDto;
+	}
+
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(
 			@Valid @ModelAttribute(MODEL_ATTRIBUTE_USER) UserDto userDto,

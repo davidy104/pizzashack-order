@@ -38,9 +38,10 @@
 			</label>
 
 			<div class="controls">
-				<form:input id="staff-individual-firstName" path="individual.firstName" />
-				<form:errors id="error-individual-firstName" path="individual.firstName"
-					cssClass="help-inline" />
+				<form:input id="staff-individual-firstName"
+					path="individual.firstName" />
+				<form:errors id="error-individual-firstName"
+					path="individual.firstName" cssClass="help-inline" />
 			</div>
 		</div>
 
@@ -50,9 +51,10 @@
 			</label>
 
 			<div class="controls">
-				<form:input id="staff-individual-lastName" path="individual.lastName" />
-				<form:errors id="error-individual-lastName" path="individual.lastName"
-					cssClass="help-inline" />
+				<form:input id="staff-individual-lastName"
+					path="individual.lastName" />
+				<form:errors id="error-individual-lastName"
+					path="individual.lastName" cssClass="help-inline" />
 			</div>
 		</div>
 
@@ -74,23 +76,38 @@
 			</label>
 
 			<div class="controls">
-				<form:input id="staff-individual-identity" path="individual.identity" />
-				<form:errors id="error-individual-identity" path="individual.identity"
-					cssClass="help-inline" />
+				<form:input id="staff-individual-identity"
+					path="individual.identity" />
+				<form:errors id="error-individual-identity"
+					path="individual.identity" cssClass="help-inline" />
 			</div>
 		</div>
 
-		<div id="control-group-firstName" class="control-group">
-			<label for="staff-individual-firstName"> <spring:message
-					code="individual.label.firstName" />:
+		<div id="control-group-role" class="control-group">
+			<label for="staff-role"> <spring:message
+					code="view.staff.role.label" />:
 			</label>
 
 			<div class="controls">
-				<form:select path="category" items="${roles}" itemValue="id" itemLabel="name"/>
-				<form:input id="staff-individual-firstName" path="individual.firstName" />
-				<form:errors id="error-individual-firstName" path="individual.firstName"
-					cssClass="help-inline" />
+				<form:select path="role" items="${roles}" class="checkbox" />
+				<form:errors id="error-role" path="role" cssClass="help-inline" />
 			</div>
+		</div>
+		
+		<div id="control-group-user" class="control-group">
+			<label for="staff-user-userId"> <spring:message
+					code="view.user.userId.label" />:
+			</label>
+
+			<div class="controls">
+				<form:input id="staff-user-userId"
+					path="user.userId" />
+			</div>
+			<div>
+				<a id="add-user-link" class="btn btn-primary"> <spring:message
+						code="create.user.button.label" /></a>
+			</div>
+			
 		</div>
 
 		<div class="form-buttons">
@@ -102,5 +119,48 @@
 			</button>
 		</div>
 	</form:form>
+
+
+
+	<script id="template-add-user-window" type="text/x-handlebars-template">
+    <div id="add-user-window" class="modal">
+        <div class="modal-header">
+            <button class="close" data-dismiss="modal">×</button>
+            <h3><spring:message code="createuser.title"/></h3>
+        </div>
+        <div class="modal-body">
+			<form:form action="/user/create" cssClass="well" modelAttribute="user" method="POST">
+
+			<div id="control-group-username" class="control-group">
+				<form:label path="username"><spring:message
+					code="user.label.username" />:</form:label>
+
+			<div class="controls">
+				<form:input path="username" />
+			</div>
+		</div>
+
+		<div id="control-group-password" class="control-group">
+			<form:label path="password"><spring:message
+					code="user.label.password" />:</form:label>
+			<div class="controls">
+				<form:input type="password" path="password" />
+				
+			</div>
+		</div>
+
+		<div class="form-buttons">
+			<button id="close-user-create-button" class="btn">
+				<spring:message code="close.button.label" />
+			</button>
+			<button id="add-user-button" class="btn btn-primary">
+				<spring:message code="create.button.label" />
+			</button>
+		</div>
+	</form:form>
+        </div>
+    </div>
+	</script>
+
 </body>
 </html>
