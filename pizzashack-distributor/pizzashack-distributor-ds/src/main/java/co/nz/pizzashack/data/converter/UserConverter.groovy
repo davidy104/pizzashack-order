@@ -26,7 +26,7 @@ class UserConverter implements GeneralConverter<UserDto, UserModel> {
 	}
 
 	@Override
-	UserModel toModel(UserDto dto)  {
+	UserModel toModel(UserDto dto,Object... additionalMappingSource)  {
 		log.info "toModel start:{} $dto"
 		String encodePwd = GeneralUtils.pwdEncode(dto.password)
 		UserModel model = new UserModel(username:dto.username,password:encodePwd)

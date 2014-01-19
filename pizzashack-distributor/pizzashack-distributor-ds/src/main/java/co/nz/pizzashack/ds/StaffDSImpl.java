@@ -314,9 +314,17 @@ public class StaffDSImpl implements StaffDS {
 
 	@Override
 	@Transactional(value = "localTxManager", readOnly = false)
-	public void updateStaff(Long staffId, Set<Long> updatedDeptIds)
-			throws Exception {
-
+	public void updateStaff(Long staffId, StaffDto staff,
+			Set<Long> updatedDeptIds) throws Exception {
+		LOGGER.info("updateStaff start:{}", staffId);
+		StaffModel foundModel = staffRepository.findOne(staffId);
+		if (foundModel == null) {
+			throw new NotFoundException("Staff not found by staffId[" + staffId
+					+ "]");
+		}
+		foundModel = staffConverter.toModel(staff, foundModel);
+		this.assignMembershipOfDepartment(foundModel, updatedDeptIds);
+		LOGGER.info("updateStaff end:{}");
 	}
 
 	private void assignMembershipOfDepartment(StaffModel staffModel,

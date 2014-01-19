@@ -25,7 +25,7 @@ class DepartmentConverter implements GeneralConverter<DepartmentDto, DepartmentM
 	}
 
 	@Override
-	DepartmentModel toModel(DepartmentDto dto) {
+	DepartmentModel toModel(DepartmentDto dto,Object... additionalMappingSource) {
 		log.info "toModel start:{} $dto"
 		DepartmentModel model = new DepartmentModel(deptName:dto.deptName)
 		if(dto.createDate){

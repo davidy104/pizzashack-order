@@ -29,7 +29,7 @@ GeneralConverter<WorkflowDto, WorkflowModel> {
 	}
 
 	@Override
-	WorkflowModel toModel(WorkflowDto dto)  {
+	WorkflowModel toModel(WorkflowDto dto,Object... additionalMappingSource)  {
 		log.info "toModel start:{} $dto"
 		WorkflowModel model = WorkflowModel.getBuilder(dto.name,
 				dto.category).build();

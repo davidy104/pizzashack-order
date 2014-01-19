@@ -114,14 +114,20 @@ class StaffConverter implements GeneralConverter<StaffDto, StaffModel> {
 	}
 
 	@Override
-	StaffModel toModel(StaffDto dto) {
+	StaffModel toModel(StaffDto dto,Object... additionalMappingSource) {
 		log.info "toModel start:{} $dto"
+		StaffModel model
 		IndividualModel individual = new IndividualModel(firstName:dto.firstName,lastName:dto.lastName,identity:dto.identity,email:dto.email)
-		StaffModel model = new StaffModel(individual:individual)
-
-		if(dto.createDate){
-			model.createDate = GeneralUtils.strToDate(dto.createDate, 'yyyy-MM-dd')
+		if(additionalMappingSource && additionalMappingSource.length >0){
+			model = (StaffModel)additionalMappingSource[0]
+			model.individual = individual
+		} else {
+			model = new StaffModel(individual:individual)
+			if(dto.createDate){
+				model.createDate = GeneralUtils.strToDate(dto.createDate, 'yyyy-MM-dd')
+			}
 		}
+
 
 		if(dto.level){
 			switch (dto.level){

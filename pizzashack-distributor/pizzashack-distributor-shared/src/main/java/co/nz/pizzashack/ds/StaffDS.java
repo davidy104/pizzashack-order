@@ -26,6 +26,6 @@ public interface StaffDS {
 
 	Set<StaffDto> getAllStaffs(StaffDto searchConditions) throws Exception;
 
-	void updateStaff(Long staffId, Set<Long> updatedDeptIds) throws Exception;
+	void updateStaff(Long staffId, StaffDto staff, Set<Long> updatedDeptIds) throws Exception;
 
 }
