@@ -9,9 +9,9 @@
 </head>
 <body>
 	<div id="user-id" class="hidden">${user.userId}</div>
-	<h1>
+	<h2>
 		<spring:message code="pizzashack.title" />
-	</h1>
+	</h2>
 	<div>
 		<a href="/index" class="btn btn-primary"> <spring:message
 				code="pizza.label.tasks.link" /></a> <a href="/department/list"
@@ -23,7 +23,7 @@
 				code="pizza.label.users.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.logout.link" /></a>
-
+	<br>
 
 		<div class="well">
 			<user> <abbr
@@ -37,7 +37,8 @@
 				</abbr>
 				<c:out value="${user.createTime}" />
 				<br />
-			</c:if> </user>
+			</c:if>
+			</user>
 
 			<div>
 				<a href="/user/update/${user.userId}" class="btn btn-primary"> <spring:message

@@ -9,9 +9,9 @@
 </head>
 <body>
 	<div id="dept-id" class="hidden">${dept.deptId}</div>
-	<h1>
+	<h2>
 		<spring:message code="pizzashack.title" />
-	</h1>
+	</h2>
 	<div>
 		<a href="/index" class="btn btn-primary"> <spring:message
 				code="pizza.label.tasks.link" /></a> <a href="/department/list"
@@ -23,7 +23,7 @@
 				code="pizza.label.users.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.logout.link" /></a>
-
+		<br>
 
 		<div class="well">
 			<user> <abbr

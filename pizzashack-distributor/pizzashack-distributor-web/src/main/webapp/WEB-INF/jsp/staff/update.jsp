@@ -5,13 +5,16 @@
 <html>
 <head>
 <script type="text/javascript" src="/static/js/pizza.form.js"></script>
-<script type="text/javascript" src="/static/js/staff.create.js"></script>
+<script type="text/javascript" src="/static/js/staff.update.js"></script>
 <title></title>
 </head>
 <body>
 	<h2>
 		<spring:message code="pizzashack.title" />
 	</h2>
+
+	<div id="staff-id" class="hidden">${staff.staffId}</div>
+	<div id="staff-deptIds" class="hidden">${staff.selectedDeptIdsStr}</div>
 
 	<a href="/index" class="btn btn-primary"> <spring:message
 			code="pizza.label.tasks.link" /></a>
@@ -25,13 +28,14 @@
 			code="pizza.label.logout.link" /></a>
 	<br>
 	<h3>
-		<spring:message code="staff.create.title" />
+		<spring:message code="staff.update.title" />
 	</h3>
-
 	<form:errors path="staff" cssClass="errorBlock" element="div" />
-	<form:form action="/staff/create" cssClass="well" commandName="staff"
+	<form:form action="/staff/update" cssClass="well" commandName="staff"
 		method="POST">
+		<form:hidden path="staffId" />
 		<form:hidden path="selectedDeptIdsStr" />
+
 		<div id="control-group-firstName" class="control-group">
 			<label for="staff-individual-firstName"> <spring:message
 					code="individual.label.firstName" />:
@@ -105,35 +109,7 @@
 			</div>
 		</div>
 
-		<div id="control-group-username" class="control-group">
-			<label for="staff-user-username"> <spring:message
-					code="view.user.username.label" />:
-			</label>
-
-			<div class="controls">
-				<form:input id="staff-user-username" path="user.username" />
-				<form:errors id="error-user-username" path="user.username"
-					cssClass="help-inline" />
-				<a id="check-user-link" class="btn btn-primary"> <spring:message
-						code="check.user.button.label" /></a>
-			</div>
-			<div id="actionMsg" class="help-inline"></div>
-		</div>
-
-		<div id="control-group-userpassword" class="control-group">
-			<label for="staff-user-password"> <spring:message
-					code="view.user.password.label" />:
-			</label>
-
-			<div class="controls">
-				<form:input id="staff-user-password" type="password"
-					path="user.password" />
-				<form:errors id="error-user-password" path="user.password"
-					cssClass="help-inline" />
-			</div>
-		</div>
-
-		<div id="control-group-depts" class="control-group">
+			<div id="control-group-depts" class="control-group">
 			<label for="staff-depts"> <spring:message
 					code="view.staff.selectedDepts.label" />:
 			</label>
@@ -143,18 +119,20 @@
 				<a id="select-depts-link" class="btn"> <spring:message
 						code="select.button.label" /></a>
 
-				<textarea id="staff-depts-textarea" readOnly="true"></textarea>
+				<form:textarea path="selectedDeptNamesStr" readOnly="true"></form:textarea>
 			</div>
 		</div>
 
+
 		<div class="form-buttons">
-			<button id="cancel-staff-create-button" class="btn">
+			<button id="cancel-staff-udpate-button" class="btn">
 				<spring:message code="cancel.button.label" />
 			</button>
-			<button id="add-staff-button" type="submit" class="btn btn-primary">
-				<spring:message code="create.button.label" />
+			<button id="update-staff-button" type="submit" class="btn btn-primary">
+				<spring:message code="update.button.label" />
 			</button>
 		</div>
+
 	</form:form>
 
 
@@ -177,7 +155,6 @@
 
     	</div>
 	</script>
-
 
 </body>
 </html>

@@ -9,9 +9,9 @@
 <title></title>
 </head>
 <body>
-	<h1>
+	<h2>
 		<spring:message code="pizzashack.title" />
-	</h1>
+	</h2>
 
 	<a href="/index" class="btn btn-primary"> <spring:message
 			code="pizza.label.tasks.link" /></a>
@@ -23,14 +23,14 @@
 			code="pizza.label.users.link" /></a>
 	<a href="/logout" class="btn btn-primary"> <spring:message
 			code="pizza.label.logout.link" /></a>
-
+	<br>
 	<h3>
 		<spring:message code="dept.create.title" />
 	</h3>
 
 	<form:errors path="dept" cssClass="errorBlock" element="div" />
-	<form:form action="/department/create" cssClass="well" commandName="dept"
-		method="POST">
+	<form:form action="/department/create" cssClass="well"
+		commandName="dept" method="POST">
 
 		<div id="control-group-deptName" class="control-group">
 			<label for="dept-deptName"> <spring:message

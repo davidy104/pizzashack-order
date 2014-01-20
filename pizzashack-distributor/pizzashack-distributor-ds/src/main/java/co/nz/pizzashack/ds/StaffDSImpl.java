@@ -323,6 +323,17 @@ public class StaffDSImpl implements StaffDS {
 					+ "]");
 		}
 		foundModel = staffConverter.toModel(staff, foundModel);
+		UserModel userModel = foundModel.getUser();
+		User user = identityService.createUserQuery()
+				.userId(String.valueOf(userModel.getUserId())).singleResult();
+		if (user != null) {
+			LOGGER.info("update userinfo in ws");
+			user.setEmail(foundModel.getIndividual().getEmail());
+			user.setFirstName(foundModel.getIndividual().getFirstName());
+			user.setLastName(foundModel.getIndividual().getLastName());
+			identityService.saveUser(user);
+		}
+
 		this.assignMembershipOfDepartment(foundModel, updatedDeptIds);
 		LOGGER.info("updateStaff end:{}");
 	}

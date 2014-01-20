@@ -14,6 +14,10 @@ class StaffDto implements Serializable {
 	@NotEmpty
 	String role
 	String level
+
+	String selectedDeptIdsStr
+	String selectedDeptNamesStr
+
 	@Delegate
 	UserDto user= new UserDto()
 

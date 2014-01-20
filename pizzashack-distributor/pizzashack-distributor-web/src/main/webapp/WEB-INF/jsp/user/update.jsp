@@ -9,10 +9,10 @@
 <title></title>
 </head>
 <body>
-	<h1>
+	<h2>
 		<spring:message code="pizzashack.title" />
-	</h1>
-	
+	</h2>
+
 	<div id="user-id" class="hidden">${user.userId}</div>
 
 	<a href="/index" class="btn btn-primary"> <spring:message
@@ -25,7 +25,7 @@
 			code="pizza.label.users.link" /></a>
 	<a href="/logout" class="btn btn-primary"> <spring:message
 			code="pizza.label.logout.link" /></a>
-
+	<br>
 	<h3>
 		<spring:message code="user.update.title" />
 	</h3>

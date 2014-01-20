@@ -37,6 +37,9 @@ public class UserController extends BaseController {
 	private static final String FEEDBACK_MESSAGE_KEY_USER_UPDATED = "feedback.message.user.updated";
 	private static final String FEEDBACK_MESSAGE_KEY_USER_DELETED = "feedback.message.user.deleted";
 
+	private static final String FEEDBACK_MESSAGE_KEY_USER_EXISTED = "feedback.message.user.existed";
+	private static final String FEEDBACK_MESSAGE_KEY_USER_FREE = "feedback.message.user.freeforuse";
+
 	private static final String REQUEST_USERS_INDEX_MAPPING_VIEW = "/user/list";
 	private static final String REQUEST_USER_MAPPING_VIEW = "/user/{userId}";
 
@@ -159,6 +162,26 @@ public class UserController extends BaseController {
 		LOGGER.info("deleteUser: {}", userId);
 		userDs.deleteUser(userId);
 		return getMessage(FEEDBACK_MESSAGE_KEY_USER_DELETED, userId);
+	}
+
+	@RequestMapping(value = "/check/{userName}", method = RequestMethod.GET)
+	@ResponseBody
+	public String checkUser(@PathVariable("userName") String username)
+			throws Exception {
+		LOGGER.info("checkUser start:{} ", username);
+		String responseMessage = FEEDBACK_MESSAGE_KEY_USER_FREE;
+		UserDto user = null;
+		try {
+			user = userDs.getUserByName(username);
+		} catch (Exception e) {
+		}
+
+		if (user != null) {
+			responseMessage = FEEDBACK_MESSAGE_KEY_USER_EXISTED;
+		}
+
+		LOGGER.info("checkUser end:{} ", responseMessage);
+		return getMessage(responseMessage, username);
 	}
 
 }

@@ -9,9 +9,9 @@
 <title></title>
 </head>
 <body>
-	<h1>
+	<h2>
 		<spring:message code="login.title" />
-	</h1>
+	</h2>
 	<form:errors path="user" cssClass="errorBlock" element="div" />
 	<form:form action="/login" cssClass="well" commandName="user"
 		method="POST">

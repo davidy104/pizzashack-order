@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ public class DepartmentController extends BaseController {
 	public static final String CREATE_DEPT_VIEW = DEPT_FOLDER + "create";
 	public static final String SHOW_DEPT_VIEW = DEPT_FOLDER + "show";
 	public static final String UPDATE_DEPT_VIEW = DEPT_FOLDER + "update";
+	public static final String SELECT_DEPT_VIEW = DEPT_FOLDER + "selectDepts";
 
 	public static final String MODEL_ATTRIBUTE_DEPTS = "depts";
 	public static final String MODEL_ATTRIBUTE_DEPT = "dept";
@@ -60,6 +62,17 @@ public class DepartmentController extends BaseController {
 		model.addAttribute(MODEL_ATTRIBUTE_DEPTS, depts);
 		model.addAttribute(MODEL_ATTRIBUTE_DEPT, new DepartmentDto());
 		return DEPT_INDEX_VIEW;
+	}
+
+	@RequestMapping(value = "/selectdepts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Set<DepartmentDto> select() throws Exception {
+		LOGGER.info("select start: {}");
+		Set<DepartmentDto> depts = departmentDs.getAllDepartments(null);
+		if (depts != null) {
+			LOGGER.info("depts size: {}", depts.size());
+		}
+		return depts;
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
