@@ -9,12 +9,11 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>pizzashack-billing-repository</artifactId>
-	<name>pizzashack-billing-repository</name>
+	<artifactId>pizzashack-billing-ds</artifactId>
+	<name>pizzashack-billing-ds</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
-		<!-- testing -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -35,11 +34,8 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>pizzashack-billing-shared</artifactId>
+			<artifactId>pizzashack-billing-repository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 	</dependencies>
-
-
 </project>

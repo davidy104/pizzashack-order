@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="co.nz.pizzashack.billing.data.mapper.AccountMapper">
+
+	<resultMap id="accountResultMap" type="account">
+		<id property="accountId" column="account_id" />
+		<result property="accountNo" column="account_no" />
+		<result property="securityNo" column="security_no"/>
+		<result property="balance" column="balance" />
+		<result property="accountType" column="account_type" />
+		<result property="createTime" column="create_time" />
+		<result property="expireDate" column="expire_date" />
+	</resultMap>
+
+	<insert id="saveAccount" parameterType="account">
+		<selectKey keyProperty="accountId" resultType="long" order="BEFORE">
+			select
+			account_seq.nextval from dual
+		</selectKey>
+		insert into
+		t_account(account_id,account_no,security_no,balance,account_type,create_time,expire_date)
+		values
+		(#{accountId},
+		#{accountNo},#{securityNo},#{balance},#{accountType},#{createTime},#{expireDate})
+	</insert>
+
+	<update id="updateAccount" parameterType="account">
+		update t_account
+		<set>
+			<if test="expireDate != null">expire_date=#{expireDate},</if>
+			<if test="balance != null">balance=#{balance},</if>
+			<if test="accountType != null">account_type=#{accountType},</if>
+		</set>
+		where account_id = #{accountId}
+	</update>
+
+	<delete id="deleteAccount" parameterType="long">
+		delete from t_account
+		where
+		account_id = #{accountId}
+	</delete>
+
+
+	<select id="getAccounts" parameterType="hashmap" resultMap="accountResultMap">
+		SELECT * FROM t_account
+		<where>
+			<include refid="searchConditions" />
+		</where>
+	</select>
+
+
+	<sql id="searchConditions">
+		<if test="accountId != null and accountId != '' ">
+			account_id = #{accountId}
+		</if>
+
+		<if test="accountNo != null and accountNo != '' ">
+			AND ACCOUNT_NO = #{accountNo}
+		</if>
+
+		<if test="securityNo != null and securityNo != '' ">
+			AND security_no = #{securityNo}
+		</if>
+
+		<if test="accountType != null">
+			AND ACCOUNT_TYPE = #{accountType}
+		</if>
+
+		<if test="expireDate != null">
+			AND expire_date = #{expireDate}
+		</if>
+	</sql>
+
+
+</mapper>

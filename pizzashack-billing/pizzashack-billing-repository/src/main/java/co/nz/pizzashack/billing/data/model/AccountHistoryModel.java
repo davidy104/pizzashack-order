@@ -4,26 +4,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.ibatis.type.Alias;
 
 @SuppressWarnings("serial")
-@Entity
-@Table(name = "T_ACCOUNT_HISTORY")
+@Alias("accountHistory")
 public class AccountHistoryModel implements Serializable {
 
 	public enum TransType {
@@ -39,26 +27,11 @@ public class AccountHistoryModel implements Serializable {
 		}
 	}
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "ACCOUNT_HIST_ID", insertable = false, updatable = false)
 	private Long accountHistoryId;
-
-	@Column(name = "ACCOUNT_TRANS_NO")
 	private String accountTransNo;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ACCOUNT_ID", referencedColumnName = "ACCOUNT_ID")
 	private AccountModel account;
-
-	@Column(name = "TRANS_AMOUNT")
 	private BigDecimal transAmount;
-
-	@Column(name = "CREATE_TIME")
-	@Temporal(TemporalType.TIME)
 	private Date createTime;
-
-	@Column(name = "TRANS_TYPE")
 	private Integer transType;
 
 	public Long getAccountHistoryId() {

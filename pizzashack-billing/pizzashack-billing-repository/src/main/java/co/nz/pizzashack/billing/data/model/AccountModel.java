@@ -6,51 +6,43 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.ibatis.type.Alias;
 
 @SuppressWarnings("serial")
-@Entity
-@Table(name = "T_ACCOUNT")
+@Alias("account")
 public class AccountModel implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "ACCOUNT_ID", insertable = false, updatable = false)
+	public enum AccountType {
+		credit(0), debit(1);
+		AccountType(int value) {
+			this.value = value;
+		}
+
+		private final int value;
+
+		public int value() {
+			return value;
+		}
+	}
+
 	private Long accountId;
 
-	@Column(name = "ACCOUNT_NO")
 	private String accountNo;
 
-	@Column(name = "BALANCE")
+	private String securityNo;
+
 	private BigDecimal balance = BigDecimal.ZERO;
 
-	@Column(name = "ACCOUNT_TYPE")
 	private Integer accountType;
 
-	@Column(name = "CREATE_TIME")
-	@Temporal(TemporalType.TIME)
 	private Date createTime;
 
-	@Column(name = "EXPIRE_DATE")
-	@Temporal(TemporalType.DATE)
 	private Date expireDate;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "account")
 	private Set<AccountHistoryModel> histories;
 
 	public void addAccountHistory(AccountHistoryModel accountHistory) {
@@ -60,37 +52,49 @@ public class AccountModel implements Serializable {
 		histories.add(accountHistory);
 	}
 
-	public static Builder getBuilder(String accountNo, BigDecimal balance,
-			Integer accountType, Date expireTime) {
-		return new Builder(accountNo, balance, accountType, expireTime);
+	public static Builder getBuilder(String accountNo, String securityNo,
+			BigDecimal balance, Integer accountType, Date expireTime) {
+		return new Builder(accountNo, securityNo, balance, accountType,
+				expireTime);
 	}
 
-	public static Builder getBuilder(String accountNo, Integer accountType) {
-		return new Builder(accountNo, accountType);
+	public static Builder getBuilder(String accountNo, String securityNo,
+			Integer accountType) {
+		return new Builder(accountNo, securityNo, accountType);
 	}
 
 	public static class Builder {
 
 		private AccountModel built;
 
-		public Builder(String accountNo, BigDecimal balance,
+		public Builder(String accountNo, String securityNo, BigDecimal balance,
 				Integer accountType, Date expireDate) {
 			built = new AccountModel();
 			built.accountNo = accountNo;
 			built.balance = balance;
+			built.securityNo = securityNo;
 			built.accountType = accountType;
 			built.expireDate = expireDate;
 		}
 
-		public Builder(String accountNo, Integer accountType) {
+		public Builder(String accountNo, String securityNo, Integer accountType) {
 			built = new AccountModel();
 			built.accountNo = accountNo;
+			built.securityNo = securityNo;
 			built.accountType = accountType;
 		}
 
 		public AccountModel build() {
 			return built;
 		}
+	}
+
+	public String getSecurityNo() {
+		return securityNo;
+	}
+
+	public void setSecurityNo(String securityNo) {
+		this.securityNo = securityNo;
 	}
 
 	public Long getAccountId() {

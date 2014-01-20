@@ -5,8 +5,8 @@ import groovy.transform.ToString
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["accountNo","securityNo"])
 class AccountDto implements Serializable{
-
-	//credit,cash,debit
+	Long accountId
+	//credit,debit
 	String paymode
 	String accountNo
 	BigDecimal balance
