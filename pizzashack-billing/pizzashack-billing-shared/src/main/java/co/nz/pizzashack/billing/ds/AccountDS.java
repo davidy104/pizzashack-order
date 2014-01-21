@@ -26,6 +26,6 @@ public interface AccountDS {
 			throws Exception;
 
 	Set<BillingTransactionDto> getAllTransactionsForAccount(String accountNo,
-			String securityNo, Integer accountType) throws Exception;
+			String securityNo, String accountType) throws Exception;
 
 }

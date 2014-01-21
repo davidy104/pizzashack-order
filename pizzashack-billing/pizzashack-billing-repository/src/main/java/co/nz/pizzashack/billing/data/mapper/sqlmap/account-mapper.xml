@@ -13,6 +13,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="accountType" column="ACCOUNT_TYPE" />
 		<result property="createTime" column="CREATE_TIME" />
 		<result property="expireDate" column="EXPIRE_DATE" />
+
+		<collection property="histories" ofType="accountTransaction">
+			<id property="accountTransId" column="ACCOUNT_TRANS_ID" />
+			<result property="accountTransNo" column="ACCOUNT_TRANS_NO" />
+			<result property="transType" column="TRANS_TYPE" />
+			<result property="transAmount" column="TRANS_AMT" />
+			<result property="createTime" column="CREATE_TIME" />
+		</collection>
 	</resultMap>
 
 	<insert id="saveAccount" parameterType="account">
@@ -45,6 +53,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT * FROM T_ACCOUNT
 		where
 		ACCOUNT_ID = #{accountId}
+	</select>
+
+	<select id="getAssociatedAccountTransactions" parameterType="hashmap"
+		resultMap="accountResultMap">
+		SELECT
+		a.*,
+		b.ACCOUNT_TRANS_ID,
+		b.ACCOUNT_TRANS_NO,
+		b.TRANS_TYPE,
+		b.TRANS_AMT,
+		b.CREATE_TIME
+		FROM T_ACCOUNT a left join
+		T_ACCOUNT_TRANSACTION b on a.ACCOUNT_ID = b.ACCOUNT_ID
+		<where>
+			<include refid="searchConditions" />
+		</where>
 	</select>
 
 

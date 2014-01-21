@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
+import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.component.sql.SqlComponent;
@@ -24,6 +25,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.jta.JtaTransactionManager;
+
+import co.nz.pizzashack.billing.integration.route.AccountServicesRoute;
+import co.nz.pizzashack.billing.integration.route.BillingRoute;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
@@ -45,6 +49,15 @@ public class CamelSpringConfig {
 
 	@Resource
 	private Environment environment;
+
+	@Resource
+	private CxfEndpoint accountWsEndpoint;
+
+	@Resource
+	private BillingRoute billingRoute;
+
+	@Resource
+	private AccountServicesRoute accountServicesRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	// private static final String ACTIVITYMQ_TRANSACTED =
@@ -136,6 +149,9 @@ public class CamelSpringConfig {
 		camelContext.addComponent("jms", jmsComponent());
 		camelContext.addComponent("sql", sqlComponent);
 		SimpleRegistry registry = new SimpleRegistry();
+
+		registry.put("accountWsEndpoint", accountWsEndpoint);
+
 		registry.put("connectionFactory", mqXaConnectionFactory());
 		registry.put("atomikos.connectionFactory",
 				atomikosConnectionFactoryBean());
@@ -144,9 +160,8 @@ public class CamelSpringConfig {
 		registry.put("PROPAGATION_REQUIRED", propagationRequired());
 
 		camelContext.setRegistry(registry);
-
-
-
+		camelContext.addRoutes(billingRoute);
+		camelContext.addRoutes(accountServicesRoute);
 		return camelContext;
 	}
 

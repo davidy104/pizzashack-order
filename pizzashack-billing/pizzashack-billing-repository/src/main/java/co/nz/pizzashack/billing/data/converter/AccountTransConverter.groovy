@@ -19,7 +19,7 @@ class AccountTransConverter implements GeneralConverter<BillingTransactionDto, A
 	BillingTransactionDto toDto(AccountTransactionModel model,
 			Object... loadStrategies)  {
 		log.info "toDto start:{} $model"
-		BillingTransactionDto dto  = new BillingTransactionDto(accountTransNo:model.accountTransNo,transAmount:model.transAmount)
+		BillingTransactionDto dto  = new BillingTransactionDto(accountTransNo:model.accountTransNo,billingAmount:model.transAmount)
 		if(model.createTime){
 			dto.createTime = GeneralUtils.dateToStr(model.createTime)
 		}
@@ -37,8 +37,11 @@ class AccountTransConverter implements GeneralConverter<BillingTransactionDto, A
 			}
 		}
 
-		AccountModel accountModel = model.account
-		dto.accountNo = accountModel.accountNo
+		if(model.account){
+			AccountModel accountModel = model.account
+			dto.accountNo = accountModel.accountNo
+		}
+
 		log.info "toDto end:{} $dto"
 		return dto
 	}

@@ -18,4 +18,7 @@ public interface AccountMapper {
 	AccountModel getAccountById(@Param("accountId") Long accountId);
 
 	List<AccountModel> getAccounts(Map<String, Object> paramMap);
+
+	List<AccountModel> getAssociatedAccountTransactions(
+			Map<String, Object> paramMap);
 }

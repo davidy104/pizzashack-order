@@ -39,14 +39,14 @@ public class CamelJdbcIdempotentConfig {
 				xaJdbcDataSource, transactionTemplate, "billingMqConsumer");
 
 		jdbcMessageIdRepository
-				.setTableExistsString("SELECT 1 FROM T_BILLING_REQUEST WHERE 1 = 0");
+				.setTableExistsString("SELECT 1 FROM T_BILLING_REQUEST_HISTORY WHERE 1 = 0");
 
 		jdbcMessageIdRepository
-				.setDeleteString("DELETE FROM T_BILLING_REQUEST WHERE processor_name = ? AND message_id = ?");
+				.setDeleteString("DELETE FROM T_BILLING_REQUEST_HISTORY WHERE processor_name = ? AND message_id = ?");
 		jdbcMessageIdRepository
-				.setQueryString("SELECT COUNT(*) FROM T_BILLING_REQUEST WHERE processor_name = ? AND message_id = ? AND TRANS_NO is not null");
+				.setQueryString("SELECT COUNT(*) FROM T_BILLING_REQUEST_HISTORY WHERE processor_name = ? AND message_id = ?");
 		jdbcMessageIdRepository
-				.setInsertString("INSERT INTO T_BILLING_REQUEST (processor_name, message_id, created_at) VALUES (?, ?, ?)");
+				.setInsertString("INSERT INTO T_BILLING_REQUEST_HISTORY (processor_name, message_id, created_at) VALUES (?, ?, ?)");
 
 		return jdbcMessageIdRepository;
 	}

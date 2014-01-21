@@ -3,24 +3,27 @@ package co.nz.pizzashack.billing.ds;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import co.nz.pizzashack.billing.NotFoundException;
 import co.nz.pizzashack.billing.data.AccountModel;
+import co.nz.pizzashack.billing.data.AccountModel.AccountType;
 import co.nz.pizzashack.billing.data.AccountTransactionModel;
 import co.nz.pizzashack.billing.data.AccountTransactionModel.TransType;
 import co.nz.pizzashack.billing.data.converter.AccountConverter;
 import co.nz.pizzashack.billing.data.converter.AccountTransConverter;
-import co.nz.pizzashack.billing.data.dto.AccountTransactionRespDto;
 import co.nz.pizzashack.billing.data.dto.AccountDto;
+import co.nz.pizzashack.billing.data.dto.AccountTransactionRespDto;
 import co.nz.pizzashack.billing.data.dto.BillingTransactionDto;
 import co.nz.pizzashack.billing.data.mapper.AccountMapper;
 import co.nz.pizzashack.billing.data.mapper.AccountTransactionMapper;
@@ -100,6 +103,7 @@ public class AccountDSImpl implements AccountDS {
 	public AccountTransactionRespDto deduct(BillingTransactionDto billingTrans)
 			throws Exception {
 		LOGGER.info("deduct start:{} ", billingTrans);
+
 		AccountDto account = billingTrans.getAccount();
 		AccountTransactionRespDto result = this.accountAuthentication(account);
 		BigDecimal deductAmount = billingTrans.getBillingAmount();
@@ -107,24 +111,24 @@ public class AccountDSImpl implements AccountDS {
 		Date createTime = new Date();
 		AccountModel model = null;
 		BigDecimal newBalance = null;
+		result.setCreateTime(GeneralUtils.dateToStr(createTime));
+		result.setAccountNo(billingTrans.getAccount().getAccountNo());
+
 		if (result.getCode().equals("000")) {
-			result.setCreateTime(GeneralUtils.dateToStr(createTime));
 			model = accountMapper.getAccountById(result.getAccountId());
 			if (model.getBalance().compareTo(deductAmount) == -1) {
 				result.setCode("004");
 				result.setReasons("Account balance not enough");
 			} else {
+				String accountTransNo = UUID.randomUUID().toString();
 				newBalance = model.getBalance().subtract(deductAmount);
 				model.setBalance(newBalance);
 				accountMapper.updateAccount(model);
-				String accountTransNo = UUID.randomUUID().toString();
-
 				AccountTransactionModel transModel = AccountTransactionModel
 						.getBuilder(accountTransNo, model,
 								TransType.out.value(), deductAmount).build();
 				transModel.setCreateTime(createTime);
 				accountTransMapper.saveAccountTrans(transModel);
-
 				result.setTransactionNo(accountTransNo);
 			}
 		}
@@ -135,6 +139,7 @@ public class AccountDSImpl implements AccountDS {
 	@Override
 	public AccountTransactionRespDto accountAuthentication(AccountDto account) {
 		LOGGER.info("accountAuthentication start:{} ", account);
+
 		AccountTransactionRespDto resultDto = new AccountTransactionRespDto();
 		resultDto.setAccountNo(account.getAccountNo());
 		resultDto.setCode("000");
@@ -170,10 +175,45 @@ public class AccountDSImpl implements AccountDS {
 	}
 	@Override
 	public Set<BillingTransactionDto> getAllTransactionsForAccount(
-			String accountNo, String securityNo, Integer accountType)
+			String accountNo, String securityNo, String accountTypeStr)
 			throws Exception {
+		LOGGER.info("getAllTransactionsForAccount start:{}");
+		LOGGER.info("accountNo:{}", accountNo);
+		LOGGER.info("securityNo:{}", securityNo);
+		LOGGER.info("accountTypeStr:{}", accountTypeStr);
+		Set<BillingTransactionDto> transactionSet = null;
+		AccountModel foundModel = null;
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("accountNo", accountNo);
+		parameters.put("securityNo", securityNo);
 
-		return null;
+		if (!StringUtils.isEmpty(accountTypeStr)) {
+			if (accountTypeStr.equals("credit")) {
+				parameters.put("accountType", AccountType.credit.value());
+			} else if (accountTypeStr.equals("debit")) {
+				parameters.put("accountType", AccountType.debit.value());
+			}
+		}
+
+		foundModel = accountMapper.getAssociatedAccountTransactions(parameters)
+				.get(0);
+
+		if (foundModel == null) {
+			throw new NotFoundException("Account not found by no[" + accountNo
+					+ "] and securityNo[" + securityNo + "]");
+		}
+
+		Set<AccountTransactionModel> transactions = foundModel.getHistories();
+
+		if (transactions != null && transactions.size() > 0) {
+			transactionSet = new HashSet<BillingTransactionDto>();
+			for (AccountTransactionModel accountTransaction : transactions) {
+				accountTransaction.setAccount(foundModel);
+				transactionSet.add(accountTransConverter
+						.toDto(accountTransaction));
+			}
+		}
+		return transactionSet;
 	}
 
 	@Override

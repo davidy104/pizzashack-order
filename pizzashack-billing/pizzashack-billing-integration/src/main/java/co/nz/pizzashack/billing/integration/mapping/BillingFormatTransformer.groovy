@@ -103,6 +103,10 @@ class BillingFormatTransformer {
 	}
 
 	/**
+	 *
+	 * build response for duplicated request, data from T_BILLING_REQUEST_HISTORY
+	 *
+	 *
 	 * <account-transaction>
 	 * <transaction-no></transaction-no>
 	 * 	<account-no></account-no>
@@ -119,12 +123,13 @@ class BillingFormatTransformer {
 		StringWriter sw = new StringWriter()
 		MarkupBuilder builder = new MarkupBuilder(sw)
 
-		String createTime = GeneralUtils.dateToStr(transMetaData['CREATE_TIME'])
+		String createTime = GeneralUtils.dateToStr(transMetaData['created_at'])
 
 		builder.'account-transaction'() {
-			'transaction-no' "${transMetaData['ACCOUNT_TRANS_NO']}"
+			'transaction-no' "${transMetaData['TRANS_NO']}"
 			'account-no' "${transMetaData['ACCOUNT_NO']}"
-			'code' "000"
+			'code' "${transMetaData['CODE']}"
+			'reasons' "${transMetaData['reasons']}"
 			'create-time' "${createTime}"
 		}
 

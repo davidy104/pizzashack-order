@@ -1,6 +1,7 @@
 package co.nz.pizzashack.billing.test;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -61,10 +62,20 @@ public class AccountDSTest {
 		billingTransaction.setBillingAmount(new BigDecimal(120));
 		billingTransaction.setAccount(account);
 
-		AccountTransactionRespDto accountAuthenticationDto = accountDs.deduct(billingTransaction);
+		AccountTransactionRespDto accountAuthenticationDto = accountDs
+				.deduct(billingTransaction);
 		LOGGER.info("accountAuthenticationDto:{} ", accountAuthenticationDto);
 		account = accountDs.getAccountById(1L);
 		LOGGER.info("after deduct account:{} ", account);
+
+		LOGGER.info("to test account transactions:{}");
+		Set<BillingTransactionDto> transactions = accountDs
+				.getAllTransactionsForAccount(account.getAccountNo(),
+						account.getSecurityNo(), account.getPaymode());
+		for (BillingTransactionDto billingTransactionDto : transactions) {
+			LOGGER.info("billingTransactionDto:{} ", billingTransactionDto);
+		}
+
 	}
 
 }
