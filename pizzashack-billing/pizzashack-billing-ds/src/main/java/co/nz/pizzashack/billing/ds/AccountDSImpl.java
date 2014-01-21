@@ -36,7 +36,7 @@ public class AccountDSImpl implements AccountDS {
 			.getLogger(AccountDSImpl.class);
 
 	@Resource
-	private AccountTransactionMapper accountTransMapper;
+	private AccountTransactionMapper accountTransactionMapper;
 
 	@Resource
 	private AccountMapper accountMapper;
@@ -128,7 +128,7 @@ public class AccountDSImpl implements AccountDS {
 						.getBuilder(accountTransNo, model,
 								TransType.out.value(), deductAmount).build();
 				transModel.setCreateTime(createTime);
-				accountTransMapper.saveAccountTrans(transModel);
+				accountTransactionMapper.saveAccountTrans(transModel);
 				result.setTransactionNo(accountTransNo);
 			}
 		}
@@ -221,7 +221,7 @@ public class AccountDSImpl implements AccountDS {
 			throws Exception {
 		LOGGER.info("getBillingTransactionByTransNo start:{} ", transNo);
 		BillingTransactionDto billingTransactionDto = null;
-		AccountTransactionModel accountTransactionModel = accountTransMapper
+		AccountTransactionModel accountTransactionModel = accountTransactionMapper
 				.getAccountTransactionByTransNo(transNo);
 		if (accountTransactionModel == null) {
 			throw new NotFoundException(

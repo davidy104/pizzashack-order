@@ -17,4 +17,5 @@ public interface AccountTransactionMapper {
 			Map<String, Object> paramMap);
 
 	AccountTransactionModel getAccountTransactionByTransNo(String accountTransNo);
+
 }

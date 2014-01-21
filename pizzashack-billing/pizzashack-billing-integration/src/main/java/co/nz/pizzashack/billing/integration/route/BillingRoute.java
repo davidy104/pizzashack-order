@@ -62,7 +62,7 @@ public class BillingRoute extends RouteBuilder {
 						"respXmlMarshalFromAccountTransQueryMap")
 				.log("after marshal ${body}")
 				.setHeader("duplicatedBillingRequest", constant("yes"))
-				.to(OUTBOUND_END_POINT).endChoice();
+				.to(OUTBOUND_END_POINT);
 
 		from(BILLING_REQULAR_ENDPOINT)
 				.routeId(BILLING_REQULAR_ENDPOINT)

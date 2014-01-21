@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.ibatis.type.Alias;
 
 @SuppressWarnings("serial")
-@Alias("billingRequest")
+// @Alias("billingRequest")
 public class BillingRequestModel implements Serializable {
 
 	private String messageId;
