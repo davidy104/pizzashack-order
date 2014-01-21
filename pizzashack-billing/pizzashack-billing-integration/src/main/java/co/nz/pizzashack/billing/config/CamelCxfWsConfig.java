@@ -13,6 +13,10 @@ import co.nz.pizzashack.billing.integration.ws.BillingWebServices;
 		"classpath:META-INF/cxf/cxf-servlet.xml"})
 public class CamelCxfWsConfig {
 
+	/**
+	 * http://localhost:8112/pizzashackbilling/ws/accountWs?wsdl
+	 * @return
+	 */
 	@Bean
 	public CxfEndpoint accountWsEndpoint() {
 		CxfEndpoint cxfEndpoint = new CxfEndpoint();

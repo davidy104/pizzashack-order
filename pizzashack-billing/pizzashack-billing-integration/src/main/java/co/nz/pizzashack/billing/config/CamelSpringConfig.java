@@ -149,7 +149,6 @@ public class CamelSpringConfig {
 		camelContext.addComponent("jms", jmsComponent());
 		camelContext.addComponent("sql", sqlComponent);
 		SimpleRegistry registry = new SimpleRegistry();
-
 		registry.put("accountWsEndpoint", accountWsEndpoint);
 
 		registry.put("connectionFactory", mqXaConnectionFactory());
