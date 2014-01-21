@@ -1,25 +1,33 @@
 --sequences
-create sequence account_seq;
-create sequence account_hist_seq;
+create sequence ACCOUNT_SEQ;
+create sequence ACCOUNT_TRANS_SEQ;
 
-create table t_account (
-	account_id number(10) not null,
-	account_no varchar2(20),
-	security_no varchar2(10),
-	account_type number(2),
-	balance number(10,2),
-	create_time datetime,
-	expire_date date
+create table T_ACCOUNT (
+	ACCOUNT_ID number(10) not null,
+	ACCOUNT_NO varchar2(50),
+	SECURITY_NO varchar2(10),
+	ACCOUNT_TYPE number(2),
+	BALANCE number(10,2),
+	CREATE_TIME datetime,
+	EXPIRE_DATE date
 );
-alter table t_account add constraint t_account_pk primary key (account_id);
+alter table T_ACCOUNT add constraint T_ACCOUNT_PK primary key (ACCOUNT_ID);
 
-create table t_account_history (
-	account_hist_id number(10) not null,
-	account_trans_no varchar2(20),
-	trans_type number(2),
-	trans_amount number(10,2),
-	create_time datetime,
-	account_id number(10) not null
+create table T_ACCOUNT_TRANSACTION (
+	ACCOUNT_TRANS_ID number(10) not null,
+	ACCOUNT_TRANS_NO varchar2(50),
+	TRANS_TYPE number(2),
+	TRANS_AMT number(10,2),
+	CREATE_TIME datetime,
+	ACCOUNT_ID number(10) not null
 );
-alter table t_account_history add constraint t_account_history_pk primary key (account_hist_id);
+alter table T_ACCOUNT_TRANSACTION add constraint T_ACCOUNT_TRANSACTION_PK primary key (ACCOUNT_TRANS_ID);
+
+
+create table T_BILLING_REQUEST (
+	message_id varchar2(50) not null,
+	processor_name varchar2(50),
+	TRANS_NO varchar2(50)
+);
+alter table T_BILLING_REQUEST add constraint T_BILLING_REQUEST_PK primary key (message_id);
 

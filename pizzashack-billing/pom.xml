@@ -692,6 +692,12 @@
 				<version>3.2.1</version>
 			</dependency>
 
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>1.4.01</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -824,6 +830,7 @@
 	<modules>
 		<module>pizzashack-billing-shared</module>
 		<module>pizzashack-billing-repository</module>
-    <module>pizzashack-billing-ds</module>
+		<module>pizzashack-billing-ds</module>
+    <module>pizzashack-billing-integration</module>
   </modules>
 </project>

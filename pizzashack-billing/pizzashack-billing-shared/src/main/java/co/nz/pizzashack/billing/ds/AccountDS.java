@@ -1,26 +1,31 @@
 package co.nz.pizzashack.billing.ds;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
-import co.nz.pizzashack.billing.data.dto.AccountAuthenticationDto;
+import co.nz.pizzashack.billing.data.dto.AccountTransactionRespDto;
 import co.nz.pizzashack.billing.data.dto.AccountDto;
-import co.nz.pizzashack.billing.data.dto.AccountHistoryDto;
+import co.nz.pizzashack.billing.data.dto.BillingTransactionDto;
 
 public interface AccountDS {
 
-	void createAccount(AccountDto account) throws Exception;
+	Long createAccount(AccountDto account) throws Exception;
 
-	AccountDto getAccountByAccountNo(String accountNo, String securityNo) throws Exception;
+	AccountDto getAccountById(Long accountId) throws Exception;
+
+	AccountDto getAccountByAccountNo(String accountNo, String securityNo)
+			throws Exception;
 
 	void deleteAccount(Long accountId) throws Exception;
 
-	AccountAuthenticationDto deduct(AccountDto account, BigDecimal deductAmount)
+	AccountTransactionRespDto deduct(BillingTransactionDto billingTrans)
 			throws Exception;
 
-	AccountAuthenticationDto accountAuthentication(AccountDto account);
+	AccountTransactionRespDto accountAuthentication(AccountDto account);
 
-	Set<AccountHistoryDto> getAllHistoryForAccount(String accountNo,
+	BillingTransactionDto getBillingTransactionByTransNo(String transNo)
+			throws Exception;
+
+	Set<BillingTransactionDto> getAllTransactionsForAccount(String accountNo,
 			String securityNo, Integer accountType) throws Exception;
 
 }

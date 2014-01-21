@@ -5,9 +5,9 @@ import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 
 import co.nz.pizzashack.billing.ConvertException
+import co.nz.pizzashack.billing.data.AccountModel
+import co.nz.pizzashack.billing.data.AccountModel.AccountType;
 import co.nz.pizzashack.billing.data.dto.AccountDto
-import co.nz.pizzashack.billing.data.model.AccountModel
-import co.nz.pizzashack.billing.data.model.AccountModel.AccountType
 import co.nz.pizzashack.billing.utils.GeneralUtils
 
 @Component
@@ -18,22 +18,22 @@ class AccountConverter implements GeneralConverter<AccountDto, AccountModel> {
 	AccountDto toDto(AccountModel model, Object... loadStrategies){
 		log.info "toDto start:{} $model"
 		AccountDto dto = new AccountDto(accountId:model.accountId,accountNo:model.accountNo,balance:model.balance,securityNo:model.securityNo);
-		Integer accountType = model.getAccountType();
+		Integer accountType = model.accountType
+		log.info "accountType: $accountType"
 
-		if(accountType){
-			switch(accountType) {
-				case AccountType.credit.value() :
-					dto.paymode = 'credit'
-					break
+		switch(accountType) {
+			case AccountType.credit.value() :
+				dto.paymode = 'credit'
+				break
 
-				case AccountType.debit.value() :
-					dto.paymode = 'debit'
-					break
+			case AccountType.debit.value() :
+				dto.paymode = 'debit'
+				break
 
-				default :
-					dto.paymode = 'credit'
-			}
+			default :
+				dto.paymode = 'credit'
 		}
+
 
 		if(model.expireDate){
 			dto.expireDate = GeneralUtils.dateToStr(model.expireDate, "yyyy-MM-dd")
@@ -62,6 +62,6 @@ class AccountConverter implements GeneralConverter<AccountDto, AccountModel> {
 		}
 
 		log.info "toModel end:{} $model"
-		return null
+		return model
 	}
 }

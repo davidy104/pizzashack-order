@@ -2,6 +2,8 @@ package co.nz.pizzashack.billing.ds;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,16 +14,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import co.nz.pizzashack.billing.NotFoundException;
+import co.nz.pizzashack.billing.data.AccountModel;
+import co.nz.pizzashack.billing.data.AccountTransactionModel;
+import co.nz.pizzashack.billing.data.AccountTransactionModel.TransType;
 import co.nz.pizzashack.billing.data.converter.AccountConverter;
-import co.nz.pizzashack.billing.data.converter.AccountHistoryConverter;
-import co.nz.pizzashack.billing.data.dto.AccountAuthenticationDto;
+import co.nz.pizzashack.billing.data.converter.AccountTransConverter;
+import co.nz.pizzashack.billing.data.dto.AccountTransactionRespDto;
 import co.nz.pizzashack.billing.data.dto.AccountDto;
-import co.nz.pizzashack.billing.data.dto.AccountHistoryDto;
-import co.nz.pizzashack.billing.data.mapper.AccountHistoryMapper;
+import co.nz.pizzashack.billing.data.dto.BillingTransactionDto;
 import co.nz.pizzashack.billing.data.mapper.AccountMapper;
-import co.nz.pizzashack.billing.data.model.AccountHistoryModel;
-import co.nz.pizzashack.billing.data.model.AccountHistoryModel.TransType;
-import co.nz.pizzashack.billing.data.model.AccountModel;
+import co.nz.pizzashack.billing.data.mapper.AccountTransactionMapper;
+import co.nz.pizzashack.billing.utils.GeneralUtils;
 
 @Service
 public class AccountDSImpl implements AccountDS {
@@ -30,7 +33,7 @@ public class AccountDSImpl implements AccountDS {
 			.getLogger(AccountDSImpl.class);
 
 	@Resource
-	private AccountHistoryMapper accountHistoryMapper;
+	private AccountTransactionMapper accountTransMapper;
 
 	@Resource
 	private AccountMapper accountMapper;
@@ -39,14 +42,31 @@ public class AccountDSImpl implements AccountDS {
 	private AccountConverter accountConverter;
 
 	@Resource
-	private AccountHistoryConverter accountHistoryConverter;
+	private AccountTransConverter accountTransConverter;
 
 	@Override
-	public void createAccount(AccountDto account) throws Exception {
+	public Long createAccount(AccountDto account) throws Exception {
 		LOGGER.info("createAccount start:{}", account);
 		AccountModel model = accountConverter.toModel(account);
+		model.setCreateTime(new Date());
 		accountMapper.saveAccount(model);
 		LOGGER.info("createAccount end:{}", model);
+		return model.getAccountId();
+	}
+
+	@Override
+	public AccountDto getAccountById(Long accountId) throws Exception {
+		LOGGER.info("getAccountById start:{}", accountId);
+		AccountDto found = null;
+		AccountModel foundModel = accountMapper.getAccountById(accountId);
+		if (foundModel == null) {
+			throw new NotFoundException("Account not found by accountId["
+					+ accountId + "] ");
+		}
+		LOGGER.info("found model:{} ", foundModel);
+		found = accountConverter.toDto(foundModel);
+		LOGGER.info("getAccountById end:{}", found);
+		return found;
 	}
 
 	@Override
@@ -55,8 +75,11 @@ public class AccountDSImpl implements AccountDS {
 		LOGGER.info("getAccountByAccountNo start:{}", accountNo);
 		LOGGER.info("securityNo:{}", securityNo);
 		AccountDto found = null;
-		AccountModel foundModel = accountMapper
-				.getAccountByAccountNoAndSecurityNo(accountNo, securityNo);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("accountNo", accountNo);
+		parameters.put("securityNo", securityNo);
+		AccountModel foundModel = accountMapper.getAccounts(parameters).get(0);
 		if (foundModel == null) {
 			throw new NotFoundException("Account not found by no[" + accountNo
 					+ "] and securityNo[" + securityNo + "]");
@@ -74,16 +97,20 @@ public class AccountDSImpl implements AccountDS {
 	}
 
 	@Override
-	public AccountAuthenticationDto deduct(AccountDto account,
-			BigDecimal deductAmount) throws Exception {
-		LOGGER.info("deduct start:{} ", account);
+	public AccountTransactionRespDto deduct(BillingTransactionDto billingTrans)
+			throws Exception {
+		LOGGER.info("deduct start:{} ", billingTrans);
+		AccountDto account = billingTrans.getAccount();
+		AccountTransactionRespDto result = this.accountAuthentication(account);
+		BigDecimal deductAmount = billingTrans.getBillingAmount();
 		LOGGER.info("deductAmount:{} ", deductAmount);
-		AccountAuthenticationDto result = this.accountAuthentication(account);
+		Date createTime = new Date();
 		AccountModel model = null;
 		BigDecimal newBalance = null;
 		if (result.getCode().equals("000")) {
+			result.setCreateTime(GeneralUtils.dateToStr(createTime));
 			model = accountMapper.getAccountById(result.getAccountId());
-			if (deductAmount.compareTo(model.getBalance()) == -1) {
+			if (model.getBalance().compareTo(deductAmount) == -1) {
 				result.setCode("004");
 				result.setReasons("Account balance not enough");
 			} else {
@@ -91,11 +118,14 @@ public class AccountDSImpl implements AccountDS {
 				model.setBalance(newBalance);
 				accountMapper.updateAccount(model);
 				String accountTransNo = UUID.randomUUID().toString();
-				AccountHistoryModel historyModel = AccountHistoryModel
+
+				AccountTransactionModel transModel = AccountTransactionModel
 						.getBuilder(accountTransNo, model,
 								TransType.out.value(), deductAmount).build();
-				historyModel.setCreateTime(new Date());
-				accountHistoryMapper.saveAccountHistory(historyModel);
+				transModel.setCreateTime(createTime);
+				accountTransMapper.saveAccountTrans(transModel);
+
+				result.setTransactionNo(accountTransNo);
 			}
 		}
 		LOGGER.info("deduct end:{} ", result);
@@ -103,9 +133,9 @@ public class AccountDSImpl implements AccountDS {
 	}
 
 	@Override
-	public AccountAuthenticationDto accountAuthentication(AccountDto account) {
+	public AccountTransactionRespDto accountAuthentication(AccountDto account) {
 		LOGGER.info("accountAuthentication start:{} ", account);
-		AccountAuthenticationDto resultDto = new AccountAuthenticationDto();
+		AccountTransactionRespDto resultDto = new AccountTransactionRespDto();
 		resultDto.setAccountNo(account.getAccountNo());
 		resultDto.setCode("000");
 		AccountModel foundModel = null;
@@ -116,8 +146,10 @@ public class AccountDSImpl implements AccountDS {
 		} else {
 			String accountNo = account.getAccountNo();
 			String securityNo = account.getSecurityNo();
-			foundModel = accountMapper.getAccountByAccountNoAndSecurityNo(
-					accountNo, securityNo);
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			parameters.put("accountNo", accountNo);
+			parameters.put("securityNo", securityNo);
+			foundModel = accountMapper.getAccounts(parameters).get(0);
 		}
 
 		if (foundModel == null) {
@@ -137,10 +169,29 @@ public class AccountDSImpl implements AccountDS {
 		return resultDto;
 	}
 	@Override
-	public Set<AccountHistoryDto> getAllHistoryForAccount(String accountNo,
-			String securityNo, Integer accountType) throws Exception {
+	public Set<BillingTransactionDto> getAllTransactionsForAccount(
+			String accountNo, String securityNo, Integer accountType)
+			throws Exception {
 
 		return null;
+	}
+
+	@Override
+	public BillingTransactionDto getBillingTransactionByTransNo(String transNo)
+			throws Exception {
+		LOGGER.info("getBillingTransactionByTransNo start:{} ", transNo);
+		BillingTransactionDto billingTransactionDto = null;
+		AccountTransactionModel accountTransactionModel = accountTransMapper
+				.getAccountTransactionByTransNo(transNo);
+		if (accountTransactionModel == null) {
+			throw new NotFoundException(
+					"accountTransactionModel not found by no[" + transNo + "]");
+		}
+		billingTransactionDto = accountTransConverter
+				.toDto(accountTransactionModel);
+		LOGGER.info("getBillingTransactionByTransNo end:{} ",
+				billingTransactionDto);
+		return billingTransactionDto;
 	}
 
 }

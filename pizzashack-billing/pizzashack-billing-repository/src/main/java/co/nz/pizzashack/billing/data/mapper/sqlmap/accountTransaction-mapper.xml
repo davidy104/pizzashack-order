@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="co.nz.pizzashack.billing.data.mapper.AccountTransactionMapper">
+
+	<resultMap id="accountTransResultMap" type="accountTransaction">
+		<id property="accountTransId" column="ACCOUNT_TRANS_ID" />
+		<result property="accountTransNo" column="ACCOUNT_TRANS_NO" />
+		<result property="transType" column="TRANS_TYPE" />
+		<result property="transAmount" column="TRANS_AMT" />
+		<result property="createTime" column="CREATE_TIME" />
+
+		<association property="account" javaType="account">
+			<id property="accountId" column="account_id" />
+			<result property="accountNo" column="account_no" />
+			<result property="securityNo" column="security_no" />
+			<result property="balance" column="balance" />
+			<result property="accountType" column="account_type" />
+			<result property="createTime" column="create_time" />
+			<result property="expireDate" column="expire_date" />
+		</association>
+	</resultMap>
+
+	<insert id="saveAccountTrans" parameterType="accountTransaction">
+		<selectKey keyProperty="accountTransId" resultType="long"
+			order="BEFORE">
+			select
+			ACCOUNT_TRANS_SEQ.nextval from dual
+		</selectKey>
+		insert into
+		T_ACCOUNT_TRANSACTION(ACCOUNT_TRANS_ID,ACCOUNT_TRANS_NO,TRANS_AMT,create_time,trans_type,account_id)
+		values
+		(#{accountTransId},
+		#{accountTransNo},#{transAmount},#{createTime},#{transType},#{account.accountId})
+	</insert>
+
+	<update id="updateAccountTrans" parameterType="accountTransaction">
+		update T_ACCOUNT_TRANSACTION
+		<set>
+			<if test="transAmount != null">TRANS_AMT=#{transAmount},</if>
+			<if test="transType != null">trans_type=#{transType},</if>
+		</set>
+		where ACCOUNT_TRANS_ID = #{accountTransId}
+	</update>
+
+	<delete id="deleteAccountTrans" parameterType="long">
+		delete from
+		T_ACCOUNT_TRANSACTION
+		where
+		ACCOUNT_TRANS_ID = #{accountTransId}
+	</delete>
+
+	<select id="getAccountTransByNo" parameterType="String"
+		resultMap="accountTransResultMap">
+		SELECT * FROM T_ACCOUNT_TRANSACTION
+		where
+		account_trans_no =
+		#{accountTransNo}
+	</select>
+
+
+	<select id="getAccountTransactions" parameterType="hashmap"
+		resultMap="accountTransResultMap">
+		SELECT * FROM T_ACCOUNT_TRANSACTION
+		<where>
+			<include refid="searchConditions" />
+		</where>
+	</select>
+
+
+	<sql id="searchConditions">
+		<if test="accountTransId != null and accountTransId != '' ">
+			ACCOUNT_TRANS_ID = #{accountTransId}
+		</if>
+
+		<if test="accountTransNo != null and accountTransNo != '' ">
+			AND account_trans_no = #{accountTransNo}
+		</if>
+
+		<if test="transType != null">
+			AND trans_type = #{transType}
+		</if>
+	</sql>
+
+
+</mapper>

@@ -1,4 +1,4 @@
-package co.nz.pizzashack.billing.data.model;
+package co.nz.pizzashack.billing.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,8 +11,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.ibatis.type.Alias;
 
 @SuppressWarnings("serial")
-@Alias("accountHistory")
-public class AccountHistoryModel implements Serializable {
+@Alias("accountTransaction")
+public class AccountTransactionModel implements Serializable {
 
 	public enum TransType {
 		in(0), out(1);
@@ -27,19 +27,19 @@ public class AccountHistoryModel implements Serializable {
 		}
 	}
 
-	private Long accountHistoryId;
+	private Long accountTransId;
 	private String accountTransNo;
 	private AccountModel account;
 	private BigDecimal transAmount;
 	private Date createTime;
 	private Integer transType;
 
-	public Long getAccountHistoryId() {
-		return accountHistoryId;
+	public Long getAccountTransId() {
+		return accountTransId;
 	}
 
-	public void setAccountHistoryId(Long accountHistoryId) {
-		this.accountHistoryId = accountHistoryId;
+	public void setAccountTransId(Long accountTransId) {
+		this.accountTransId = accountTransId;
 	}
 
 	public String getAccountTransNo() {
@@ -89,18 +89,18 @@ public class AccountHistoryModel implements Serializable {
 
 	public static class Builder {
 
-		private AccountHistoryModel built;
+		private AccountTransactionModel built;
 
 		public Builder(String accountTransNo, AccountModel account,
 				Integer transType, BigDecimal transAmount) {
-			built = new AccountHistoryModel();
+			built = new AccountTransactionModel();
 			built.accountTransNo = accountTransNo;
 			built.account = account;
 			built.transType = transType;
 			built.transAmount = transAmount;
 		}
 
-		public AccountHistoryModel build() {
+		public AccountTransactionModel build() {
 			return built;
 		}
 	}
@@ -109,7 +109,7 @@ public class AccountHistoryModel implements Serializable {
 	public boolean equals(Object obj) {
 		EqualsBuilder builder = new EqualsBuilder();
 		return builder.append(this.accountTransNo,
-				((AccountHistoryModel) obj).accountTransNo).isEquals();
+				((AccountTransactionModel) obj).accountTransNo).isEquals();
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class AccountHistoryModel implements Serializable {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this, ToStringStyle.DEFAULT_STYLE)
-				.append("accountHistoryId", accountHistoryId)
+				.append("accountTransId", accountTransId)
 				.append("accountTransNo", accountTransNo)
 				.append("transAmount", transAmount)
 				.append("createTime", createTime)

@@ -5,21 +5,21 @@ import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 
 import co.nz.pizzashack.billing.ConvertException
-import co.nz.pizzashack.billing.data.dto.AccountHistoryDto
-import co.nz.pizzashack.billing.data.model.AccountHistoryModel
-import co.nz.pizzashack.billing.data.model.AccountModel
-import co.nz.pizzashack.billing.data.model.AccountHistoryModel.TransType
+import co.nz.pizzashack.billing.data.AccountModel
+import co.nz.pizzashack.billing.data.AccountTransactionModel
+import co.nz.pizzashack.billing.data.AccountTransactionModel.TransType
+import co.nz.pizzashack.billing.data.dto.BillingTransactionDto
 import co.nz.pizzashack.billing.utils.GeneralUtils
 
 @Component
 @Slf4j
-class AccountHistoryConverter implements GeneralConverter<AccountHistoryDto, AccountHistoryModel> {
+class AccountTransConverter implements GeneralConverter<BillingTransactionDto, AccountTransactionModel> {
 
 	@Override
-	AccountHistoryDto toDto(AccountHistoryModel model,
+	BillingTransactionDto toDto(AccountTransactionModel model,
 			Object... loadStrategies)  {
 		log.info "toDto start:{} $model"
-		AccountHistoryDto dto  = new AccountHistoryDto(accountHistId:model.accountHistoryId,accountTransNo:model.accountTransNo,transAmount:model.transAmount)
+		BillingTransactionDto dto  = new BillingTransactionDto(accountTransNo:model.accountTransNo,transAmount:model.transAmount)
 		if(model.createTime){
 			dto.createTime = GeneralUtils.dateToStr(model.createTime)
 		}
@@ -44,10 +44,10 @@ class AccountHistoryConverter implements GeneralConverter<AccountHistoryDto, Acc
 	}
 
 	@Override
-	AccountHistoryModel toModel(AccountHistoryDto dto,
+	AccountTransactionModel toModel(BillingTransactionDto dto,
 			Object... additionalMappingSource) {
 		log.info "toModel start:{} $dto"
-		AccountHistoryModel model = new AccountHistoryModel(transAmount:dto.transAmount)
+		AccountTransactionModel model = new AccountTransactionModel(transAmount:dto.transAmount)
 		if(dto.transType){
 			if(dto.transType == 'in'){
 				model.transType = TransType.in.value()

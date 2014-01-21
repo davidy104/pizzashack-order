@@ -1,4 +1,4 @@
-package co.nz.pizzashack.billing.data.model;
+package co.nz.pizzashack.billing.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.ibatis.type.Alias;
+
 
 @SuppressWarnings("serial")
 @Alias("account")
@@ -43,11 +44,11 @@ public class AccountModel implements Serializable {
 
 	private Date expireDate;
 
-	private Set<AccountHistoryModel> histories;
+	private Set<AccountTransactionModel> histories;
 
-	public void addAccountHistory(AccountHistoryModel accountHistory) {
+	public void addAccountHistory(AccountTransactionModel accountHistory) {
 		if (histories == null) {
-			histories = new HashSet<AccountHistoryModel>();
+			histories = new HashSet<AccountTransactionModel>();
 		}
 		histories.add(accountHistory);
 	}
@@ -145,11 +146,11 @@ public class AccountModel implements Serializable {
 		this.expireDate = expireDate;
 	}
 
-	public Set<AccountHistoryModel> getHistories() {
+	public Set<AccountTransactionModel> getHistories() {
 		return histories;
 	}
 
-	public void setHistories(Set<AccountHistoryModel> histories) {
+	public void setHistories(Set<AccountTransactionModel> histories) {
 		this.histories = histories;
 	}
 
