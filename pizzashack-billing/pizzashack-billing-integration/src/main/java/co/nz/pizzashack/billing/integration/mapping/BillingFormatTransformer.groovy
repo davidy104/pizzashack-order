@@ -41,7 +41,7 @@ class BillingFormatTransformer {
 		log.info "account:{} $account"
 		billingTrans.account = account
 
-		billingTrans.billingAmount = billingEle."billing-amount".text()
+		billingTrans.billingAmount = new BigDecimal(billingEle."billing-amount".text())
 		billingTrans.createTime = billingEle."create-time".text()
 
 		log.info "billingReqXmlUnmarshal end:{} $billingTrans"

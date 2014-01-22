@@ -75,9 +75,7 @@ public class BillingRoute extends RouteBuilder {
 				.to("sql:update T_BILLING_REQUEST_HISTORY set TRANS_NO = :#transactionNo, ACCOUNT_NO=:#accountNo, reasons = :#reasons, code = :#code where message_id = :#messageId")
 				.bean(billingFormatTransformer, "respXmlMarshal")
 				.to("log:output")
-				.to(OUTBOUND_END_POINT)
-				.to("controlbus:route?routeId=" + BILLING_REQULAR_ENDPOINT
-						+ "&action=stop&async=true");
+				.to(OUTBOUND_END_POINT);
 
 	}
 

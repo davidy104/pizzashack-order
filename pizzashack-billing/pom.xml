@@ -260,19 +260,6 @@
 				<version>${mybatis-spring.version}</version>
 			</dependency>
 
-
-			<dependency>
-				<groupId>org.apache.xbean</groupId>
-				<artifactId>xbean-spring</artifactId>
-				<version>${xbean.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
