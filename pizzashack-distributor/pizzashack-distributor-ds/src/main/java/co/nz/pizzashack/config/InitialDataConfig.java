@@ -9,7 +9,7 @@ import co.nz.pizzashack.ds.DepartmentDS;
 import co.nz.pizzashack.ds.StaffDS;
 import co.nz.pizzashack.ds.UserDS;
 import co.nz.pizzashack.ds.WorkflowDS;
-import co.nz.pizzashack.support.InitialDataSetup;
+import co.nz.pizzashack.support.WorkflowInitialDataSetup;
 
 @Configuration
 public class InitialDataConfig {
@@ -27,7 +27,8 @@ public class InitialDataConfig {
 	private WorkflowDS workflowDs;
 
 	@Bean(initMethod = "initialize")
-	public InitialDataSetup setupData() {
-		return new InitialDataSetup(userDs, departmentDs, staffDs, workflowDs);
+	public WorkflowInitialDataSetup setupWorkflowData() {
+		return new WorkflowInitialDataSetup(userDs, departmentDs, staffDs,
+				workflowDs);
 	}
 }

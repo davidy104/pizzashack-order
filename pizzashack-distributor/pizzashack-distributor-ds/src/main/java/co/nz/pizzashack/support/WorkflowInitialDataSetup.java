@@ -14,7 +14,7 @@ import co.nz.pizzashack.ds.StaffDS;
 import co.nz.pizzashack.ds.UserDS;
 import co.nz.pizzashack.ds.WorkflowDS;
 
-public class InitialDataSetup {
+public class WorkflowInitialDataSetup {
 
 	private UserDS userDs;
 
@@ -25,9 +25,9 @@ public class InitialDataSetup {
 	private WorkflowDS workflowDs;
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(InitialDataSetup.class);
+			.getLogger(WorkflowInitialDataSetup.class);
 
-	public InitialDataSetup(UserDS userDs, DepartmentDS departmentDs,
+	public WorkflowInitialDataSetup(UserDS userDs, DepartmentDS departmentDs,
 			StaffDS staffDs, WorkflowDS workflowDs) {
 		this.userDs = userDs;
 		this.departmentDs = departmentDs;
