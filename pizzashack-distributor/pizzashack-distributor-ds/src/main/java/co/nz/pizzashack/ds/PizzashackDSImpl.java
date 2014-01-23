@@ -38,7 +38,8 @@ public class PizzashackDSImpl implements PizzashackDS {
 				dto.setIcon(model.getIcon());
 				dto.setPizzaName(model.getPizzaName());
 				dto.setPizzashackId(model.getPizzashackId());
-				dto.setPrice(dto.getPrice());
+				dto.setPrice(model.getPrice());
+				LOGGER.info("pizzashack:{} ", dto);
 				results.add(dto);
 			}
 		}

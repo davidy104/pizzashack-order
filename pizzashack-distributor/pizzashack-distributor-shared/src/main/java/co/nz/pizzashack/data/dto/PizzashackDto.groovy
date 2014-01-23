@@ -9,6 +9,6 @@ class PizzashackDto implements Serializable{
 	Long pizzashackId
 	String pizzaName
 	String description
-	String price
+	BigDecimal price
 	String icon
 }

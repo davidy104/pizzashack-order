@@ -1,0 +1,48 @@
+@charset "utf-8";
+
+body {
+    background-color: #CCC8CC;
+}
+
+.page {
+    background-color: #FFFFFF;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+.form-buttons {
+    bottom: 20px;
+    float: right;
+    position: relative;
+}
+
+#content {
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    padding: 0;
+    width: 98%;
+}
+
+#pizza-list {
+    margin: 20px 0 20px 0;
+}
+
+.pizza-list-item {
+    margin-bottom: 10px;
+}
+
+label {
+    font-weight: bold;
+}
+
+legend {
+    margin-bottom: 20px;
+}
+
+#footer {
+    background: #000000;
+    height: 40px;
+}

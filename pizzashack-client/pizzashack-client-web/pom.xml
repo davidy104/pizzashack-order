@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>pizzashack-client-integration</artifactId>
+			<artifactId>pizzashack-client-ds</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
