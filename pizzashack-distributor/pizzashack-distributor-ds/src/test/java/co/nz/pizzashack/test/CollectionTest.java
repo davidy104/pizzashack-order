@@ -4,10 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+@Ignore
 public class CollectionTest {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -29,7 +30,7 @@ public class CollectionTest {
 		existedDeptIds.add(1L);
 		existedDeptIds.add(2L);
 		existedDeptIds.add(4L);
-//		existedDeptIds.add(3L);
+		// existedDeptIds.add(3L);
 	}
 
 	@Test
@@ -49,7 +50,7 @@ public class CollectionTest {
 		printList(newDeptIds);
 		LOGGER.info("newDeptIds print end :{} ");
 
-//		needRemoveDeptIds = unionSet;
+		// needRemoveDeptIds = unionSet;
 		existedDeptIds.removeAll(selectedIds);
 
 		LOGGER.info("needRemoveDeptIds print start :{} ");

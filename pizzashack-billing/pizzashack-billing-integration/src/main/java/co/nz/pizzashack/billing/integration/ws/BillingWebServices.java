@@ -12,7 +12,7 @@ import co.nz.pizzashack.billing.data.dto.BillingTransactionDto;
 @WebService
 public interface BillingWebServices {
 	AccountTransactionRespDto accountAuthentication(@WebParam AccountDto account)
-			throws FaultMessage;;
+			throws FaultMessage;
 
 	Set<BillingTransactionDto> getAllTransactionsForAccount(
 			@WebParam AccountDto account) throws FaultMessage;;

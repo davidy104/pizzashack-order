@@ -31,8 +31,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class OrderModel implements Serializable {
 
 	public enum OrderStatus {
-		dataEntry(0), pendingOnReview(3), pendingOnDeliver(5), delivered(7), rejected(
-				9);
+		dataEntry(0), pendingOnReview(3), pendingOnBilling(5), delivered(7), rejected(9);
 		OrderStatus(int value) {
 			this.value = value;
 		}

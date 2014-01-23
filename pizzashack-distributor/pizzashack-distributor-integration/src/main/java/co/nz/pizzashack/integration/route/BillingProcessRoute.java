@@ -43,11 +43,11 @@ public class BillingProcessRoute extends RouteBuilder {
 				.transform(billingVariableTransformer)
 				.setHeader("messageId", simple("${body.billingRequestId}"))
 				.to("direct:doBillingIntegration")
-				.wireTap("direct:receiveQueue")
+				.wireTap("direct:receiveBillingQueue")
 				.executorServiceRef("genericThreadPool");
 
-		from("direct:receiveQueue")
-				.routeId("direct:receiveQueue")
+		from("direct:receiveBillingQueue")
+				.routeId("direct:receiveBillingQueue")
 				.to("log:input")
 				.to("activiti:orderBillingProcess:receiveBillingResult")
 				.to("controlbus:route?routeId=direct:receiveQueue&action=stop&async=true");

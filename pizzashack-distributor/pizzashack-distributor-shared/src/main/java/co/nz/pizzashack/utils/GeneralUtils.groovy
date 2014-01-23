@@ -2,7 +2,6 @@ package co.nz.pizzashack.utils
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Date;
 
 class GeneralUtils {
 	static final Integer DEFAULT_ERROR_LENGTH = 255
@@ -49,7 +48,7 @@ class GeneralUtils {
 		return result
 	}
 
-	def static getExceptionInfo = {Throwable error->
+	static String getExceptionInfo(Throwable error) {
 		def stackStr
 		def errorStr
 		def getErrorStack = {Throwable e->
@@ -63,6 +62,23 @@ class GeneralUtils {
 			stackLength = stackStr.length()
 		}
 		errorStr = stackStr[0..stackLength]
-		errorStr
+		return errorStr
 	}
+
+	//	static getExceptionInfo = {Exception error->
+	//		def stackStr
+	//		def errorStr
+	//		def getErrorStack = {Exception e->
+	//			StringWriter sw = new StringWriter()
+	//			e.printStackTrace(new PrintWriter(sw))
+	//			stackStr = sw.toString()
+	//		}
+	//		getErrorStack(error)
+	//		def stackLength=DEFAULT_ERROR_LENGTH
+	//		if(stackStr.length()<stackLength){
+	//			stackLength = stackStr.length()
+	//		}
+	//		errorStr = stackStr[0..stackLength]
+	//		errorStr
+	//	}
 }

@@ -6,7 +6,6 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -29,7 +28,7 @@ import co.nz.pizzashack.support.SessionAttributeProcessor;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "co.nz.pizzashack")
+// @ComponentScan(basePackages = "co.nz.pizzashack")
 public class WebMvcContextConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -75,7 +74,7 @@ public class WebMvcContextConfiguration extends WebMvcConfigurerAdapter {
 	 * It provides a <code>paramName</code> property which sets the request
 	 * parameter to check for changing the language, the default is
 	 * <code>locale</code>.
-	 * 
+	 *
 	 * @return the {@link LocaleChangeInterceptor}
 	 */
 	@Bean
@@ -88,7 +87,7 @@ public class WebMvcContextConfiguration extends WebMvcConfigurerAdapter {
 	/**
 	 * The {@link LocaleResolver} implementation to use. Specifies where to
 	 * store the current selected locale.
-	 * 
+	 *
 	 * @return the {@link LocaleResolver}
 	 */
 	@Bean

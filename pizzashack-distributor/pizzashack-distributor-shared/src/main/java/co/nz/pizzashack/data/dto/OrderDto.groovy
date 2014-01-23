@@ -10,7 +10,7 @@ class OrderDto implements Serializable {
 	String orderNo
 	Set<OrderPizzaDto> pizzaOrders
 	Integer qty
-	String totalPrice
+	BigDecimal totalPrice
 
 	@Delegate
 	CustomerDto customer = new CustomerDto()

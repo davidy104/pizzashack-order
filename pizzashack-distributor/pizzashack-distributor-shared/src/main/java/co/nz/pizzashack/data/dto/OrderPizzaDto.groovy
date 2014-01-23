@@ -9,5 +9,5 @@ class OrderPizzaDto {
 	Long pizzaOrderId
 	String pizzaName
 	Integer qty
-	String totalPrice
+	BigDecimal totalPrice
 }

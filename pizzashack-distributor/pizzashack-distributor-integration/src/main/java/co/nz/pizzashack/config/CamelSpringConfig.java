@@ -11,6 +11,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
+import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.spi.ThreadPoolProfile;
 import org.apache.camel.spring.CamelBeanPostProcessor;
 import org.apache.camel.spring.SpringCamelContext;
@@ -42,6 +43,7 @@ public class CamelSpringConfig {
 
 	@Resource
 	private BillingProcessRoute billingProcessRoute;
+
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
@@ -105,7 +107,12 @@ public class CamelSpringConfig {
 		camelContext.getExecutorServiceManager().registerThreadPoolProfile(
 				custThreadPoolProfile());
 		camelContext.addComponent("jms", jmsComponent());
+
+		SimpleRegistry registry = new SimpleRegistry();
+
+		camelContext.setRegistry(registry);
 		camelContext.addRoutes(billingProcessRoute);
+
 		return camelContext;
 	}
 

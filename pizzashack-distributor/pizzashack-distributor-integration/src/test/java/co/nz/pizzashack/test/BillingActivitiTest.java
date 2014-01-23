@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,12 +19,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.nz.pizzashack.TestApplicationConfiguration;
 import co.nz.pizzashack.data.dto.BillingDto;
 import co.nz.pizzashack.data.dto.ProcessActivityDto;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestApplicationConfiguration.class)
+@Ignore("execute when billing app is running")
 public class BillingActivitiTest {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -63,24 +66,22 @@ public class BillingActivitiTest {
 		BillingDto billingDto = BillingTestUtils.mockBilling();
 		this.transactionalProcess(billingDto);
 
-
-
-//		String bizKey = billingDto.getOrderNo();
-//
-//		Map<String, Object> variables = new HashMap<String, Object>();
-//		variables.put("billingTrans", billingDto);
-//		ProcessInstance processInstance = runtimeService
-//				.startProcessInstanceById(definitionId, bizKey, variables);
-//		Thread.sleep(3000);
-//		boolean ifCompleted = activitiFacade.ifProcessFinishted(bizKey,
-//				definitionId);
-//		LOGGER.info("completed?:{}", ifCompleted);
-//		if (!ifCompleted) {
-//			ProcessActivityDto pendingActivity = activitiFacade
-//					.getExecutionActivityBasicInfo(bizKey, definitionId,
-//							processInstance.getId(), true, true);
-//			LOGGER.info("pendingActivity:{} ", pendingActivity);
-//		}
+		// String bizKey = billingDto.getOrderNo();
+		//
+		// Map<String, Object> variables = new HashMap<String, Object>();
+		// variables.put("billingTrans", billingDto);
+		// ProcessInstance processInstance = runtimeService
+		// .startProcessInstanceById(definitionId, bizKey, variables);
+		// Thread.sleep(3000);
+		// boolean ifCompleted = activitiFacade.ifProcessFinishted(bizKey,
+		// definitionId);
+		// LOGGER.info("completed?:{}", ifCompleted);
+		// if (!ifCompleted) {
+		// ProcessActivityDto pendingActivity = activitiFacade
+		// .getExecutionActivityBasicInfo(bizKey, definitionId,
+		// processInstance.getId(), true, true);
+		// LOGGER.info("pendingActivity:{} ", pendingActivity);
+		// }
 	}
 
 	@Transactional(value = "localTxManager", readOnly = false)

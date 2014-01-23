@@ -21,7 +21,12 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>pizzashack-distributor-ds</artifactId>
+			<artifactId>pizzashack-distributor-integration</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>pizzashack-distributor-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -80,6 +85,7 @@
 				<version>8.1.5.v20120716</version>
 
 				<configuration>
+					<jvmArgs>-Xmx2048m -Xms1536m -XX:PermSize=128m -XX:MaxPermSize=256m</jvmArgs>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<!-- <webApp> <contextPath>/pizzaWeb</contextPath> </webApp> -->
 					<connectors>

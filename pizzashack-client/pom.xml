@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>co.nz.pizzashack</groupId>
-	<artifactId>pizzashack-distributor</artifactId>
+	<groupId>co.nz.pizzashack.client</groupId>
+	<artifactId>pizzashack-client</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>pizzashack-distributor</name>
-	<url>http://pizzashack.co.nz</url>
+	<name>pizzashack-client</name>
+	<url>http://maven.apache.org</url>
 
 	<properties>
 		<activiti.version>5.14</activiti.version>
@@ -793,14 +794,6 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.6</version>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<argLine>-Xmx1024m</argLine>
-				</configuration>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -907,7 +900,11 @@
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>2.1</version>
 				</plugin>
-
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
@@ -918,11 +915,6 @@
 
 	</build>
 	<modules>
-		<module>pizzashack-distributor-shared</module>
-		<module>pizzashack-distributor-repository</module>
-		<module>pizzashack-distributor-ds</module>
-		<module>pizzashack-distributor-integration</module>
-		<module>pizzashack-distributor-web</module>
-    <module>pizzashack-distributor-api</module>
-  </modules>
+		<module>pizzashack-client-shared</module>
+	</modules>
 </project>

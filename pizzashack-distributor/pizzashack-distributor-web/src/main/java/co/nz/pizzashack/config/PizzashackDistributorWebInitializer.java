@@ -18,8 +18,11 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-public class PizzashackDistributorWebInitializer implements
-		WebApplicationInitializer {
+import co.nz.pizzashack.api.config.JerseySpringServlet;
+
+public class PizzashackDistributorWebInitializer
+		implements
+			WebApplicationInitializer {
 
 	private static final String DISPATCHER_SERVLET_NAME = "dispatcher";
 
@@ -33,7 +36,6 @@ public class PizzashackDistributorWebInitializer implements
 			throws ServletException {
 		LOGGER.debug("onStartup:{}");
 
-		registerListener(servletContext);
 		registerDispatcherServlet(servletContext);
 		registerSitemesh(servletContext);
 
@@ -52,21 +54,28 @@ public class PizzashackDistributorWebInitializer implements
 	}
 
 	private void registerDispatcherServlet(ServletContext servletContext) {
-		AnnotationConfigWebApplicationContext dispatcherContext = createContext(WebMvcContextConfiguration.class);
+		AnnotationConfigWebApplicationContext rootContext = createContext(
+				ApplicationConfiguration.class,
+				WebMvcContextConfiguration.class);
 		ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
-				DISPATCHER_SERVLET_NAME, new DispatcherServlet(
-						dispatcherContext));
+				DISPATCHER_SERVLET_NAME, new DispatcherServlet(rootContext));
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping(DISPATCHER_SERVLET_MAPPING);
-	}
 
-	private void registerListener(ServletContext servletContext) {
-		AnnotationConfigWebApplicationContext rootContext = createContext(
-				ApplicationConfiguration.class, ViewConfiguration.class,
-				InfrastructureContextConfiguration.class);
+		// for Jersey REST
+		ServletRegistration.Dynamic jerseyServletDispatcher = servletContext
+				.addServlet("JerseySpringServlet", JerseySpringServlet.class);
+		jerseyServletDispatcher.setLoadOnStartup(1);
+		jerseyServletDispatcher.addMapping("/rest/*");
+
 		servletContext.addListener(new ContextLoaderListener(rootContext));
-
 	}
+
+	// private void registerListener(ServletContext servletContext) {
+	// AnnotationConfigWebApplicationContext rootContext =
+	// createContext(ApplicationConfiguration.class);
+	// servletContext.addListener(new ContextLoaderListener(rootContext));
+	// }
 
 	private AnnotationConfigWebApplicationContext createContext(
 			final Class<?>... annotatedClasses) {
