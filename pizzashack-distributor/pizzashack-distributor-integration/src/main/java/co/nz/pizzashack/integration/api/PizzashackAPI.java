@@ -1,4 +1,4 @@
-package co.nz.pizzashack.api;
+package co.nz.pizzashack.integration.api;
 
 import javax.ws.rs.core.Response;
 

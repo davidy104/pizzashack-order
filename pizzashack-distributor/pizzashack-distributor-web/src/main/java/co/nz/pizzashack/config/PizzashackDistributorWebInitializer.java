@@ -18,7 +18,6 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import co.nz.pizzashack.api.config.JerseySpringServlet;
 
 public class PizzashackDistributorWebInitializer
 		implements

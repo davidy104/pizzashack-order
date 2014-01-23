@@ -1,4 +1,4 @@
-package co.nz.pizzashack.api.impl;
+package co.nz.pizzashack.integration.api.impl;
 
 import java.util.Set;
 
@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import co.nz.pizzashack.api.GenericAPIError;
-import co.nz.pizzashack.api.PizzashackAPI;
-import co.nz.pizzashack.api.PizzashackAPIUtils;
 import co.nz.pizzashack.data.dto.PizzashackDto;
 import co.nz.pizzashack.ds.PizzashackDS;
+import co.nz.pizzashack.integration.api.GenericAPIError;
+import co.nz.pizzashack.integration.api.PizzashackAPI;
+import co.nz.pizzashack.integration.api.PizzashackAPIUtils;
 
 @Component
 @Path("/v1")

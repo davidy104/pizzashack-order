@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class PizzashackDSImpl implements PizzashackDS {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PizzashackDSImpl.class);
 
+	@Resource
 	private PizzashackRepository pizzashackRepository;
 
 	@Override
