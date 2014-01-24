@@ -36,8 +36,9 @@ class ActivityDiscountRateConverter implements GeneralConverter<ActivityDiscount
 	ActivityDiscountRateModel toModel(ActivityDiscountRateDto dto,
 			Object... additionalMappingSource) {
 		log.info "toModel start:{} $dto"
-		ActivityDiscountRateModel model = new ActivityDiscountRateModel(activityCode:dto.activityCode,description:dto.description,
-		rate:dto.rate)
+		ActivityDiscountRateModel model = new ActivityDiscountRateModel(activityCode:dto.activityCode,
+			description:dto.description,
+			rate:dto.rate)
 
 		if(dto.effectTime){
 			model.effectiveTime = GeneralUtils.strToDate(dto.effectTime)
