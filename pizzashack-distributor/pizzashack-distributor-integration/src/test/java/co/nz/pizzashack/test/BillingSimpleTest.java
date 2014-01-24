@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import co.nz.pizzashack.TestApplicationConfiguration;
+import co.nz.pizzashack.config.ApplicationConfiguration;
 import co.nz.pizzashack.data.dto.BillingDto;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestApplicationConfiguration.class)
+@ContextConfiguration(classes = ApplicationConfiguration.class)
 @Ignore("execute when billing app is running")
 public class BillingSimpleTest {
 

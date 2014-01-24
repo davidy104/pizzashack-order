@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="orderCoreProcess" name="My process" isExecutable="true">
+  <process id="orderCoreProcess" name="Order Core Process" isExecutable="true">
     <startEvent id="startevent1" name="Start"></startEvent>
-    <scriptTask id="calculation" name="Calculation" scriptFormat="groovy" activiti:autoStoreVariables="false"></scriptTask>
-    <scriptTask id="autounderwriting" name="Auto underwriting" scriptFormat="groovy" activiti:autoStoreVariables="false"></scriptTask>
+    <scriptTask id="calculation" name="Calculation" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>out:println "start calculate: " + orderTransBean;
+OrderDto order = orderTransBean.order;
+pizzashackCaculator.apCaculate(order);
+out:println "after calculation: " + order;</script>
+    </scriptTask>
+    <scriptTask id="autounderwriting" name="Auto underwriting" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>def order = orderTransBean.order;
+def orderReviewStatus=0;
+out:println "total qty: " + order.qty;
+if(order.qty &gt; 10){
+	orderReviewStatus=1;
+}
+out:println "after autoreview: " + orderReviewStatus;</script>
+    </scriptTask>
     <userTask id="manualunderwriting" name="Manual underwriting" activiti:candidateGroups="1"></userTask>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
@@ -15,17 +28,24 @@
     <sequenceFlow id="flow2" sourceRef="calculation" targetRef="autounderwriting"></sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="autounderwriting" targetRef="exclusivegateway1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="manualunderwriting">
+      <extensionElements>
+        <activiti:executionListener event="take" expression="#{toManualReviewExecutionListener.execute(execution)}"></activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderProcessStatus == 0}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow5" sourceRef="manualunderwriting" targetRef="exclusivegateway2"></sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="terminateendevent1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderProcessStatus == 1}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderReviewStatus == 1}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow7" sourceRef="exclusivegateway2" targetRef="terminateendevent1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderProcessStatus == 1}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderReviewStatus == 1}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow8" sourceRef="exclusivegateway1" targetRef="endevent1"></sequenceFlow>
-    <sequenceFlow id="flow9" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderReviewStatus == 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="exclusivegateway2" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${orderReviewStatus == 0}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_orderCoreProcess">
     <bpmndi:BPMNPlane bpmnElement="orderCoreProcess" id="BPMNPlane_orderCoreProcess">

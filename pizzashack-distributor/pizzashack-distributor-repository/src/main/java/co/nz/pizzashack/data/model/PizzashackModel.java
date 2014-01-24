@@ -2,7 +2,9 @@ package co.nz.pizzashack.data.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,8 +41,19 @@ public class PizzashackModel implements Serializable {
 	@Column(name = "ICON")
 	private String icon;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pizzashack")
+	private Set<ActivityDiscountRateModel> activityDiscountRateSet;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "orderPizzashackPK.pizzashack")
 	private List<OrderPizzashackModel> orderPizzashackModels;
+
+	public void addActivityDiscountRate(
+			ActivityDiscountRateModel activityDiscountRate) {
+		if (activityDiscountRateSet == null) {
+			activityDiscountRateSet = new HashSet<ActivityDiscountRateModel>();
+		}
+		activityDiscountRateSet.add(activityDiscountRate);
+	}
 
 	public List<OrderPizzashackModel> getOrderPizzashackModels() {
 		return orderPizzashackModels;
@@ -89,6 +102,15 @@ public class PizzashackModel implements Serializable {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public Set<ActivityDiscountRateModel> getActivityDiscountRateSet() {
+		return activityDiscountRateSet;
+	}
+
+	public void setActivityDiscountRateSet(
+			Set<ActivityDiscountRateModel> activityDiscountRateSet) {
+		this.activityDiscountRateSet = activityDiscountRateSet;
 	}
 
 	public static Builder getBuilder(String pizzaName, String description,

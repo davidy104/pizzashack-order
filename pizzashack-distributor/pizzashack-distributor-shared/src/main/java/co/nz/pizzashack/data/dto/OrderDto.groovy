@@ -8,21 +8,23 @@ import groovy.transform.ToString
 class OrderDto implements Serializable {
 	Long orderId
 	String orderNo
-	Set<OrderPizzaDto> pizzaOrders
+	Set<OrderDetailsDto> orderDetailsSet
 	Integer qty
 	BigDecimal totalPrice
 
 	@Delegate
 	CustomerDto customer = new CustomerDto()
 	String address
+
+	//dataEntry,pendingBilling,pendingReview,rejected,delivered
 	String status
 	String orderTime
 	String deliverTime
 
-	void addPizzaOrder(OrderPizzaDto pizzaOrder){
-		if(!pizzaOrders){
-			pizzaOrders = new HashSet<OrderPizzaDto>()
+	void addPizzaOrder(OrderDetailsDto orderDetails){
+		if(!orderDetailsSet){
+			orderDetailsSet = new HashSet<OrderDetailsDto>()
 		}
-		pizzaOrders << pizzaOrder
+		orderDetailsSet << orderDetails
 	}
 }

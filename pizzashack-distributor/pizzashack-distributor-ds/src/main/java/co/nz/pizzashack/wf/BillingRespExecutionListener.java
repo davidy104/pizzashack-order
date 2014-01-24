@@ -1,5 +1,7 @@
 package co.nz.pizzashack.wf;
 
+import static co.nz.pizzashack.DistributorConstants.BILLING_SUB_PROCESS_OBJ;
+
 import java.util.Map;
 
 import org.activiti.engine.impl.pvm.delegate.ExecutionListenerExecution;
@@ -17,8 +19,10 @@ public class BillingRespExecutionListener {
 
 	public void execute(ExecutionListenerExecution execution) throws Exception {
 		LOGGER.info("BillingRespExecutionListener execute start:{}");
+
 		BillingDto billingTrans = (BillingDto) execution
-				.getVariable("billingTrans");
+				.getVariable(BILLING_SUB_PROCESS_OBJ);
+
 		LOGGER.info("get billing after integration:{}", billingTrans);
 
 		Integer billingProcessStatus = 0;

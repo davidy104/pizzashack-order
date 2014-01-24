@@ -10,11 +10,11 @@ class OrderProcessDto implements Serializable{
 	@Delegate
 	OrderDto order = new OrderDto()
 
-	private String mainProcessInstanceId;
-	private String mainProcessDefinitionId;
+	String mainProcessInstanceId
+	String mainProcessDefinitionId
 
-	private String activeProcesssInstanceId;
-	private String activeProcessDefinitionId;
+	String activeProcesssInstanceId
+	String activeProcessDefinitionId
 
 	String createTime
 	String completeTime

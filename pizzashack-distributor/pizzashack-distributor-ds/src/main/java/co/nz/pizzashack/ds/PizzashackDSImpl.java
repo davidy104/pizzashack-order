@@ -1,5 +1,6 @@
 package co.nz.pizzashack.ds;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import co.nz.pizzashack.data.dto.PizzashackDto;
 import co.nz.pizzashack.data.model.PizzashackModel;
 import co.nz.pizzashack.data.repository.PizzashackRepository;
+import co.nz.pizzashack.support.PizzashackCaculator;
 
 @Service
 @Transactional(value = "localTxManager", readOnly = true)
@@ -25,6 +27,9 @@ public class PizzashackDSImpl implements PizzashackDS {
 	@Resource
 	private PizzashackRepository pizzashackRepository;
 
+	@Resource
+	private PizzashackCaculator pizzashackCaculator;
+
 	@Override
 	public Set<PizzashackDto> getAllItems() throws Exception {
 		LOGGER.info("getAllItems start:{} ");
@@ -33,6 +38,7 @@ public class PizzashackDSImpl implements PizzashackDS {
 		if (modelList != null && modelList.size() > 0) {
 			results = new HashSet<PizzashackDto>();
 			for (PizzashackModel model : modelList) {
+
 				PizzashackDto dto = new PizzashackDto();
 				dto.setDescription(model.getDescription());
 				dto.setIcon(model.getIcon());
@@ -40,6 +46,15 @@ public class PizzashackDSImpl implements PizzashackDS {
 				dto.setPizzashackId(model.getPizzashackId());
 				dto.setPrice(model.getPrice());
 				LOGGER.info("pizzashack:{} ", dto);
+
+				BigDecimal discountRate = pizzashackCaculator
+						.getDiscountForPizza(model);
+				if (discountRate.compareTo(BigDecimal.ZERO) == 1) {
+					BigDecimal discountPrice = model.getPrice().subtract(
+							model.getPrice().multiply(discountRate));
+					dto.setAfterDiscount(discountPrice);
+				}
+
 				results.add(dto);
 			}
 		}

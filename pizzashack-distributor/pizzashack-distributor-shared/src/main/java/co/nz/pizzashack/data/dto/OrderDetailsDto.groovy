@@ -5,8 +5,8 @@ import groovy.transform.ToString
 
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["pizzaName"])
-class OrderPizzaDto {
-	Long pizzaOrderId
+class OrderDetailsDto {
+	Long orderDetailId
 	String pizzaName
 	Integer qty
 	BigDecimal totalPrice
