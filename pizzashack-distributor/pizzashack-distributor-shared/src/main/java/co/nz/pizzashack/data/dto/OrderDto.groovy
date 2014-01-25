@@ -16,7 +16,7 @@ class OrderDto implements Serializable {
 	CustomerDto customer = new CustomerDto()
 	String address
 
-	//dataEntry,pendingBilling,pendingReview,rejected,delivered
+	//dataEntry,pendingOnBilling,pendingOnReview,rejected,delivered
 	String status
 	String orderTime
 	String deliverTime

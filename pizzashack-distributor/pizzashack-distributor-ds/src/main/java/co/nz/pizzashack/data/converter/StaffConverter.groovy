@@ -142,7 +142,6 @@ class StaffConverter implements GeneralConverter<StaffDto, StaffModel> {
 					break
 				default :
 					model.level = StaffLevel.junior.value()
-					break
 			}
 		}
 
@@ -156,7 +155,6 @@ class StaffConverter implements GeneralConverter<StaffDto, StaffModel> {
 					break
 				default :
 					model.role = StaffRole.operator.value()
-					break
 			}
 		}
 

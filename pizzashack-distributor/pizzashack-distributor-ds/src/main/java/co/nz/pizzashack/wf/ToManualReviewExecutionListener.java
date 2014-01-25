@@ -3,6 +3,8 @@ package co.nz.pizzashack.wf;
 import static co.nz.pizzashack.DistributorConstants.INDEPENDENT_PROCESS_FLAG;
 import static co.nz.pizzashack.DistributorConstants.ORDER_MAIN_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.ORDER_SUB_PROCESS_OBJ;
+import static co.nz.pizzashack.DistributorConstants.REVIEW_MAIN_PROCESS_OBJ;
+import static co.nz.pizzashack.DistributorConstants.REVIEW_SUB_PROCESS_OBJ;
 
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.delegate.ExecutionListenerExecution;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import co.nz.pizzashack.data.dto.OrderProcessDto;
+import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
 
 @Component("toManualReviewExecutionListener")
 public class ToManualReviewExecutionListener {
@@ -22,6 +25,7 @@ public class ToManualReviewExecutionListener {
 		LOGGER.info("ToManualReviewExecutionListener start:{} ");
 		LOGGER.info("eventName:{} ", execution.getEventName());
 		boolean indenpendentProcess = true;
+
 		indenpendentProcess = (Boolean) execution
 				.getVariable(INDEPENDENT_PROCESS_FLAG);
 
@@ -42,6 +46,7 @@ public class ToManualReviewExecutionListener {
 		LOGGER.info("activitiProcessDefinitionId:{}",
 				activitiProcessDefinitionId);
 		LOGGER.info("activitiProcesssInstanceId:{}", activitiProcesssInstanceId);
+
 		parentExecutionEntity = ((ExecutionEntity) execution)
 				.getSuperExecution();
 
@@ -62,6 +67,13 @@ public class ToManualReviewExecutionListener {
 					.setBusinessKey(orderProcess.getOrder().getOrderNo());
 		}
 
+		// get autoreview variable and set it to main flow
+		OrderReviewRecordDto orderReviewRecord = (OrderReviewRecordDto) execution
+				.getVariable(REVIEW_SUB_PROCESS_OBJ);
+		LOGGER.info("get orderReviewRecord:{} ", orderReviewRecord);
+
+		parentExecutionEntity.setVariable(REVIEW_MAIN_PROCESS_OBJ,
+				orderReviewRecord);
 		parentExecutionEntity.setVariable(ORDER_MAIN_PROCESS_OBJ, orderProcess);
 	}
 }

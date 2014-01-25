@@ -17,7 +17,7 @@ import co.nz.pizzashack.client.ds.PizzashackDS
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-@Ignore("run when service is ready")
+//@Ignore("run when service is ready")
 class PizzashackRestTest {
 
 	@Resource

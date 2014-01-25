@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import co.nz.pizzashack.data.dto.DepartmentDto;
 import co.nz.pizzashack.data.dto.StaffDto;
 import co.nz.pizzashack.data.dto.UserDto;
+import co.nz.pizzashack.data.dto.WorkflowDto;
 import co.nz.pizzashack.ds.DepartmentDS;
 import co.nz.pizzashack.ds.StaffDS;
 import co.nz.pizzashack.ds.UserDS;
@@ -47,6 +48,7 @@ public class WorkflowInitialDataSetup {
 		DepartmentDto deptDto = new DepartmentDto();
 		deptDto.setDeptName("Order manager");
 		deptDto = departmentDs.createDepartment(deptDto);
+		LOGGER.info("department:{} ", deptDto);
 
 		Set<Long> deptIds = new HashSet<Long>();
 		deptIds.add(deptDto.getDeptId());
@@ -80,5 +82,17 @@ public class WorkflowInitialDataSetup {
 		staff.setRole("manager");
 		staff.setUser(johnUser);
 		staffDs.createStaff(staff, deptIds);
+
+		WorkflowDto workflow = workflowDs.deployWorkflow("orderBillingProcess",
+				"order", "bpmn/OrderBillingProcess.bpmn20.xml");
+		LOGGER.info("deploy billing process, workflow:{} ", workflow);
+
+		workflow = workflowDs.deployWorkflow("orderCoreProcess", "order",
+				"bpmn/OrdercoreProcess.bpmn20.xml");
+		LOGGER.info("deploy core process, workflow:{} ", workflow);
+
+		workflow = workflowDs.deployWorkflow("orderlocalProcess", "order",
+				"bpmn/OrderlocalProcess.bpmn20.xml");
+		LOGGER.info("deploy local main process, workflow:{} ", workflow);
 	}
 }

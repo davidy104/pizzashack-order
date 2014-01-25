@@ -59,6 +59,22 @@ public class OrderReviewRecordModel implements Serializable {
 	@Column(name = "REVIEW_STATUS")
 	private Integer reviewStatus = ReviewStatus.pending.value();
 
+	public OrderModel getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderModel order) {
+		this.order = order;
+	}
+
+	public StaffModel getReviewer() {
+		return reviewer;
+	}
+
+	public void setReviewer(StaffModel reviewer) {
+		this.reviewer = reviewer;
+	}
+
 	public Long getReviewRecordId() {
 		return reviewRecordId;
 	}

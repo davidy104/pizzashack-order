@@ -31,7 +31,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class OrderModel implements Serializable {
 
 	public enum OrderStatus {
-		dataEntry(0), pendingOnReview(3), pendingOnBilling(5), delivered(7), rejected(9);
+		dataEntry(0), pendingOnReview(3), pendingOnBilling(5), delivered(7), rejected(
+				9);
 		OrderStatus(int value) {
 			this.value = value;
 		}
@@ -44,7 +45,7 @@ public class OrderModel implements Serializable {
 	}
 
 	public enum PaymentStatus {
-		payied(1), unpay(0);
+		paied(1), unpay(0), rejected(2);
 		PaymentStatus(int value) {
 			this.value = value;
 		}
@@ -74,8 +75,14 @@ public class OrderModel implements Serializable {
 	@Column(name = "STATUS")
 	private Integer status;
 
+	@Column(name = "SHIP_ADDRESS")
+	private String shipAddress;
+
 	@Column(name = "PAYMENT_STATUS")
-	private Integer paymentStatus;
+	private Integer paymentStatus = PaymentStatus.unpay.value();
+
+	@Column(name = "PAYMENT_REMARKS")
+	private String paymentRemarks;
 
 	@Column(name = "TOTAL_PRICE")
 	private BigDecimal totalPrice;
@@ -88,7 +95,7 @@ public class OrderModel implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date deliverTime;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, mappedBy = "orderPizzashackPK.order")
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL }, mappedBy = "orderPizzashackPK.order")
 	private List<OrderPizzashackModel> orderPizzashackModels;
 
 	public void addOrderPizzashack(OrderPizzashackModel orderPizzashack) {
@@ -179,8 +186,24 @@ public class OrderModel implements Serializable {
 		this.orderTime = orderTime;
 	}
 
+	public String getShipAddress() {
+		return shipAddress;
+	}
+
+	public void setShipAddress(String shipAddress) {
+		this.shipAddress = shipAddress;
+	}
+
 	public static Builder getBuilder(CustomerModel customer) {
 		return new Builder(customer);
+	}
+
+	public String getPaymentRemarks() {
+		return paymentRemarks;
+	}
+
+	public void setPaymentRemarks(String paymentRemarks) {
+		this.paymentRemarks = paymentRemarks;
 	}
 
 	public static class Builder {
