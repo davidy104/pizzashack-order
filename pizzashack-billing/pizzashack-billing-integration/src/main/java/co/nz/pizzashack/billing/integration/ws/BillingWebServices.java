@@ -15,5 +15,9 @@ public interface BillingWebServices {
 			throws FaultMessage;
 
 	Set<BillingTransactionDto> getAllTransactionsForAccount(
-			@WebParam AccountDto account) throws FaultMessage;;
+			@WebParam AccountDto account) throws FaultMessage;
+
+	AccountTransactionRespDto billingProcess(
+			@WebParam BillingTransactionDto billingTransaction)
+			throws FaultMessage;
 }

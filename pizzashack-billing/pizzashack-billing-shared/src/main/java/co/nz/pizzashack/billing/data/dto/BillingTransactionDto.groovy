@@ -14,22 +14,23 @@ import co.nz.pizzashack.billing.utils.BigDecimalAdapter
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["accountTransNo"])
 
-@XmlRootElement
+@XmlRootElement(name="billing")
 @XmlAccessorType(XmlAccessType.FIELD)
 class BillingTransactionDto {
 
-	@XmlElement
+	@XmlElement(name="account-transaction-no")
 	String accountTransNo
+	
 	@Delegate
 	AccountDto account= new AccountDto()
 
-	@XmlElement
+	@XmlElement(name="transaction-type")
 	String transType
 
-	@XmlElement
+	@XmlElement(name="billing-amount")
 	@XmlJavaTypeAdapter(BigDecimalAdapter.class)
 	BigDecimal billingAmount
 
-	@XmlElement
+	@XmlElement(name="create-time")
 	String createTime
 }

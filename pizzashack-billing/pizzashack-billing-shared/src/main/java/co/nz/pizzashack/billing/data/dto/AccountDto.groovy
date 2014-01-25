@@ -13,25 +13,25 @@ import co.nz.pizzashack.billing.utils.BigDecimalAdapter
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["accountNo","securityNo"])
 
-@XmlRootElement
+@XmlRootElement(name="account")
 @XmlAccessorType(XmlAccessType.FIELD)
 class AccountDto implements Serializable{
 	Long accountId
 
 	//credit,debit
-	@XmlElement
+	@XmlElement(name="account-type")
 	String paymode
 
-	@XmlElement
+	@XmlElement(name="account-no")
 	String accountNo
 
 	@XmlElement
 	@XmlJavaTypeAdapter(BigDecimalAdapter.class)
 	BigDecimal balance
 
-	@XmlElement
+	@XmlElement(name="expire-date")
 	String expireDate
 
-	@XmlElement
+	@XmlElement(name="security-no")
 	String securityNo
 }

@@ -25,6 +25,12 @@ public class BillingResponseMergeProcessor implements Processor {
 		billingTrans.setBillingCode(billingResp.getBillingCode());
 		billingTrans.setBillingMessage(billingResp.getBillingMessage());
 		inMessage.setBody(billingTrans);
+//		Integer billingProcessStatus = 0;
+//		if(!billingTrans.getBillingCode().equals("000")){
+//			billingProcessStatus = 1;
+//			
+//		}
+//		exchange.setProperty("billingProcessStatus", billingProcessStatus);
 	}
 
 }

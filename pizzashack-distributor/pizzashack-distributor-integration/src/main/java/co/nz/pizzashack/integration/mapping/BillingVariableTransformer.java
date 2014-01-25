@@ -20,7 +20,7 @@ public class BillingVariableTransformer implements Expression {
 	public <T> T evaluate(Exchange exchange, Class<T> type) {
 		Map variablesFromProcess = exchange.getIn().getBody(Map.class);
 		BillingDto billing = (BillingDto) variablesFromProcess
-				.get("billingTrans");
+				.get("billingTransBean");
 		LOGGER.info("after transform billing:{} ", billing);
 		return (T) billing;
 	}

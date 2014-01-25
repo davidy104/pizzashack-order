@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 import co.nz.pizzashack.integration.mapping.BillingFormatTransformer;
 import co.nz.pizzashack.integration.mapping.BillingResponseMergeProcessor;
 import co.nz.pizzashack.integration.mapping.BillingVariableTransformer;
+import co.nz.pizzashack.integration.utils.SleepBean;
 
-@Component
+//@Component
 public class BillingProcessRoute extends RouteBuilder {
 
 	public static final String MQ_ENDPOINT = "jms:queue:pizzashackBillingInbound?transacted=true&replyTo=pizzashackBillingOutbound&replyToType=Exclusive&requestTimeout=10s";
@@ -26,6 +27,9 @@ public class BillingProcessRoute extends RouteBuilder {
 	@Resource
 	private BillingResponseMergeProcessor billingResponseMergeProcessor;
 
+	@Resource
+	private SleepBean sleepBean;
+
 	@Override
 	public void configure() throws Exception {
 
@@ -33,8 +37,11 @@ public class BillingProcessRoute extends RouteBuilder {
 				"activiti:orderBillingProcess:billingIntegration?copyVariablesToBodyAsMap=true")
 				.routeId("activitiBillingProcess")
 				.to("log:input")
-				.to(BILLING_INTEGRATION_ENDPOINT)
-				.to("controlbus:route?routeId=activitiBillingProcess&action=stop&async=true");
+				.setHeader(
+						"destination",
+						constant("activiti:orderBillingProcess:receiveBillingResult"))
+				.to(BILLING_INTEGRATION_ENDPOINT);
+		// .to("controlbus:route?routeId=activitiBillingProcess&action=stop&async=true");
 		// .wireTap(BILLING_INTEGRATION_ENDPOINT)
 		// .executorServiceRef("genericThreadPool");
 
@@ -43,14 +50,15 @@ public class BillingProcessRoute extends RouteBuilder {
 				.transform(billingVariableTransformer)
 				.setHeader("messageId", simple("${body.billingRequestId}"))
 				.to("direct:doBillingIntegration")
-				.wireTap("direct:receiveBillingQueue")
-				.executorServiceRef("genericThreadPool");
+				.recipientList(header("destination"));
+		// .wireTap("direct:receiveBillingQueue")
+		// .executorServiceRef("genericThreadPool");
 
 		from("direct:receiveBillingQueue")
-				.routeId("direct:receiveBillingQueue")
-				.to("log:input")
-				.to("activiti:orderBillingProcess:receiveBillingResult")
-				.to("controlbus:route?routeId=direct:receiveQueue&action=stop&async=true");
+				.routeId("direct:receiveBillingQueue").to("log:input")
+				.recipientList(header("destination"));
+		// .to("activiti:orderBillingProcess:receiveBillingResult")
+		// .to("controlbus:route?routeId=direct:receiveBillingQueue&action=stop&async=true");
 
 		from("direct:doBillingIntegration")
 				.setExchangePattern(ExchangePattern.InOut)
@@ -61,5 +69,6 @@ public class BillingProcessRoute extends RouteBuilder {
 				.to("log:myLog?showAll=true")
 				.bean(billingFormatTransformer, "billingRespXmalUnmarshal")
 				.process(billingResponseMergeProcessor);
+		// .bean(sleepBean, "sleep");
 	}
 }

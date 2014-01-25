@@ -10,13 +10,13 @@ import javax.xml.bind.annotation.XmlRootElement
 
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["transactionNo"])
-@XmlRootElement
+@XmlRootElement(name="account-transaction")
 @XmlAccessorType(XmlAccessType.FIELD)
 class AccountTransactionRespDto implements Serializable{
 	Long accountId
-	@XmlElement
+	@XmlElement(name="transaction-no")
 	String transactionNo
-	@XmlElement
+	@XmlElement(name="account-no")
 	String accountNo
 	//000: accept;
 	//001:account not found;
@@ -25,6 +25,6 @@ class AccountTransactionRespDto implements Serializable{
 	String code
 	@XmlElement
 	String reasons
-	@XmlElement
+	@XmlElement(name="create-time")
 	String createTime
 }

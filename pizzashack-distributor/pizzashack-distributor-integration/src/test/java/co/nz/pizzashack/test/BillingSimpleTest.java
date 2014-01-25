@@ -23,6 +23,7 @@ public class BillingSimpleTest {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BillingSimpleTest.class);
+
 	@Test
 	public void testSimpleBillingRoute() {
 
