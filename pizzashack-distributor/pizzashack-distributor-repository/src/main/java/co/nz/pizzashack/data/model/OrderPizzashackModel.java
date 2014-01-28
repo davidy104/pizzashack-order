@@ -30,7 +30,7 @@ public class OrderPizzashackModel {
 	private Long orderPizzashackId;
 
 	@Embedded
-	private OrderPizzashackPK orderPizzashackPK;
+	private OrderPizzashackPK orderPizzashackPK = new OrderPizzashackPK();
 
 	@Column(name = "QTY")
 	private Integer qty;

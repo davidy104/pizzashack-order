@@ -24,7 +24,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.JmsTransactionManager;
 
-import co.nz.pizzashack.integration.route.WsBillingProcessRoute;
+import co.nz.pizzashack.integration.route.BillingProcessRoute;
 
 @Configuration
 @PropertySource("classpath:activitymq-config.properties")
@@ -45,11 +45,11 @@ public class CamelSpringConfig {
 	@Inject
 	private ApplicationContext context;
 
-	// @Resource
-	// private BillingProcessRoute billingProcessRoute;
-
 	@Resource
-	private WsBillingProcessRoute wsBillingProcessRoute;
+	private BillingProcessRoute billingProcessRoute;
+
+	// @Resource
+	// private WsBillingProcessRoute wsBillingProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
@@ -117,7 +117,7 @@ public class CamelSpringConfig {
 		SimpleRegistry registry = new SimpleRegistry();
 		registry.put("billingAccountEndpoint", billingAccountEndpoint);
 		camelContext.setRegistry(registry);
-		camelContext.addRoutes(wsBillingProcessRoute);
+		camelContext.addRoutes(billingProcessRoute);
 
 		return camelContext;
 	}

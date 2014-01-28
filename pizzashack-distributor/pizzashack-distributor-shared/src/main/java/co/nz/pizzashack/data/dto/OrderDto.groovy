@@ -9,8 +9,8 @@ class OrderDto implements Serializable {
 	Long orderId
 	String orderNo
 	Set<OrderDetailsDto> orderDetailsSet
-	Integer qty
-	BigDecimal totalPrice
+	Integer qty = 0
+	BigDecimal totalPrice = BigDecimal.ZERO
 
 	@Delegate
 	CustomerDto customer = new CustomerDto()

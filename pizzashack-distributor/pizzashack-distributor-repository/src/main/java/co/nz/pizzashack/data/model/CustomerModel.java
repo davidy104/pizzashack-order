@@ -86,6 +86,18 @@ public class CustomerModel implements Serializable {
 		this.email = email;
 	}
 
+	public Integer getCredits() {
+		return credits;
+	}
+
+	public void setCredits(Integer credits) {
+		this.credits = credits;
+	}
+
+	public void setOrders(List<OrderModel> orders) {
+		this.orders = orders;
+	}
+
 	public static Builder getBuilder(String customerName, String address,
 			String email) {
 		return new Builder(customerName, address, email);

@@ -1,5 +1,7 @@
 package co.nz.pizzashack.ds;
 
+import static co.nz.pizzashack.data.predicates.OrderPredicates.findByOrderNo;
+
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -9,7 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.nz.pizzashack.NotFoundException;
+import co.nz.pizzashack.data.OrderLoadStrategies;
+import co.nz.pizzashack.data.converter.OrderConverter;
 import co.nz.pizzashack.data.dto.OrderDto;
+import co.nz.pizzashack.data.model.OrderModel;
 import co.nz.pizzashack.data.repository.OrderRepository;
 import co.nz.pizzashack.support.PizzashackCaculator;
 
@@ -26,10 +32,21 @@ public class OrderDSImpl implements OrderDS {
 	@Resource
 	private PizzashackCaculator pizzashackCaculator;
 
+	@Resource
+	private OrderConverter orderConverter;
+
 	@Override
 	public OrderDto getOrderByOrderNo(String orderNo) throws Exception {
-
-		return null;
+		LOGGER.info("getOrderByOrderNo start:{} ", orderNo);
+		OrderDto found = null;
+		OrderModel orderModel = orderRepository.findOne(findByOrderNo(orderNo));
+		if (orderModel == null) {
+			throw new NotFoundException("Order not found by no[" + orderNo
+					+ "]");
+		}
+		found = orderConverter.toDto(orderModel, OrderLoadStrategies.LOAD_ALL);
+		LOGGER.info("getOrderByOrderNo end:{} ", found);
+		return found;
 	}
 
 	@Override

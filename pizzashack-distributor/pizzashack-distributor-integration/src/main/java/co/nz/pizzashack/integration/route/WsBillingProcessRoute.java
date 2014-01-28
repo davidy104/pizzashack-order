@@ -11,7 +11,7 @@ import co.nz.pizzashack.integration.mapping.BillingProcessRespTransformer;
 import co.nz.pizzashack.integration.mapping.BillingVariableTransformer;
 import co.nz.pizzashack.integration.utils.SleepBean;
 
-@Component
+//@Component
 public class WsBillingProcessRoute extends RouteBuilder {
 
 	public static final String ENDPOINT = "activiti:orderBillingProcess:billingIntegration?copyVariablesToBodyAsMap=true";
@@ -47,7 +47,7 @@ public class WsBillingProcessRoute extends RouteBuilder {
 				.transform(billingVariableTransformer)
 				.setHeader("messageId", simple("${body.billingRequestId}"))
 				.to("direct:doBillingIntegration")
-//				.to("direct:receiveBillingQueue");
+				// .to("direct:receiveBillingQueue");
 				.wireTap("direct:receiveBillingQueue")
 				.executorServiceRef("genericThreadPool");
 

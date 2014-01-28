@@ -3,7 +3,10 @@ package co.nz.pizzashack.ds;
 import static co.nz.pizzashack.DistributorConstants.BILLING_SUB_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.ORDER_MAIN_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.ORDER_SUB_PROCESS_OBJ;
+import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByOrderNo;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,13 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import co.nz.pizzashack.NotFoundException;
 import co.nz.pizzashack.data.converter.OrderConverter;
 import co.nz.pizzashack.data.converter.OrderProcessConverter;
 import co.nz.pizzashack.data.dto.BillingDto;
+import co.nz.pizzashack.data.dto.OrderDetailsDto;
 import co.nz.pizzashack.data.dto.OrderDto;
 import co.nz.pizzashack.data.dto.OrderProcessDto;
 import co.nz.pizzashack.data.dto.ProcessActivityDto;
 import co.nz.pizzashack.data.model.OrderModel;
+import co.nz.pizzashack.data.model.OrderPizzashackModel;
 import co.nz.pizzashack.data.model.OrderModel.OrderStatus;
 import co.nz.pizzashack.data.model.OrderProcessModel;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
@@ -57,7 +63,7 @@ public class OrderProcessAccessor {
 	}
 
 	public void mergeDtoToModelAftProcess(OrderProcessDto dto,
-			OrderProcessModel model) {
+			OrderProcessModel model, boolean mergeCalculationResult) {
 		model.setActiveProcessDefinitionId(dto.getActiveProcessDefinitionId());
 		model.setActiveProcesssInstanceId(dto.getActiveProcesssInstanceId());
 		model.setExecutionId(dto.getExecutionId());
@@ -72,6 +78,36 @@ public class OrderProcessAccessor {
 		} else if (order.getStatus().equals("pendingOnBilling")) {
 			orderModel.setStatus(OrderStatus.pendingOnBilling.value());
 		}
+
+		if (mergeCalculationResult) {
+			LOGGER.info("merge calculation result");
+			LOGGER.info("total price:{} ", order.getTotalPrice());
+			LOGGER.info("qty:{} ", order.getQty());
+			orderModel.setTotalPrice(order.getTotalPrice());
+			orderModel.setQuantity(order.getQty());
+
+			Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
+			List<OrderPizzashackModel> orderPizzashackModels = orderModel
+					.getOrderPizzashackModels();
+			if (orderDetailsSet != null && orderDetailsSet.size() > 0) {
+				for (OrderDetailsDto orderDetails : orderDetailsSet) {
+					for (OrderPizzashackModel orderPizzashackModel : orderPizzashackModels) {
+						if (orderDetails.getOrderDetailId() == orderPizzashackModel
+								.getOrderPizzashackId()) {
+							LOGGER.info("merge calculation for pizza["
+									+ orderDetails.getPizzaName() + "]");
+							LOGGER.info("qty:{}", orderDetails.getQty());
+							LOGGER.info("totalPrice:{}",
+									orderDetails.getTotalPrice());
+							orderPizzashackModel.setQty(orderDetails.getQty());
+							orderPizzashackModel.setTotalPrice(orderDetails
+									.getTotalPrice());
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	public OrderProcessDto postProcessForPendingActivity(
@@ -79,83 +115,103 @@ public class OrderProcessAccessor {
 			OrderProcessModel orderProcessModel, String operatorName,
 			PendingActivityBuildOperation... loadPendingActivityOperations)
 			throws Exception {
-		OrderProcessDto resultDto = null;
+		OrderProcessDto resultDto = orderProcessDto;
 		LOGGER.info("postProcessForFlow start:{} ", orderProcessDto);
 		OrderDto orderDto = orderProcessDto.getOrder();
 		String orderNo = orderDto.getOrderNo();
-		String mainProcessDefinitionId = orderProcessDto
-				.getMainProcessDefinitionId();
+		boolean ifMergeRequired = false;
+		boolean mergeCalculationResult = false;
 		String mainProcessInstanceId = orderProcessDto
 				.getMainProcessInstanceId();
+		String mainProcessDefinitionId = orderProcessDto
+				.getMainProcessDefinitionId();
+		String activeProcessDefinitionId = orderProcessDto
+				.getActiveProcessDefinitionId();
+		String activeProcessInstanceId = orderProcessDto
+				.getActiveProcesssInstanceId();
 
-		if (!activitiFacade
-				.ifProcessFinishted(orderNo, mainProcessDefinitionId)) {
-			LOGGER.info("process pending ");
-			boolean loadincoming = false;
-			boolean loadoutgoing = false;
-			boolean loadTaskDetails = false;
+		LOGGER.info("process pending ");
+		boolean loadincoming = false;
+		boolean loadoutgoing = false;
+		boolean loadTaskDetails = false;
 
-			Object variable = activitiFacade.getVariableFromCurrentProcess(
-					mainProcessInstanceId, ORDER_MAIN_PROCESS_OBJ);
-			if (variable != null) {
-				resultDto = (OrderProcessDto) variable;
-				LOGGER.info("get OrderProcessDto from flow:{} ", resultDto);
-			}
+		Object variable = activitiFacade.getVariableFromCurrentProcess(
+				mainProcessInstanceId, ORDER_MAIN_PROCESS_OBJ);
+		if (variable != null) {
+			resultDto = (OrderProcessDto) variable;
+			LOGGER.info("get OrderProcessDto from flow:{} ", resultDto);
 
-			if (loadPendingActivityOperations != null
-					&& loadPendingActivityOperations.length > 0) {
-				for (PendingActivityBuildOperation loadPendingActivityOperation : loadPendingActivityOperations) {
-					if (loadPendingActivityOperation == PendingActivityBuildOperation.ALL) {
-						loadincoming = true;
-						loadoutgoing = true;
-						loadTaskDetails = true;
-						break;
-					} else if (loadPendingActivityOperation == PendingActivityBuildOperation.TASK_DETAILS) {
-						loadTaskDetails = true;
-					} else if (loadPendingActivityOperation == PendingActivityBuildOperation.ACTIVITY_INCOMING) {
-						loadincoming = true;
-					} else if (loadPendingActivityOperation == PendingActivityBuildOperation.ACTIVITY_OUTGOING) {
-						loadoutgoing = true;
-					}
+			activeProcessDefinitionId = resultDto
+					.getActiveProcessDefinitionId();
+			activeProcessInstanceId = resultDto.getActiveProcesssInstanceId();
+			ifMergeRequired = true;
+		}
+
+		if (loadPendingActivityOperations != null
+				&& loadPendingActivityOperations.length > 0) {
+			for (PendingActivityBuildOperation loadPendingActivityOperation : loadPendingActivityOperations) {
+				if (loadPendingActivityOperation == PendingActivityBuildOperation.ALL) {
+					loadincoming = true;
+					loadoutgoing = true;
+					loadTaskDetails = true;
+					break;
+				} else if (loadPendingActivityOperation == PendingActivityBuildOperation.TASK_DETAILS) {
+					loadTaskDetails = true;
+				} else if (loadPendingActivityOperation == PendingActivityBuildOperation.ACTIVITY_INCOMING) {
+					loadincoming = true;
+				} else if (loadPendingActivityOperation == PendingActivityBuildOperation.ACTIVITY_OUTGOING) {
+					loadoutgoing = true;
 				}
 			}
+		}
 
-			ProcessActivityDto pendingActivity = activitiFacade
-					.getExecutionActivityBasicInfo(orderNo,
-							resultDto.getActiveProcessDefinitionId(),
-							resultDto.getActiveProcesssInstanceId(),
-							loadincoming, loadoutgoing);
-			LOGGER.info("pending activity:{}", pendingActivity);
+		ProcessActivityDto pendingActivity = activitiFacade
+				.getExecutionActivityBasicInfo(orderNo,
+						activeProcessDefinitionId, activeProcessInstanceId,
+						loadincoming, loadoutgoing);
+		LOGGER.info("pending activity:{}", pendingActivity);
 
-			if (pendingActivity.getType().equals("userTask")) {
-				Task pendingTask = this.getPendingTask(
-						pendingActivity.getName(), orderNo);
-				if (pendingActivity.getName().equals("Data entry")
-						|| pendingActivity.getName().equals("Billing fill in")) {
-					LOGGER.info("assign operator[" + operatorName
-							+ "] to task[" + pendingTask.getName() + "]");
-					pendingTask.setAssignee(operatorName);
-					taskService.claim(pendingTask.getId(), operatorName);
-					pendingActivity.setAssignee(operatorName);
-				} else if (loadTaskDetails) {
-					this.buildTaskDetails(pendingTask, pendingActivity,
-							resultDto.getActiveProcessDefinitionId());
+		if (pendingActivity.getType().equals("userTask")) {
+			Task pendingTask = this.getPendingTask(pendingActivity.getName(),
+					orderNo);
+			if (pendingActivity.getName().equals("Data entry")
+					|| pendingActivity.getName().equals("Billing fill in")) {
+				LOGGER.info("assign operator[" + operatorName + "] to task["
+						+ pendingTask.getName() + "]");
+				pendingTask.setAssignee(operatorName);
+				taskService.claim(pendingTask.getId(), operatorName);
+				pendingActivity.setAssignee(operatorName);
+
+				if (pendingActivity.getName().equals("Billing fill in")) {
+					mergeCalculationResult = true;
 				}
-			} else if (pendingActivity.getType().equals("receiveTask")
-					&& pendingActivity.getName().equals(
-							"Receive Billing Result")) {
-				// billing response, it might be bug , receiveTask can not be
-				// triggered automatically by camel route
-				this.signalBillingRecieveTask(resultDto);
+
+			} else if (loadTaskDetails) {
+				this.buildTaskDetails(pendingTask, pendingActivity,
+						activeProcessDefinitionId);
+			}
+		} else if (pendingActivity.getType().equals("receiveTask")
+				&& pendingActivity.getName().equals("Receive Billing Result")) {
+			// billing response, it might be bug , receiveTask can not be
+			// triggered automatically by camel route
+			LOGGER.info("***********************************pending on receiveBillingResponse task:{}");
+			this.signalBillingRecieveTask(resultDto);
+			if (!activitiFacade.ifProcessFinishted(orderNo,
+					mainProcessDefinitionId)) {
 				resultDto = (OrderProcessDto) activitiFacade
 						.getVariableFromCurrentProcess(mainProcessInstanceId,
 								ORDER_MAIN_PROCESS_OBJ);
-
+				LOGGER.info("after signal receive task:{} ", resultDto);
+			} else {
+				resultDto = this.getLatestOrderProcess(orderNo);
 			}
+		}
 
-			resultDto.setPendingActivity(pendingActivity);
-			this.mergeDtoToModelAftProcess(resultDto, orderProcessModel);
-			LOGGER.info("after merge publishTransModel:{} ", orderProcessModel);
+		resultDto.setPendingActivity(pendingActivity);
+		if (ifMergeRequired) {
+			this.mergeDtoToModelAftProcess(resultDto, orderProcessModel,
+					mergeCalculationResult);
+			LOGGER.info("after merge orderProcessModel:{} ", orderProcessModel);
 		}
 
 		LOGGER.info("postProcessForFlow end:{} ", resultDto);
@@ -204,6 +260,25 @@ public class OrderProcessAccessor {
 						.get(ActivitiFacade.CANDIDATE_GROUPS));
 			}
 		}
+	}
+
+	public OrderProcessModel getOrderProcessByOrderNo(String orderNo)
+			throws NotFoundException {
+		OrderProcessModel orderProcessModel = orderProcessRepository
+				.findOne(findByOrderNo(orderNo));
+
+		if (orderProcessModel == null) {
+			throw new NotFoundException("Order not found by no[" + orderNo
+					+ "]");
+		}
+		LOGGER.info("get OrderProcess from db:{} ", orderProcessModel);
+		return orderProcessModel;
+	}
+
+	public OrderProcessDto getLatestOrderProcess(String orderNo)
+			throws Exception {
+		OrderProcessModel model = this.getOrderProcessByOrderNo(orderNo);
+		return orderProcessConverter.toDto(model);
 	}
 
 }

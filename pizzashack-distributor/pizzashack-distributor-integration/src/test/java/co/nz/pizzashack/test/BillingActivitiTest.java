@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import co.nz.pizzashack.wf.ActivitiFacade;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-// @Ignore("execute when billing app is running")
+//@Ignore("execute when billing app is running")
 public class BillingActivitiTest {
 
 	private static final Logger LOGGER = LoggerFactory

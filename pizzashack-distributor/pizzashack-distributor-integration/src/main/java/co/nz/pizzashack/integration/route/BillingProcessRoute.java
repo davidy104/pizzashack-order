@@ -11,7 +11,7 @@ import co.nz.pizzashack.integration.mapping.BillingResponseMergeProcessor;
 import co.nz.pizzashack.integration.mapping.BillingVariableTransformer;
 import co.nz.pizzashack.integration.utils.SleepBean;
 
-//@Component
+@Component
 public class BillingProcessRoute extends RouteBuilder {
 
 	public static final String MQ_ENDPOINT = "jms:queue:pizzashackBillingInbound?transacted=true&replyTo=pizzashackBillingOutbound&replyToType=Exclusive&requestTimeout=10s";
@@ -50,9 +50,8 @@ public class BillingProcessRoute extends RouteBuilder {
 				.transform(billingVariableTransformer)
 				.setHeader("messageId", simple("${body.billingRequestId}"))
 				.to("direct:doBillingIntegration")
-				.recipientList(header("destination"));
-		// .wireTap("direct:receiveBillingQueue")
-		// .executorServiceRef("genericThreadPool");
+				.wireTap("direct:receiveBillingQueue")
+				.executorServiceRef("genericThreadPool");
 
 		from("direct:receiveBillingQueue")
 				.routeId("direct:receiveBillingQueue").to("log:input")

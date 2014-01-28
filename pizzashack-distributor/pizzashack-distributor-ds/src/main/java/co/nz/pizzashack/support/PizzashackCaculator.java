@@ -31,11 +31,13 @@ public class PizzashackCaculator {
 		LOGGER.info("caculate start:{} ", order);
 		Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
 		BigDecimal totalPrice = BigDecimal.ZERO;
+		Integer totalNumber = 0;
 		if (orderDetailsSet != null) {
-			order.setQty(orderDetailsSet.size());
+		
 			for (OrderDetailsDto orderDetails : orderDetailsSet) {
 				String pizzaName = orderDetails.getPizzaName();
 				int orderCount = orderDetails.getQty();
+				totalNumber += orderCount;
 				PizzashackModel pModel = pizzashackRepository
 						.findOne(findByPizzashackName(pizzaName));
 				if (pModel != null) {
@@ -52,6 +54,7 @@ public class PizzashackCaculator {
 					totalPrice = totalPrice.add(totalPricePerPizza);
 				}
 			}
+			order.setQty(totalNumber);
 			order.setTotalPrice(totalPrice);
 		}
 		LOGGER.info("caculate end:{} ", order);

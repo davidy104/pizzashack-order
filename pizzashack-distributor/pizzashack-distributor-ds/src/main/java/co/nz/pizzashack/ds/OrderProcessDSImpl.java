@@ -4,8 +4,8 @@ import static co.nz.pizzashack.DistributorConstants.BILLING_MAIN_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.ORDER_MAIN_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.ORDER_SUB_PROCESS_OBJ;
 import static co.nz.pizzashack.DistributorConstants.REVIEW_SUB_PROCESS_OBJ;
+import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustEmail;
 import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByExecutionIds;
-import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByOrderNo;
 import static co.nz.pizzashack.data.predicates.PizzashackPredicates.findByPizzashackName;
 import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByProcessDefinitionKeyAndCategory;
 
@@ -49,6 +49,7 @@ import co.nz.pizzashack.data.model.OrderProcessModel;
 import co.nz.pizzashack.data.model.PizzashackModel;
 import co.nz.pizzashack.data.model.UserModel;
 import co.nz.pizzashack.data.model.WorkflowModel;
+import co.nz.pizzashack.data.repository.CustomerRepository;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
 import co.nz.pizzashack.data.repository.OrderRepository;
 import co.nz.pizzashack.data.repository.OrderReviewRecordRepository;
@@ -59,6 +60,7 @@ import co.nz.pizzashack.ds.OrderProcessAccessor.PendingActivityBuildOperation;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @Service
+@Transactional(value = "localTxManager", readOnly = true)
 public class OrderProcessDSImpl implements OrderProcessDS {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -106,6 +108,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	@Resource
 	private OrderReviewRecordRepository orderReviewRecordRepository;
 
+	@Resource
+	private CustomerRepository customerRepository;
+
 	public static final String PROCESS_DEFINITION_KEY = "orderlocalProcess";
 	public static final String CATEGORY = "order";
 
@@ -152,6 +157,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		orderProcessModel.setActiveProcessDefinitionId(processDefinitionId);
 		orderProcessModel.setMainProcessInstanceId(processInstance.getId());
 		orderProcessModel.setActiveProcesssInstanceId(processInstance.getId());
+		orderProcessModel.setExecutionId(processInstance.getId());
+		orderProcessModel.setCreateTime(new Date());
 		orderProcessModel.setOrder(orderModel);
 		orderProcessModel = orderProcessRepository.save(orderProcessModel);
 		orderProcessDto = orderProcessConverter.toDto(orderProcessModel);
@@ -173,10 +180,17 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		OrderProcessDto orderProcessDto = null;
 		Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
 		CustomerDto customerDto = order.getCustomer();
+		String custEmail = customerDto.getCustomerEmail();
 
-		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		OrderProcessModel orderProcessModel = orderProcessAccessor
+				.getOrderProcessByOrderNo(orderNo);
 
-		CustomerModel customerModel = customerConverter.toModel(customerDto);
+		CustomerModel customerModel = customerRepository
+				.findOne(findByCustEmail(custEmail));
+		if (customerModel == null) {
+			customerModel = customerConverter.toModel(customerDto);
+			customerModel = customerRepository.save(customerModel);
+		}
 
 		OrderModel orderModel = orderProcessModel.getOrder();
 		orderModel.setCustomer(customerModel);
@@ -223,14 +237,17 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	}
 
 	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
 	public OrderProcessDto fillinBillingAccount(String orderNo,
 			BillingDto billing, UserDto operator) throws Exception {
 		LOGGER.info("fillinBillingAccount start:{}", billing);
 		OrderProcessDto orderProcessDto = null;
-		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		OrderProcessModel orderProcessModel = orderProcessAccessor
+				.getOrderProcessByOrderNo(orderNo);
 		String userId = String.valueOf(operator.getUserId());
 
-		doFillinBillingAccount(orderProcessModel, orderNo, billing, userId);
+		orderProcessDto = doFillinBillingAccount(orderProcessModel, orderNo,
+				billing, userId);
 
 		if (!activitiFacade.ifProcessFinishted(orderNo,
 				orderProcessModel.getMainProcessDefinitionId())) {
@@ -244,15 +261,16 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		} else {
 			// flow completed
 			LOGGER.info("process completed, get latest status of OrderProcess:{} ");
-			orderProcessDto = getLatestOrderProcess(orderNo);
+			orderProcessDto = orderProcessAccessor
+					.getLatestOrderProcess(orderNo);
 		}
 		LOGGER.info("fillinBillingAccount end:{}", orderProcessDto);
 		return orderProcessDto;
 	}
 
-	@Transactional(value = "localTxManager", readOnly = false)
-	private void doFillinBillingAccount(OrderProcessModel orderProcessModel,
-			String orderNo, BillingDto billing, String userId) throws Exception {
+	private OrderProcessDto doFillinBillingAccount(
+			OrderProcessModel orderProcessModel, String orderNo,
+			BillingDto billing, String userId) throws Exception {
 		LOGGER.info("doFillinBillingAccount start:{} ");
 		Map<String, Object> variableMap = null;
 		Task pendingTask = activitiFacade.getActiviteTask(orderNo,
@@ -277,6 +295,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		variableMap.put(BILLING_MAIN_PROCESS_OBJ, billing);
 		taskService.complete(pendingTask.getId(), variableMap);
 		LOGGER.info("doFillinBillingAccount end:{} ");
+		return orderProcessDto;
 	}
 
 	@Override
@@ -285,7 +304,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 			throws Exception {
 		LOGGER.info("claimOrderReviewTask start:{}", orderNo);
 
-		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		OrderProcessModel orderProcessModel = orderProcessAccessor
+				.getOrderProcessByOrderNo(orderNo);
 		String activeProcessDefinitionId = null;
 		String userId = String.valueOf(currentLoginUser.getUserId());
 		activeProcessDefinitionId = orderProcessModel
@@ -313,12 +333,15 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	}
 
 	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
 	public OrderProcessDto manualOrderReview(String orderNo,
 			OrderReviewRecordDto reviewRecord) throws Exception {
 		LOGGER.info("manualOrderReview start:{} ", reviewRecord);
 		OrderProcessDto orderProcessDto = null;
-		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
-		this.doManualOrderReview(orderProcessModel, orderNo, reviewRecord);
+		OrderProcessModel orderProcessModel = orderProcessAccessor
+				.getOrderProcessByOrderNo(orderNo);
+		orderProcessDto = this.doManualOrderReview(orderProcessModel, orderNo,
+				reviewRecord);
 
 		if (!activitiFacade.ifProcessFinishted(orderNo,
 				orderProcessModel.getMainProcessDefinitionId())) {
@@ -331,15 +354,16 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		} else {
 			// flow completed
 			LOGGER.info("process completed, get latest status of OrderProcess:{} ");
-			orderProcessDto = this.getLatestOrderProcess(orderNo);
+			orderProcessDto = orderProcessAccessor
+					.getLatestOrderProcess(orderNo);
 		}
 		LOGGER.info("manualOrderReview end:{} ", orderProcessDto);
 		return orderProcessDto;
 	}
 
-	@Transactional(value = "localTxManager", readOnly = false)
-	private void doManualOrderReview(OrderProcessModel orderProcessModel,
-			String orderNo, OrderReviewRecordDto reviewRecord) throws Exception {
+	private OrderProcessDto doManualOrderReview(
+			OrderProcessModel orderProcessModel, String orderNo,
+			OrderReviewRecordDto reviewRecord) throws Exception {
 		LOGGER.info("doManualOrderReview start:{} ");
 		Map<String, Object> variableMap = null;
 		OrderProcessDto orderProcessDto = null;
@@ -365,6 +389,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		variableMap.put("orderReviewStatus", orderReviewStatus);
 		taskService.complete(task.getId(), variableMap);
 		LOGGER.info("doManualOrderReview end:{} ");
+		return orderProcessDto;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -377,7 +402,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		List<OrderProcessModel> modelList = null;
 		List<Task> taskList = activitiFacade.getAllTasksForUser(String
 				.valueOf(currentLoginUser.getUserId()));
-		if (taskList != null) {
+		if (taskList != null && taskList.size() > 0) {
 			LOGGER.info("tasks size:{}", taskList.size());
 			Set<String> taskExecutionIds = new HashSet<String>();
 			for (Task task : taskList) {
@@ -398,24 +423,17 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		return orderProcessDtoSet;
 	}
 
-	private OrderProcessModel getOrderProcessByOrderNo(String orderNo)
-			throws NotFoundException {
-		OrderProcessModel orderProcessModel = orderProcessRepository
-				.findOne(findByOrderNo(orderNo));
-
-		if (orderProcessModel == null) {
-			throw new NotFoundException("Order not found by no[" + orderNo
-					+ "]");
-		}
-		LOGGER.info("get OrderProcess from db:{} ", orderProcessModel);
-		return orderProcessModel;
-	}
-
+	@Override
 	@Transactional(value = "localTxManager", readOnly = true)
-	private OrderProcessDto getLatestOrderProcess(String orderNo)
+	public OrderProcessDto getOrderProcessByOrderNo(String orderNo)
 			throws Exception {
-		OrderProcessModel model = this.getOrderProcessByOrderNo(orderNo);
-		return orderProcessConverter.toDto(model);
+		LOGGER.info("getOrderProcessByOrderNo start:{} ", orderNo);
+		OrderProcessDto found = null;
+		OrderProcessModel orderProcessModel = orderProcessAccessor
+				.getOrderProcessByOrderNo(orderNo);
+		found = orderProcessConverter.toDto(orderProcessModel);
+		LOGGER.info("getOrderProcessByOrderNo end:{} ", found);
+		return found;
 	}
 
 }

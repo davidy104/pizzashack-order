@@ -41,8 +41,11 @@ public class BillingRespExecutionListener {
 		// manually outside. so need to copy current processInstance info to
 		// OrderProcess
 		boolean indenpendentProcess = true;
-		indenpendentProcess = (Boolean) execution
-				.getVariable(INDEPENDENT_PROCESS_FLAG);
+
+		if (execution.getVariable(INDEPENDENT_PROCESS_FLAG) != null) {
+			indenpendentProcess = (Boolean) execution
+					.getVariable(INDEPENDENT_PROCESS_FLAG);
+		}
 
 		if (!indenpendentProcess) {
 			this.workForOrderProcess(execution);

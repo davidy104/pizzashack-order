@@ -5,12 +5,13 @@
     <userTask id="dataEntry" name="Data entry"></userTask>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <scriptTask id="deliver" name="Deliver" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>TimeZone tz = TimeZone.getTimeZone("UTC");
-DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-dateFormat.setTimeZone(tz);
-def order = orderTrans.order;
+      <script>import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
+import co.nz.pizzashack.utils.GeneralUtils;
+import co.nz.pizzashack.data.dto.OrderDto;
+
+OrderDto order = orderTrans.order;
 order.status="delivered";
-order.deliverTime = dateFormat.format(new Date());
+order.deliverTime = GeneralUtils.dateToStr(new Date());
 out:println "after delivered: " + order;</script>
     </scriptTask>
     <serviceTask id="mailToCustomerAboutOrderResult" name="Mail to Customer about Order result" activiti:type="mail">
@@ -37,14 +38,10 @@ Pizzashack Distributor.
       </extensionElements>
     </serviceTask>
     <endEvent id="theEnd" name="End"></endEvent>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="dataEntry">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="dataEntry"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="billingEntry">
       <extensionElements>
-        <activiti:executionListener event="take" expression="#{toBillingFillinExecutionListener.execute(execution)}"></activiti:executionListener>
+        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 0}]]></conditionExpression>
     </sequenceFlow>

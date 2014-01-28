@@ -4,12 +4,14 @@
     <startEvent id="startevent1" name="Start"></startEvent>
     <scriptTask id="calculation" name="Calculation" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>out:println "start calculate: " + orderTransBean;
-OrderDto order = orderTransBean.order;
-pizzashackCaculator.apCaculate(order);
-out:println "after calculation: " + order;</script>
+pizzashackCaculator.apCaculate(orderTransBean.order);
+out:println "after calculation: " + orderTransBean.order;</script>
     </scriptTask>
     <scriptTask id="autounderwriting" name="Auto underwriting" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>def order = orderTransBean.order;
+      <script>import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
+import co.nz.pizzashack.utils.GeneralUtils;
+
+def order = orderTransBean.order;
 def orderReviewStatus=0;
 String reviewResult="accept";
 String content;
@@ -30,13 +32,12 @@ reviewTransBean.orderNo = order.orderNo;
 reviewTransBean.reviewResult = reviewResult;
 reviewTransBean.content = content;
 
-TimeZone tz = TimeZone.getTimeZone("UTC");
-DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-dateFormat.setTimeZone(tz)
-reviewTransBean.createTime = dateFormat.format(new Date());
+reviewTransBean.createTime = GeneralUtils.dateToStr(new Date());
 
 out:println "reviewTransBean: " + reviewTransBean;
-execution.setVariable("reviewTransBean", reviewTransBean);</script>
+execution.setVariable("reviewTransBean", reviewTransBean);
+execution.setVariable("orderReviewStatus", orderReviewStatus);
+</script>
     </scriptTask>
     <userTask id="manualunderwriting" name="Manual underwriting" activiti:candidateGroups="1"></userTask>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
