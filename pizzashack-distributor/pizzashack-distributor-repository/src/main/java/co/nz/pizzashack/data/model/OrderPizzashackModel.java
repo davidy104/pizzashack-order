@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Table(name = "T_ORDER_PIZZASHACK")
 @AssociationOverrides({
 		@AssociationOverride(name = "orderPizzashackPK.order", joinColumns = @JoinColumn(name = "ORDER_ID")),
-		@AssociationOverride(name = "orderPizzashackPK.pizzashack", joinColumns = @JoinColumn(name = "PIZZASHACK_ID"))})
+		@AssociationOverride(name = "orderPizzashackPK.pizzashack", joinColumns = @JoinColumn(name = "PIZZASHACK_ID")) })
 public class OrderPizzashackModel {
 
 	@Id
@@ -93,6 +93,11 @@ public class OrderPizzashackModel {
 		return new Builder(order, pizzashack, qty);
 	}
 
+	public static Builder getBuilder(OrderModel order,
+			PizzashackModel pizzashack, Integer qty, BigDecimal totalPrice) {
+		return new Builder(order, pizzashack, qty, totalPrice);
+	}
+
 	public static class Builder {
 
 		private OrderPizzashackModel built;
@@ -101,6 +106,15 @@ public class OrderPizzashackModel {
 			built = new OrderPizzashackModel();
 			built.setOrderModel(order);
 			built.setPizzashackModel(pizzashack);
+			built.qty = qty;
+		}
+
+		public Builder(OrderModel order, PizzashackModel pizzashack,
+				Integer qty, BigDecimal totalPrice) {
+			built = new OrderPizzashackModel();
+			built.setOrderModel(order);
+			built.setPizzashackModel(pizzashack);
+			built.totalPrice = totalPrice;
 			built.qty = qty;
 		}
 

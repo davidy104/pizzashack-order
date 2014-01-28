@@ -60,7 +60,7 @@ public class ActivitiFacade {
 	public static final String CANDIDATE_GROUPS = "candidateGroups";
 
 	/**
-	 *
+	 * 
 	 * @param bizKey
 	 * @param processDefinitionId
 	 * @param variableMap
@@ -82,9 +82,14 @@ public class ActivitiFacade {
 		return processInstance;
 	}
 
+	public void signalProcessInstance(String executionId,
+			Map<String, Object> processVariables) {
+		runtimeService.signal(executionId, processVariables);
+	}
+
 	/**
 	 * Check if current process completed.
-	 *
+	 * 
 	 * @param bizKey
 	 * @param processDefinitionId
 	 * @return
@@ -102,7 +107,7 @@ public class ActivitiFacade {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param processInstanceId
 	 * @param variableName
 	 * @return
@@ -115,7 +120,7 @@ public class ActivitiFacade {
 	/**
 	 * Get candidate assignment info, including candidate users and candidate
 	 * groups
-	 *
+	 * 
 	 * @param taskDefinitionKey
 	 * @param processDefinitionId
 	 * @return
@@ -171,7 +176,7 @@ public class ActivitiFacade {
 
 	/**
 	 * Get activeTask by bizKey
-	 *
+	 * 
 	 * @param bizKey
 	 * @param processDefinitionId
 	 * @return
@@ -182,7 +187,7 @@ public class ActivitiFacade {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param taskName
 	 * @param bizKey
 	 * @return
@@ -195,7 +200,7 @@ public class ActivitiFacade {
 	/**
 	 * Get last end activity info, sometimes we need to check the end type if we
 	 * define multiple ends in flow
-	 *
+	 * 
 	 * @param processInstanceId
 	 * @param processDefinitionId
 	 * @return
@@ -225,7 +230,7 @@ public class ActivitiFacade {
 
 	/**
 	 * Get all historic activity for given process,
-	 *
+	 * 
 	 * @param processInstanceId
 	 * @param processDefinitionId
 	 * @return activityDto see{@ProcessActivityDto}
@@ -267,7 +272,7 @@ public class ActivitiFacade {
 	 * Get Activity info by executionId, mostly, executionId is same as
 	 * processInstanceId. but if there is subprocess, the subprocess has its own
 	 * executionId and it is different from mainprocess's processInstanceId
-	 *
+	 * 
 	 * @param processDefinitionId
 	 * @param executionId
 	 * @return
@@ -305,7 +310,7 @@ public class ActivitiFacade {
 
 	/**
 	 * Get basic info of activity by given executionId
-	 *
+	 * 
 	 * @param processDefinitionId
 	 * @param executionId
 	 * @return activityDto see{@ProcessActivityDto}
