@@ -66,6 +66,7 @@ public class EndExecutionListener {
 					.getVariable(REVIEW_MAIN_PROCESS_OBJ);
 			OrderReviewRecordModel orderReviewRecordModel = orderReviewRecordConverter
 					.toModel(orderReviewRecord);
+			orderReviewRecordModel.setCreateTime(new Date());
 			orderReviewRecordModel.setOrder(orderModel);
 			orderReviewRecordRepository.save(orderReviewRecordModel);
 		} else if (status.equals("delivered")) {

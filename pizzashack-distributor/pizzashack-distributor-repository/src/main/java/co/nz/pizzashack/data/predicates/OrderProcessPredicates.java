@@ -1,5 +1,7 @@
 package co.nz.pizzashack.data.predicates;
 
+import java.util.Set;
+
 import co.nz.pizzashack.data.model.QOrderModel;
 import co.nz.pizzashack.data.model.QOrderProcessModel;
 
@@ -10,5 +12,10 @@ public class OrderProcessPredicates {
 		QOrderProcessModel orderProcessModel = QOrderProcessModel.orderProcessModel;
 		QOrderModel order = orderProcessModel.order;
 		return order.orderNo.eq(orderNo);
+	}
+
+	public static Predicate findByExecutionIds(final Set<String> executionIds) {
+		QOrderProcessModel orderProcessModel = QOrderProcessModel.orderProcessModel;
+		return orderProcessModel.executionId.in(executionIds);
 	}
 }

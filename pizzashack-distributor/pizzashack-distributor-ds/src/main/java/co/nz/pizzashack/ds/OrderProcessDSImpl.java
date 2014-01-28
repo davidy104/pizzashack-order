@@ -1,11 +1,18 @@
 package co.nz.pizzashack.ds;
 
+import static co.nz.pizzashack.DistributorConstants.BILLING_MAIN_PROCESS_OBJ;
+import static co.nz.pizzashack.DistributorConstants.ORDER_MAIN_PROCESS_OBJ;
+import static co.nz.pizzashack.DistributorConstants.ORDER_SUB_PROCESS_OBJ;
+import static co.nz.pizzashack.DistributorConstants.REVIEW_SUB_PROCESS_OBJ;
+import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByExecutionIds;
 import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByOrderNo;
-import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByProcessDefinitionKeyAndCategory;
 import static co.nz.pizzashack.data.predicates.PizzashackPredicates.findByPizzashackName;
+import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByProcessDefinitionKeyAndCategory;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +22,7 @@ import javax.annotation.Resource;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +32,7 @@ import co.nz.pizzashack.NotFoundException;
 import co.nz.pizzashack.data.converter.CustomerConverter;
 import co.nz.pizzashack.data.converter.OrderConverter;
 import co.nz.pizzashack.data.converter.OrderProcessConverter;
+import co.nz.pizzashack.data.converter.OrderReviewRecordConverter;
 import co.nz.pizzashack.data.converter.UserConverter;
 import co.nz.pizzashack.data.dto.BillingDto;
 import co.nz.pizzashack.data.dto.CustomerDto;
@@ -42,16 +51,14 @@ import co.nz.pizzashack.data.model.UserModel;
 import co.nz.pizzashack.data.model.WorkflowModel;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
 import co.nz.pizzashack.data.repository.OrderRepository;
+import co.nz.pizzashack.data.repository.OrderReviewRecordRepository;
 import co.nz.pizzashack.data.repository.PizzashackRepository;
 import co.nz.pizzashack.data.repository.UserRepository;
 import co.nz.pizzashack.data.repository.WorkflowRepository;
 import co.nz.pizzashack.ds.OrderProcessAccessor.PendingActivityBuildOperation;
 import co.nz.pizzashack.wf.ActivitiFacade;
-import static co.nz.pizzashack.DistributorConstants.BILLING_SUB_PROCESS_OBJ;
-import static co.nz.pizzashack.DistributorConstants.ORDER_MAIN_PROCESS_OBJ;
 
 @Service
-@Transactional(value = "localTxManager", readOnly = true)
 public class OrderProcessDSImpl implements OrderProcessDS {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -92,6 +99,12 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 
 	@Resource
 	private OrderProcessAccessor orderProcessAccessor;
+
+	@Resource
+	private OrderReviewRecordConverter orderReviewRecordConverter;
+
+	@Resource
+	private OrderReviewRecordRepository orderReviewRecordRepository;
 
 	public static final String PROCESS_DEFINITION_KEY = "orderlocalProcess";
 	public static final String CATEGORY = "order";
@@ -161,13 +174,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
 		CustomerDto customerDto = order.getCustomer();
 
-		OrderProcessModel orderProcessModel = orderProcessRepository
-				.findOne(findByOrderNo(orderNo));
-
-		if (orderProcessModel == null) {
-			throw new NotFoundException("Order not found by no[" + orderNo
-					+ "]");
-		}
+		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
 
 		CustomerModel customerModel = customerConverter.toModel(customerDto);
 
@@ -218,29 +225,197 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	@Override
 	public OrderProcessDto fillinBillingAccount(String orderNo,
 			BillingDto billing, UserDto operator) throws Exception {
-		
-		return null;
+		LOGGER.info("fillinBillingAccount start:{}", billing);
+		OrderProcessDto orderProcessDto = null;
+		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		String userId = String.valueOf(operator.getUserId());
+
+		doFillinBillingAccount(orderProcessModel, orderNo, billing, userId);
+
+		if (!activitiFacade.ifProcessFinishted(orderNo,
+				orderProcessModel.getMainProcessDefinitionId())) {
+			LOGGER.info("process pending, build pending Activity:{} ");
+			// flow paused
+			orderProcessDto = orderProcessAccessor
+					.postProcessForPendingActivity(orderProcessDto,
+							orderProcessModel,
+							String.valueOf(operator.getUserId()),
+							PendingActivityBuildOperation.ALL);
+		} else {
+			// flow completed
+			LOGGER.info("process completed, get latest status of OrderProcess:{} ");
+			orderProcessDto = getLatestOrderProcess(orderNo);
+		}
+		LOGGER.info("fillinBillingAccount end:{}", orderProcessDto);
+		return orderProcessDto;
+	}
+
+	@Transactional(value = "localTxManager", readOnly = false)
+	private void doFillinBillingAccount(OrderProcessModel orderProcessModel,
+			String orderNo, BillingDto billing, String userId) throws Exception {
+		LOGGER.info("doFillinBillingAccount start:{} ");
+		Map<String, Object> variableMap = null;
+		Task pendingTask = activitiFacade.getActiviteTask(orderNo,
+				orderProcessModel.getActiveProcessDefinitionId());
+
+		if (pendingTask == null) {
+			throw new NotFoundException("task not found");
+		}
+
+		String taskName = pendingTask.getName();
+		LOGGER.info("current task:{} ", taskName);
+		if (!activitiFacade.checkIfUserHasRightForGivenTask(orderNo, taskName,
+				userId)) {
+			throw new Exception("User[" + userId + "] has no right to process "
+					+ taskName + "");
+		}
+
+		OrderProcessDto orderProcessDto = orderProcessConverter
+				.toDto(orderProcessModel);
+		variableMap = new HashMap<String, Object>();
+		variableMap.put(ORDER_MAIN_PROCESS_OBJ, orderProcessDto);
+		variableMap.put(BILLING_MAIN_PROCESS_OBJ, billing);
+		taskService.complete(pendingTask.getId(), variableMap);
+		LOGGER.info("doFillinBillingAccount end:{} ");
 	}
 
 	@Override
-	public OrderProcessDto claimOrderReviewTask(String orderNo,
-			UserDto currentLoginUser) throws Exception {
+	@Transactional(value = "localTxManager", readOnly = false)
+	public void claimOrderReviewTask(String orderNo, UserDto currentLoginUser)
+			throws Exception {
+		LOGGER.info("claimOrderReviewTask start:{}", orderNo);
 
-		return null;
+		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		String activeProcessDefinitionId = null;
+		String userId = String.valueOf(currentLoginUser.getUserId());
+		activeProcessDefinitionId = orderProcessModel
+				.getActiveProcessDefinitionId();
+
+		Task task = activitiFacade.getActiviteTask(orderNo,
+				activeProcessDefinitionId);
+		if (task == null || !task.getName().equals("Manual underwriting")) {
+			throw new NotFoundException("Task[Manual underwriting] not found");
+		}
+		String taskId = task.getId();
+		String taskName = task.getName();
+		LOGGER.info("taskId:{}", taskId);
+		LOGGER.info("taskName:{}", taskName);
+
+		if (!activitiFacade.checkIfUserHasRightForGivenTask(orderNo, taskName,
+				userId)) {
+			throw new Exception("User[" + currentLoginUser.getUsername()
+					+ "] has no right for [" + taskName + "]");
+		}
+
+		taskService.setAssignee(taskId, userId);
+		taskService.claim(taskId, userId);
+		LOGGER.info("claimOrderReviewTask end:{}");
 	}
 
 	@Override
 	public OrderProcessDto manualOrderReview(String orderNo,
 			OrderReviewRecordDto reviewRecord) throws Exception {
+		LOGGER.info("manualOrderReview start:{} ", reviewRecord);
+		OrderProcessDto orderProcessDto = null;
+		OrderProcessModel orderProcessModel = getOrderProcessByOrderNo(orderNo);
+		this.doManualOrderReview(orderProcessModel, orderNo, reviewRecord);
 
-		return null;
+		if (!activitiFacade.ifProcessFinishted(orderNo,
+				orderProcessModel.getMainProcessDefinitionId())) {
+			LOGGER.info("process pending, build pending Activity:{} ");
+			// flow paused
+			orderProcessDto = orderProcessAccessor
+					.postProcessForPendingActivity(orderProcessDto,
+							orderProcessModel, null,
+							PendingActivityBuildOperation.ALL);
+		} else {
+			// flow completed
+			LOGGER.info("process completed, get latest status of OrderProcess:{} ");
+			orderProcessDto = this.getLatestOrderProcess(orderNo);
+		}
+		LOGGER.info("manualOrderReview end:{} ", orderProcessDto);
+		return orderProcessDto;
 	}
 
+	@Transactional(value = "localTxManager", readOnly = false)
+	private void doManualOrderReview(OrderProcessModel orderProcessModel,
+			String orderNo, OrderReviewRecordDto reviewRecord) throws Exception {
+		LOGGER.info("doManualOrderReview start:{} ");
+		Map<String, Object> variableMap = null;
+		OrderProcessDto orderProcessDto = null;
+
+		Task task = activitiFacade.getActiviteTask(orderNo,
+				orderProcessModel.getActiveProcessDefinitionId());
+		if (task == null || !task.getName().equals("Manual underwriting")) {
+			throw new NotFoundException("Task[Manual underwriting] not found");
+		}
+		orderProcessDto = orderProcessConverter.toDto(orderProcessModel);
+		String reviewResult = reviewRecord.getReviewResult();
+		LOGGER.info("reviewResult:{} ", reviewResult);
+		Integer orderReviewStatus = 0;
+		if (reviewResult.equals("reject")) {
+			orderReviewStatus = 1;
+		} else if (reviewResult.equals("pending")) {
+			orderReviewStatus = 2;
+		}
+
+		variableMap = new HashMap<String, Object>();
+		variableMap.put(REVIEW_SUB_PROCESS_OBJ, reviewRecord);
+		variableMap.put(ORDER_SUB_PROCESS_OBJ, orderProcessDto);
+		variableMap.put("orderReviewStatus", orderReviewStatus);
+		taskService.complete(task.getId(), variableMap);
+		LOGGER.info("doManualOrderReview end:{} ");
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
+	@Transactional(value = "localTxManager", readOnly = true)
 	public Set<OrderProcessDto> getAllTransTaskForCurrentUser(
 			UserDto currentLoginUser) throws Exception {
+		LOGGER.info("getAllTransTaskForCurrentUser start:{} ", currentLoginUser);
+		Set<OrderProcessDto> orderProcessDtoSet = null;
+		List<OrderProcessModel> modelList = null;
+		List<Task> taskList = activitiFacade.getAllTasksForUser(String
+				.valueOf(currentLoginUser.getUserId()));
+		if (taskList != null) {
+			LOGGER.info("tasks size:{}", taskList.size());
+			Set<String> taskExecutionIds = new HashSet<String>();
+			for (Task task : taskList) {
+				taskExecutionIds.add(task.getExecutionId());
+			}
 
-		return null;
+			Iterable<OrderProcessModel> resultIterable = orderProcessRepository
+					.findAll(findByExecutionIds(taskExecutionIds));
+			if (resultIterable != null) {
+				orderProcessDtoSet = new HashSet<OrderProcessDto>();
+				modelList = IteratorUtils.toList(resultIterable.iterator());
+				for (OrderProcessModel model : modelList) {
+					orderProcessDtoSet.add(orderProcessConverter.toDto(model));
+				}
+			}
+		}
+		LOGGER.info("getAllTransTaskForCurrentUser end:{} ");
+		return orderProcessDtoSet;
+	}
+
+	private OrderProcessModel getOrderProcessByOrderNo(String orderNo)
+			throws NotFoundException {
+		OrderProcessModel orderProcessModel = orderProcessRepository
+				.findOne(findByOrderNo(orderNo));
+
+		if (orderProcessModel == null) {
+			throw new NotFoundException("Order not found by no[" + orderNo
+					+ "]");
+		}
+		LOGGER.info("get OrderProcess from db:{} ", orderProcessModel);
+		return orderProcessModel;
+	}
+
+	@Transactional(value = "localTxManager", readOnly = true)
+	private OrderProcessDto getLatestOrderProcess(String orderNo)
+			throws Exception {
+		OrderProcessModel model = this.getOrderProcessByOrderNo(orderNo);
+		return orderProcessConverter.toDto(model);
 	}
 
 }
