@@ -9,6 +9,7 @@ import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByExec
 import static co.nz.pizzashack.data.predicates.PizzashackPredicates.findByPizzashackName;
 import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByProcessDefinitionKeyAndCategory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +51,7 @@ import co.nz.pizzashack.data.model.PizzashackModel;
 import co.nz.pizzashack.data.model.UserModel;
 import co.nz.pizzashack.data.model.WorkflowModel;
 import co.nz.pizzashack.data.repository.CustomerRepository;
+import co.nz.pizzashack.data.repository.OrderPizzashackRepository;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
 import co.nz.pizzashack.data.repository.OrderRepository;
 import co.nz.pizzashack.data.repository.OrderReviewRecordRepository;
@@ -109,6 +111,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	private OrderReviewRecordRepository orderReviewRecordRepository;
 
 	@Resource
+	private OrderPizzashackRepository orderPizzashackRepository;
+
+	@Resource
 	private CustomerRepository customerRepository;
 
 	public static final String PROCESS_DEFINITION_KEY = "orderlocalProcess";
@@ -163,9 +168,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		orderProcessModel = orderProcessRepository.save(orderProcessModel);
 		orderProcessDto = orderProcessConverter.toDto(orderProcessModel);
 
-		orderProcessDto = orderProcessAccessor.postProcessForPendingActivity(
-				orderProcessDto, orderProcessModel,
-				String.valueOf(operator.getUserId()),
+		orderProcessDto = orderProcessAccessor.postProcess(orderProcessDto,
+				orderProcessModel, String.valueOf(operator.getUserId()),
 				PendingActivityBuildOperation.ALL);
 		LOGGER.info("startOrderProcess end:{}", orderProcessDto);
 		return orderProcessDto;
@@ -198,7 +202,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		orderModel.setTotalPrice(order.getTotalPrice());
 		orderModel.setShipAddress(order.getAddress());
 
-		if (orderDetailsSet != null) {
+		if (orderDetailsSet != null && orderDetailsSet.size() > 0) {
+			List<OrderPizzashackModel> orderPizzashackModelList = new ArrayList<OrderPizzashackModel>();
+			LOGGER.info("orderDetailsSet size:{} ", orderDetailsSet.size());
 			for (OrderDetailsDto orderDetailsDto : orderDetailsSet) {
 				PizzashackModel pizzashackModel = pizzashackRepository
 						.findOne(findByPizzashackName(orderDetailsDto
@@ -207,8 +213,15 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 						.getBuilder(orderModel, pizzashackModel,
 								orderDetailsDto.getQty(),
 								orderDetailsDto.getTotalPrice()).build();
-				orderModel.addOrderPizzashack(orderPizzashackModel);
+				LOGGER.info("added orderPizzashackModel:{} ",
+						orderPizzashackModel);
+				orderPizzashackModel = orderPizzashackRepository
+						.save(orderPizzashackModel);
+				orderPizzashackModelList.add(orderPizzashackModel);
 			}
+			LOGGER.info("after add detailsDto, size in model:{} ",
+					orderPizzashackModelList.size());
+			orderModel.setOrderPizzashackModels(orderPizzashackModelList);
 		}
 
 		Task pendingTask = activitiFacade.getActiviteTask(orderNo,
@@ -228,9 +241,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		variableMap.put(ORDER_MAIN_PROCESS_OBJ, orderProcessDto);
 		taskService.complete(pendingTask.getId(), variableMap);
 
-		orderProcessDto = orderProcessAccessor.postProcessForPendingActivity(
-				orderProcessDto, orderProcessModel,
-				String.valueOf(operator.getUserId()),
+		orderProcessDto = orderProcessAccessor.postProcess(orderProcessDto,
+				orderProcessModel, String.valueOf(operator.getUserId()),
 				PendingActivityBuildOperation.ALL);
 		LOGGER.info("dataEntry end:{}", orderProcessDto);
 		return orderProcessDto;
@@ -253,11 +265,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 				orderProcessModel.getMainProcessDefinitionId())) {
 			LOGGER.info("process pending, build pending Activity:{} ");
 			// flow paused
-			orderProcessDto = orderProcessAccessor
-					.postProcessForPendingActivity(orderProcessDto,
-							orderProcessModel,
-							String.valueOf(operator.getUserId()),
-							PendingActivityBuildOperation.ALL);
+			orderProcessDto = orderProcessAccessor.postProcess(orderProcessDto,
+					orderProcessModel, String.valueOf(operator.getUserId()),
+					PendingActivityBuildOperation.ALL);
 		} else {
 			// flow completed
 			LOGGER.info("process completed, get latest status of OrderProcess:{} ");
@@ -340,6 +350,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		OrderProcessDto orderProcessDto = null;
 		OrderProcessModel orderProcessModel = orderProcessAccessor
 				.getOrderProcessByOrderNo(orderNo);
+		UserModel operatorModel = orderProcessModel.getOperator();
+		UserDto operator = userConverter.toDto(operatorModel);
+
 		orderProcessDto = this.doManualOrderReview(orderProcessModel, orderNo,
 				reviewRecord);
 
@@ -347,10 +360,9 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 				orderProcessModel.getMainProcessDefinitionId())) {
 			LOGGER.info("process pending, build pending Activity:{} ");
 			// flow paused
-			orderProcessDto = orderProcessAccessor
-					.postProcessForPendingActivity(orderProcessDto,
-							orderProcessModel, null,
-							PendingActivityBuildOperation.ALL);
+			orderProcessDto = orderProcessAccessor.postProcess(orderProcessDto,
+					orderProcessModel, String.valueOf(operator.getUserId()),
+					PendingActivityBuildOperation.ALL);
 		} else {
 			// flow completed
 			LOGGER.info("process completed, get latest status of OrderProcess:{} ");

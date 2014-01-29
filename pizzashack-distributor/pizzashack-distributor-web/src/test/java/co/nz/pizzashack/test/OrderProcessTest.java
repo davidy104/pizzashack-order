@@ -19,6 +19,8 @@ import co.nz.pizzashack.data.dto.BillingDto;
 import co.nz.pizzashack.data.dto.DepartmentDto;
 import co.nz.pizzashack.data.dto.OrderDto;
 import co.nz.pizzashack.data.dto.OrderProcessDto;
+import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
+import co.nz.pizzashack.data.dto.ProcessActivityDto;
 import co.nz.pizzashack.data.dto.StaffDto;
 import co.nz.pizzashack.data.dto.UserDto;
 import co.nz.pizzashack.ds.OrderDS;
@@ -98,12 +100,60 @@ public class OrderProcessTest {
 
 		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
 		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
-		
 
-//		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
-//				orderDto.getTotalPrice());
-//		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
-//				operator);
+		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
+				orderDto.getTotalPrice());
+		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
+				operator);
+		LOGGER.info("after billing entry:{} ", orderProcess);
+	}
+
+	@Test
+	public void testManualReviewCase() throws Exception {
+		ProcessActivityDto pendingActivity = null;
+		OrderProcessDto orderProcess = orderProcessDs
+				.startOrderProcess(operator);
+		String orderNo = orderProcess.getOrder().getOrderNo();
+		LOGGER.info("after start instance:{} ", orderProcess);
+
+		printAvailableOrderTasks(operator);
+
+		OrderDto order = OrderTestUtils.mockManualUWOrder(orderNo);
+		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
+				.size());
+		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
+		LOGGER.info("after dataentry:{} ", orderProcess);
+		LOGGER.info("current pending activity:{} ",
+				orderProcess.getPendingActivity());
+
+		printAvailableOrderTasks(operator);
+		printAvailableOrderTasks(davidReviewer.getUser());
+		printAvailableOrderTasks(bradReviewer.getUser());
+
+		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
+		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
+
+		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
+		LOGGER.info("after david claim task:{} ");
+		printAvailableOrderTasks(operator);
+		printAvailableOrderTasks(davidReviewer.getUser());
+		printAvailableOrderTasks(bradReviewer.getUser());
+
+		OrderReviewRecordDto orderReviewRecordDto = new OrderReviewRecordDto();
+		orderReviewRecordDto.setContent("review passed");
+		orderReviewRecordDto.setReviewer(davidReviewer);
+		orderReviewRecordDto.setReviewResult("accept");
+		orderProcess = orderProcessDs.manualOrderReview(orderNo,
+				orderReviewRecordDto);
+
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("after manul underwriting pendingActivity:{} ",
+				pendingActivity);
+
+		// BillingDto billing = OrderTestUtils.mockBilling(orderNo,
+		// orderDto.getTotalPrice());
+		// orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
+		// operator);
 		// LOGGER.info("after billing entry:{} ", orderProcess);
 	}
 

@@ -19,7 +19,7 @@ public class OrderTestUtils {
 		OrderDto orderDto = new OrderDto();
 		orderDto.setOrderNo(orderNo);
 		orderDto.setAddress("25 mavon downs");
-		orderDto.setQty(4);
+		orderDto.setQty(6);
 
 		OrderDetailsDto orderDetail = new OrderDetailsDto();
 		orderDetail.setPizzaName("Chicken Parmesan");
@@ -28,6 +28,33 @@ public class OrderTestUtils {
 
 		orderDetail = new OrderDetailsDto();
 		orderDetail.setPizzaName("Spicy Italian");
+		orderDetail.setQty(4);
+		orderDto.addPizzaOrder(orderDetail);
+
+		orderDto.setCustomer(mockCustomer());
+		return orderDto;
+	}
+
+	/**
+	 * maunual uw-> total order number more than 10 but less than 30
+	 * 
+	 * @param orderNo
+	 * @return
+	 */
+	public static OrderDto mockManualUWOrder(String orderNo) {
+		// Spicy Italian,Chicken Parmesan,Garden Fresh
+		OrderDto orderDto = new OrderDto();
+		orderDto.setOrderNo(orderNo);
+		orderDto.setAddress("25 mavon downs");
+		orderDto.setQty(14);
+
+		OrderDetailsDto orderDetail = new OrderDetailsDto();
+		orderDetail.setPizzaName("Chicken Parmesan");
+		orderDetail.setQty(10);
+		orderDto.addPizzaOrder(orderDetail);
+
+		orderDetail = new OrderDetailsDto();
+		orderDetail.setPizzaName("Garden Fresh");
 		orderDetail.setQty(4);
 		orderDto.addPizzaOrder(orderDetail);
 

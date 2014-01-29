@@ -48,7 +48,7 @@ Pizzashack Distributor.
     <callActivity id="orderCoreCallactivity" name="Core process" calledElement="orderCoreProcess">
       <extensionElements>
         <activiti:in source="orderTrans" target="orderTransBean"></activiti:in>
-        <activiti:in source="coreIsIndependentProcess" target="isIndependentProcess"></activiti:in>
+        <activiti:in source="coreIsIndependentProcess" target="indenpendentProcess"></activiti:in>
         <activiti:out source="orderReviewStatus" target="coreOrderReviewStatus"></activiti:out>
         <activiti:out source="orderTransBean" target="orderOutTrans"></activiti:out>
         <activiti:out source="reviewTransBean" target="reviewTrans"></activiti:out>
