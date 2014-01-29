@@ -18,4 +18,10 @@ public class OrderProcessPredicates {
 		QOrderProcessModel orderProcessModel = QOrderProcessModel.orderProcessModel;
 		return orderProcessModel.executionId.in(executionIds);
 	}
+
+	public static Predicate findByCustomerEmail(final String custEmail) {
+		QOrderProcessModel orderProcessModel = QOrderProcessModel.orderProcessModel;
+		QOrderModel order = orderProcessModel.order;
+		return order.customer.email.eq(custEmail);
+	}
 }

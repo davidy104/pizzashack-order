@@ -443,4 +443,11 @@ public class ActivitiFacade {
 		return groupIds;
 	}
 
+	public List<HistoricActivityInstance> getHistoricActivities(
+			String processInstanceId, String processDefinitionId) {
+		return historyService.createHistoricActivityInstanceQuery()
+				.processInstanceId(processInstanceId)
+				.processDefinitionId(processDefinitionId).list();
+	}
+
 }

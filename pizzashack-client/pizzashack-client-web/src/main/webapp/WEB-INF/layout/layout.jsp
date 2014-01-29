@@ -44,10 +44,7 @@
                             <li id="navi-homepage-link"><a href="/index"><spring:message code="header.home.link.label"/></a></li>
                             <li class="divider-vertical"></li>
                         </ul>
-                         <ul id="navigation" class="nav">
-                            <li id="navi-homepage-link"><a href="/adminIndex"><spring:message code="header.admin.link.label"/></a></li>
-                            <li class="divider-vertical"></li>
-                        </ul>
+                 
                     </div>
                 </div>
             </div>

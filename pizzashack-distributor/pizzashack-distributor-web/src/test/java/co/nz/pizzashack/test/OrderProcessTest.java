@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import co.nz.pizzashack.ds.UserDS;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationConfiguration.class })
 @WebAppConfiguration
-// @Ignore
+@Ignore("not run all the time")
 public class OrderProcessTest {
 
 	private static final Logger LOGGER = LoggerFactory

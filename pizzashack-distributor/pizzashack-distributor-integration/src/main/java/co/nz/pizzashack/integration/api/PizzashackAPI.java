@@ -6,7 +6,13 @@ public interface PizzashackAPI {
 
 	Response getPizzashacks();
 
+	Response getPizzashackById(Long pizzashackId);
+
+	Response getOrderProcessesByCustomer(String customerEmail);
+
+	Response getOrderProcessByOrderNo(String orderNo);
+
 	Response getOrdersforCustomer(String customerEmail);
 
-	Response getOrderByNo(String orderNo);
+	Response getOrderByOrderNo(String orderNo);
 }

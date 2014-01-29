@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.nz.pizzashack.NotFoundException;
 import co.nz.pizzashack.data.dto.PizzashackDto;
 import co.nz.pizzashack.data.model.PizzashackModel;
 import co.nz.pizzashack.data.repository.PizzashackRepository;
@@ -38,28 +39,45 @@ public class PizzashackDSImpl implements PizzashackDS {
 		if (modelList != null && modelList.size() > 0) {
 			results = new HashSet<PizzashackDto>();
 			for (PizzashackModel model : modelList) {
-
-				PizzashackDto dto = new PizzashackDto();
-				dto.setDescription(model.getDescription());
-				dto.setIcon(model.getIcon());
-				dto.setPizzaName(model.getPizzaName());
-				dto.setPizzashackId(model.getPizzashackId());
-				dto.setPrice(model.getPrice());
-				LOGGER.info("pizzashack:{} ", dto);
-
-				BigDecimal discountRate = pizzashackCaculator
-						.getDiscountForPizza(model);
-				if (discountRate.compareTo(BigDecimal.ZERO) == 1) {
-					BigDecimal discountPrice = model.getPrice().subtract(
-							model.getPrice().multiply(discountRate));
-					dto.setAfterDiscount(discountPrice);
-				}
-
-				results.add(dto);
+				results.add(this.toPizzashackDto(model));
 			}
 		}
 		LOGGER.info("getAllItems end:{} ");
 		return results;
+	}
+
+	@Override
+	public PizzashackDto getPizzashackById(Long pizzashackId) throws Exception {
+		LOGGER.info("getPizzashackById start:{} ", pizzashackId);
+		PizzashackDto found = null;
+		PizzashackModel pizzashackModel = pizzashackRepository
+				.findOne(pizzashackId);
+		if (pizzashackModel == null) {
+			throw new NotFoundException("Pizzashack not found by id["
+					+ pizzashackId + "]");
+		}
+		found = this.toPizzashackDto(pizzashackModel);
+		LOGGER.info("getPizzashackById end:{} ", found);
+		return found;
+	}
+
+	private PizzashackDto toPizzashackDto(PizzashackModel pizzashackModel) {
+		PizzashackDto dto = new PizzashackDto();
+		dto.setDescription(pizzashackModel.getDescription());
+		dto.setIcon(pizzashackModel.getIcon());
+		dto.setPizzaName(pizzashackModel.getPizzaName());
+		dto.setPizzashackId(pizzashackModel.getPizzashackId());
+		dto.setPrice(pizzashackModel.getPrice());
+		LOGGER.info("pizzashack:{} ", dto);
+
+		BigDecimal discountRate = pizzashackCaculator
+				.getDiscountForPizza(pizzashackModel);
+		if (discountRate.compareTo(BigDecimal.ZERO) == 1) {
+			BigDecimal discountPrice = pizzashackModel.getPrice().subtract(
+					pizzashackModel.getPrice().multiply(discountRate));
+			dto.setAfterDiscount(discountPrice);
+		}
+		return dto;
 	}
 
 }

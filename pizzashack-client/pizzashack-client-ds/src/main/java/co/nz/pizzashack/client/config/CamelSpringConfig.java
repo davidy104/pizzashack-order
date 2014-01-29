@@ -1,4 +1,4 @@
-package co.nz.pizzashack.config;
+package co.nz.pizzashack.client.config;
 
 import java.util.concurrent.TimeUnit;
 
@@ -9,7 +9,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.impl.SimpleRegistry;
@@ -24,8 +23,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.JmsTransactionManager;
 
-import co.nz.pizzashack.integration.route.BillingProcessRoute;
-
 @Configuration
 @PropertySource("classpath:activitymq-config.properties")
 public class CamelSpringConfig {
@@ -36,22 +33,11 @@ public class CamelSpringConfig {
 	@Autowired
 	private JmsComponent jmsComponent;
 
-	@Autowired
-	private CxfEndpoint billingAccountEndpoint;
-
 	@Resource
 	private Environment environment;
 
 	@Inject
 	private ApplicationContext context;
-
-	@Resource
-	private BillingProcessRoute billingProcessRoute;
-	
-	
-
-	// @Resource
-	// private WsBillingProcessRoute wsBillingProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
@@ -117,9 +103,7 @@ public class CamelSpringConfig {
 		camelContext.addComponent("jms", jmsComponent());
 
 		SimpleRegistry registry = new SimpleRegistry();
-		registry.put("billingAccountEndpoint", billingAccountEndpoint);
 		camelContext.setRegistry(registry);
-		camelContext.addRoutes(billingProcessRoute);
 
 		return camelContext;
 	}

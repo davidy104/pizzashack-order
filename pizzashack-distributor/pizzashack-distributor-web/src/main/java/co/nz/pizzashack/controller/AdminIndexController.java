@@ -12,14 +12,14 @@ import co.nz.pizzashack.data.dto.UserDto;
 import co.nz.pizzashack.support.SessionAttribute;
 
 @Controller
-@RequestMapping("/index")
+@RequestMapping("/adminIndex")
 @SessionAttributes(types = UserDto.class)
-public class IndexController extends BaseController {
+public class AdminIndexController extends BaseController {
 
-	public static final String INDEX_VIEW = "index";
+	public static final String INDEX_VIEW = "adminIndex";
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(IndexController.class);
+			.getLogger(AdminIndexController.class);
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String index(

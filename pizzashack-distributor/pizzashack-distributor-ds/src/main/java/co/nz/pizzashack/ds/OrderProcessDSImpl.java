@@ -435,17 +435,4 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		return orderProcessDtoSet;
 	}
 
-	@Override
-	@Transactional(value = "localTxManager", readOnly = true)
-	public OrderProcessDto getOrderProcessByOrderNo(String orderNo)
-			throws Exception {
-		LOGGER.info("getOrderProcessByOrderNo start:{} ", orderNo);
-		OrderProcessDto found = null;
-		OrderProcessModel orderProcessModel = orderProcessAccessor
-				.getOrderProcessByOrderNo(orderNo);
-		found = orderProcessConverter.toDto(orderProcessModel);
-		LOGGER.info("getOrderProcessByOrderNo end:{} ", found);
-		return found;
-	}
-
 }

@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="orderlocalProcess" name="Order local process" isExecutable="true">
-    <startEvent id="startevent1" name="Start"></startEvent>
-    <userTask id="dataEntry" name="Data entry"></userTask>
-    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
-    <scriptTask id="deliver" name="Deliver" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
-import co.nz.pizzashack.utils.GeneralUtils;
-import co.nz.pizzashack.data.dto.OrderDto;
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+	expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+	<process id="orderlocalProcess" name="Order local process"
+		isExecutable="true">
+		<startEvent id="startevent1" name="Start"></startEvent>
+		<userTask id="dataEntry" name="Data entry"></userTask>
+		<exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+		<scriptTask id="deliver" name="Deliver" scriptFormat="groovy"
+			activiti:autoStoreVariables="false">
+			<script>import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
+				import co.nz.pizzashack.utils.GeneralUtils;
+				import co.nz.pizzashack.data.dto.OrderDto;
 
-OrderDto order = orderTrans.order;
-order.status="delivered";
-order.deliverTime = GeneralUtils.dateToStr(new Date());
-out:println "after delivered: " + order;</script>
-    </scriptTask>
-    <serviceTask id="mailToCustomerAboutOrderResult" name="Mail to Customer about Order result" activiti:type="mail">
-      <extensionElements>
-        <activiti:field name="html">
-          <activiti:expression>&lt;![CDATA[
+				OrderDto order = orderTrans.order;
+				order.status="delivered";
+				order.deliverTime = GeneralUtils.dateToStr(new Date());
+				out:println "after delivered: " + order;
+			</script>
+		</scriptTask>
+		<serviceTask id="mailToCustomerAboutOrderResult" name="Mail to Customer about Order result"
+			activiti:type="mail">
+			<extensionElements>
+				<activiti:field name="html">
+					<activiti:expression>&lt;![CDATA[
 &lt;html&gt;
 &lt;body&gt;
 Dear ${emailCustomerName},&lt;br/&gt;&lt;br/&gt;
@@ -28,105 +36,131 @@ Pizzashack Distributor.
 &lt;/body&gt;
 &lt;/html&gt;
 ]]&gt;</activiti:expression>
-        </activiti:field>
-        <activiti:field name="to">
-          <activiti:expression>${emailToAddress}</activiti:expression>
-        </activiti:field>
-        <activiti:field name="subject">
-          <activiti:string>about Your order</activiti:string>
-        </activiti:field>
-      </extensionElements>
-    </serviceTask>
-    <endEvent id="theEnd" name="End"></endEvent>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="dataEntry"></sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="billingEntry">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 0}]]></conditionExpression>
-    </sequenceFlow>
-    <callActivity id="orderCoreCallactivity" name="Core process" calledElement="orderCoreProcess">
-      <extensionElements>
-        <activiti:in source="orderTrans" target="orderTransBean"></activiti:in>
-        <activiti:in source="coreIsIndependentProcess" target="indenpendentProcess"></activiti:in>
-        <activiti:out source="orderReviewStatus" target="coreOrderReviewStatus"></activiti:out>
-        <activiti:out source="orderTransBean" target="orderOutTrans"></activiti:out>
-        <activiti:out source="reviewTransBean" target="reviewTrans"></activiti:out>
-      </extensionElements>
-    </callActivity>
-    <sequenceFlow id="flow5" sourceRef="dataEntry" targetRef="orderCoreCallactivity">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow6" sourceRef="orderCoreCallactivity" targetRef="exclusivegateway1">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{outOfCoreProcessExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow7" sourceRef="exclusivegateway1" targetRef="mailToCustomerAboutOrderResult">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 1}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow8" sourceRef="deliver" targetRef="mailToCustomerAboutOrderResult">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow9" sourceRef="mailToCustomerAboutOrderResult" targetRef="theEnd">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{endExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="dataEntry">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 2}]]></conditionExpression>
-    </sequenceFlow>
-    <callActivity id="billingCallactivity" name="Billing" calledElement="orderBillingProcess">
-      <extensionElements>
-        <activiti:in source="billingTrans" target="billingTransBean"></activiti:in>
-        <activiti:in source="billingIsIndependentProcess" target="indenpendentProcess"></activiti:in>
-        <activiti:in source="orderTrans" target="orderTransBean"></activiti:in>
-        <activiti:out source="billingProcessStatus" target="mainBillingProcessStatus"></activiti:out>
-        <activiti:out source="billingTransBean" target="billingTransOut"></activiti:out>
-        <activiti:out source="orderTransBean" target="orderOutTrans"></activiti:out>
-      </extensionElements>
-    </callActivity>
-    <userTask id="billingEntry" name="Billing fill in"></userTask>
-    <sequenceFlow id="flow11" sourceRef="billingEntry" targetRef="billingCallactivity">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow12" sourceRef="exclusivegateway2" targetRef="mailToCustomerAboutBillingResult">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${mainBillingProcessStatus == 1}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow13" sourceRef="billingCallactivity" targetRef="exclusivegateway2">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{outOfBillingProcessExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow14" sourceRef="exclusivegateway2" targetRef="deliver">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${mainBillingProcessStatus == 0}]]></conditionExpression>
-    </sequenceFlow>
-    <serviceTask id="mailToCustomerAboutBillingResult" name="Mail to Customer about Billing result" activiti:type="mail">
-      <extensionElements>
-        <activiti:field name="subject">
-          <activiti:string>about Your order</activiti:string>
-        </activiti:field>
-        <activiti:field name="to">
-          <activiti:expression>${emailToAddress}</activiti:expression>
-        </activiti:field>
-        <activiti:field name="html">
-          <activiti:expression>&lt;![CDATA[
+				</activiti:field>
+				<activiti:field name="to">
+					<activiti:expression>${emailToAddress}</activiti:expression>
+				</activiti:field>
+				<activiti:field name="subject">
+					<activiti:string>about Your order</activiti:string>
+				</activiti:field>
+			</extensionElements>
+		</serviceTask>
+		<endEvent id="theEnd" name="End"></endEvent>
+		<sequenceFlow id="flow1" sourceRef="startevent1"
+			targetRef="dataEntry"></sequenceFlow>
+		<sequenceFlow id="flow4" sourceRef="exclusivegateway1"
+			targetRef="billingEntry">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 0}]]></conditionExpression>
+		</sequenceFlow>
+		<callActivity id="orderCoreCallactivity" name="Core process"
+			calledElement="orderCoreProcess">
+			<extensionElements>
+				<activiti:in source="orderTrans" target="orderTransBean"></activiti:in>
+				<activiti:in source="coreIsIndependentProcess" target="indenpendentProcess"></activiti:in>
+				<activiti:out source="orderReviewStatus" target="coreOrderReviewStatus"></activiti:out>
+				<activiti:out source="orderTransBean" target="orderOutTrans"></activiti:out>
+				<activiti:out source="reviewTransBean" target="reviewTrans"></activiti:out>
+			</extensionElements>
+		</callActivity>
+		<sequenceFlow id="flow5" sourceRef="dataEntry"
+			targetRef="orderCoreCallactivity">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<sequenceFlow id="flow6" sourceRef="orderCoreCallactivity"
+			targetRef="exclusivegateway1">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{outOfCoreProcessExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<sequenceFlow id="flow7" sourceRef="exclusivegateway1"
+			targetRef="mailToCustomerAboutOrderResult">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 1}]]></conditionExpression>
+		</sequenceFlow>
+		<sequenceFlow id="flow8" sourceRef="deliver"
+			targetRef="mailToCustomerAboutOrderResult">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<sequenceFlow id="flow9" sourceRef="mailToCustomerAboutOrderResult"
+			targetRef="theEnd">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{endExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<sequenceFlow id="flow10" sourceRef="exclusivegateway1"
+			targetRef="dataEntry">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreOrderReviewStatus == 2}]]></conditionExpression>
+		</sequenceFlow>
+		<callActivity id="billingCallactivity" name="Billing"
+			calledElement="orderBillingProcess">
+			<extensionElements>
+				<activiti:in source="billingTrans" target="billingTransBean"></activiti:in>
+				<activiti:in source="billingIsIndependentProcess"
+					target="indenpendentProcess"></activiti:in>
+				<activiti:in source="orderTrans" target="orderTransBean"></activiti:in>
+				<activiti:out source="billingProcessStatus" target="mainBillingProcessStatus"></activiti:out>
+				<activiti:out source="billingTransBean" target="billingTransOut"></activiti:out>
+				<activiti:out source="orderTransBean" target="orderOutTrans"></activiti:out>
+			</extensionElements>
+		</callActivity>
+		<userTask id="billingEntry" name="Billing fill in"></userTask>
+		<sequenceFlow id="flow11" sourceRef="billingEntry"
+			targetRef="billingCallactivity">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+		<sequenceFlow id="flow12" sourceRef="exclusivegateway2"
+			targetRef="mailToCustomerAboutBillingResult">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{emailExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${mainBillingProcessStatus == 1}]]></conditionExpression>
+		</sequenceFlow>
+		<sequenceFlow id="flow13" sourceRef="billingCallactivity"
+			targetRef="exclusivegateway2">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{outOfBillingProcessExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<sequenceFlow id="flow14" sourceRef="exclusivegateway2"
+			targetRef="deliver">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${mainBillingProcessStatus == 0}]]></conditionExpression>
+		</sequenceFlow>
+		<serviceTask id="mailToCustomerAboutBillingResult" name="Mail to Customer about Billing result"
+			activiti:type="mail">
+			<extensionElements>
+				<activiti:field name="subject">
+					<activiti:string>about Your order</activiti:string>
+				</activiti:field>
+				<activiti:field name="to">
+					<activiti:expression>${emailToAddress}</activiti:expression>
+				</activiti:field>
+				<activiti:field name="html">
+					<activiti:expression>&lt;![CDATA[
 &lt;html&gt;
 &lt;body&gt;
 Dear ${emailCustomerName},&lt;br/&gt;&lt;br/&gt;
@@ -137,142 +171,161 @@ Pizzashack Distributor.
 &lt;/body&gt;
 &lt;/html&gt;
 ]]&gt;</activiti:expression>
-        </activiti:field>
-      </extensionElements>
-    </serviceTask>
-    <sequenceFlow id="flow15" sourceRef="mailToCustomerAboutBillingResult" targetRef="billingEntry">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="mailToCustomerAboutBillingResult" cancelActivity="true">
-      <timerEventDefinition>
-        <timeDuration>PT10S</timeDuration>
-      </timerEventDefinition>
-    </boundaryEvent>
-    <sequenceFlow id="flow16" sourceRef="boundarytimer1" targetRef="billingEntry">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="mailToCustomerAboutOrderResult" cancelActivity="true">
-      <timerEventDefinition>
-        <timeDuration>PT10S</timeDuration>
-      </timerEventDefinition>
-    </boundaryEvent>
-    <sequenceFlow id="flow17" sourceRef="boundarytimer2" targetRef="theEnd">
-      <extensionElements>
-        <activiti:executionListener event="take" expression="#{endExecutionListener.execute(execution)}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-  </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_orderlocalProcess">
-    <bpmndi:BPMNPlane bpmnElement="orderlocalProcess" id="BPMNPlane_orderlocalProcess">
-      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="100.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="dataEntry" id="BPMNShape_dataEntry">
-        <omgdc:Bounds height="55.0" width="105.0" x="107.0" y="90.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
-        <omgdc:Bounds height="40.0" width="40.0" x="389.0" y="97.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="deliver" id="BPMNShape_deliver">
-        <omgdc:Bounds height="55.0" width="105.0" x="730.0" y="190.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="billingCallactivity" id="BPMNShape_billingCallactivity">
-        <omgdc:Bounds height="55.0" width="105.0" x="500.0" y="190.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="orderCoreCallactivity" id="BPMNShape_orderCoreCallactivity">
-        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="90.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="billingEntry" id="BPMNShape_billingEntry">
-        <omgdc:Bounds height="55.0" width="105.0" x="357.0" y="190.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
-        <omgdc:Bounds height="40.0" width="40.0" x="650.0" y="197.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="mailToCustomerAboutOrderResult" id="BPMNShape_mailToCustomerAboutOrderResult">
-        <omgdc:Bounds height="55.0" width="105.0" x="730.0" y="90.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="mailToCustomerAboutBillingResult" id="BPMNShape_mailToCustomerAboutBillingResult">
-        <omgdc:Bounds height="55.0" width="105.0" x="500.0" y="270.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="boundarytimer1" id="BPMNShape_boundarytimer1">
-        <omgdc:Bounds height="30.0" width="30.0" x="520.0" y="320.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
-        <omgdc:Bounds height="30.0" width="30.0" x="805.0" y="71.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
-        <omgdc:Bounds height="35.0" width="35.0" x="892.0" y="100.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="75.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="107.0" y="117.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="409.0" y="137.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="190.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="212.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="250.0" y="117.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="355.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="389.0" y="117.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="429.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="730.0" y="117.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
-        <omgdi:waypoint x="782.0" y="190.0"></omgdi:waypoint>
-        <omgdi:waypoint x="782.0" y="145.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
-        <omgdi:waypoint x="835.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="892.0" y="117.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
-        <omgdi:waypoint x="409.0" y="97.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="64.0"></omgdi:waypoint>
-        <omgdi:waypoint x="335.0" y="64.0"></omgdi:waypoint>
-        <omgdi:waypoint x="163.0" y="64.0"></omgdi:waypoint>
-        <omgdi:waypoint x="159.0" y="90.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
-        <omgdi:waypoint x="462.0" y="217.0"></omgdi:waypoint>
-        <omgdi:waypoint x="500.0" y="217.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
-        <omgdi:waypoint x="670.0" y="237.0"></omgdi:waypoint>
-        <omgdi:waypoint x="670.0" y="297.0"></omgdi:waypoint>
-        <omgdi:waypoint x="605.0" y="297.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
-        <omgdi:waypoint x="605.0" y="217.0"></omgdi:waypoint>
-        <omgdi:waypoint x="650.0" y="217.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
-        <omgdi:waypoint x="690.0" y="217.0"></omgdi:waypoint>
-        <omgdi:waypoint x="730.0" y="217.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
-        <omgdi:waypoint x="500.0" y="297.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="297.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="245.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
-        <omgdi:waypoint x="520.0" y="335.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="334.0"></omgdi:waypoint>
-        <omgdi:waypoint x="409.0" y="245.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
-        <omgdi:waypoint x="835.0" y="86.0"></omgdi:waypoint>
-        <omgdi:waypoint x="909.0" y="100.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
+				</activiti:field>
+			</extensionElements>
+		</serviceTask>
+		<sequenceFlow id="flow15" sourceRef="mailToCustomerAboutBillingResult"
+			targetRef="billingEntry">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<boundaryEvent id="boundarytimer1" name="Timer"
+			attachedToRef="mailToCustomerAboutBillingResult" cancelActivity="true">
+			<timerEventDefinition>
+				<timeDuration>PT10S</timeDuration>
+			</timerEventDefinition>
+		</boundaryEvent>
+		<sequenceFlow id="flow16" sourceRef="boundarytimer1"
+			targetRef="billingEntry">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{orderMainTransitionExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+		<boundaryEvent id="boundarytimer2" name="Timer"
+			attachedToRef="mailToCustomerAboutOrderResult" cancelActivity="true">
+			<timerEventDefinition>
+				<timeDuration>PT10S</timeDuration>
+			</timerEventDefinition>
+		</boundaryEvent>
+		<sequenceFlow id="flow17" sourceRef="boundarytimer2"
+			targetRef="theEnd">
+			<extensionElements>
+				<activiti:executionListener event="take"
+					expression="#{endExecutionListener.execute(execution)}"></activiti:executionListener>
+			</extensionElements>
+		</sequenceFlow>
+	</process>
+	<bpmndi:BPMNDiagram id="BPMNDiagram_orderlocalProcess">
+		<bpmndi:BPMNPlane bpmnElement="orderlocalProcess"
+			id="BPMNPlane_orderlocalProcess">
+			<bpmndi:BPMNShape bpmnElement="startevent1"
+				id="BPMNShape_startevent1">
+				<omgdc:Bounds height="35.0" width="35.0" x="40.0" y="100.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="dataEntry" id="BPMNShape_dataEntry">
+				<omgdc:Bounds height="55.0" width="105.0" x="107.0" y="90.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="exclusivegateway1"
+				id="BPMNShape_exclusivegateway1">
+				<omgdc:Bounds height="40.0" width="40.0" x="389.0" y="97.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="deliver" id="BPMNShape_deliver">
+				<omgdc:Bounds height="55.0" width="105.0" x="730.0" y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="billingCallactivity"
+				id="BPMNShape_billingCallactivity">
+				<omgdc:Bounds height="55.0" width="105.0" x="500.0" y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="orderCoreCallactivity"
+				id="BPMNShape_orderCoreCallactivity">
+				<omgdc:Bounds height="55.0" width="105.0" x="250.0" y="90.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="billingEntry"
+				id="BPMNShape_billingEntry">
+				<omgdc:Bounds height="55.0" width="105.0" x="357.0" y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="exclusivegateway2"
+				id="BPMNShape_exclusivegateway2">
+				<omgdc:Bounds height="40.0" width="40.0" x="650.0" y="197.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="mailToCustomerAboutOrderResult"
+				id="BPMNShape_mailToCustomerAboutOrderResult">
+				<omgdc:Bounds height="55.0" width="105.0" x="730.0" y="90.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="mailToCustomerAboutBillingResult"
+				id="BPMNShape_mailToCustomerAboutBillingResult">
+				<omgdc:Bounds height="55.0" width="105.0" x="500.0" y="270.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="boundarytimer1"
+				id="BPMNShape_boundarytimer1">
+				<omgdc:Bounds height="30.0" width="30.0" x="520.0" y="320.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="boundarytimer2"
+				id="BPMNShape_boundarytimer2">
+				<omgdc:Bounds height="30.0" width="30.0" x="805.0" y="71.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+				<omgdc:Bounds height="35.0" width="35.0" x="892.0" y="100.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+				<omgdi:waypoint x="75.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="107.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+				<omgdi:waypoint x="409.0" y="137.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="190.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+				<omgdi:waypoint x="212.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="250.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+				<omgdi:waypoint x="355.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="389.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+				<omgdi:waypoint x="429.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="730.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+				<omgdi:waypoint x="782.0" y="190.0"></omgdi:waypoint>
+				<omgdi:waypoint x="782.0" y="145.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+				<omgdi:waypoint x="835.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="892.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+				<omgdi:waypoint x="409.0" y="97.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="64.0"></omgdi:waypoint>
+				<omgdi:waypoint x="335.0" y="64.0"></omgdi:waypoint>
+				<omgdi:waypoint x="163.0" y="64.0"></omgdi:waypoint>
+				<omgdi:waypoint x="159.0" y="90.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+				<omgdi:waypoint x="462.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="500.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+				<omgdi:waypoint x="670.0" y="237.0"></omgdi:waypoint>
+				<omgdi:waypoint x="670.0" y="297.0"></omgdi:waypoint>
+				<omgdi:waypoint x="605.0" y="297.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+				<omgdi:waypoint x="605.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="650.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+				<omgdi:waypoint x="690.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="730.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+				<omgdi:waypoint x="500.0" y="297.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="297.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="245.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+				<omgdi:waypoint x="520.0" y="335.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="334.0"></omgdi:waypoint>
+				<omgdi:waypoint x="409.0" y="245.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+				<omgdi:waypoint x="835.0" y="86.0"></omgdi:waypoint>
+				<omgdi:waypoint x="909.0" y="100.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
 </definitions>
