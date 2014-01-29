@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ImportResource;
 
 import co.nz.pizzashack.integration.ws.client.stub.BillingWebServices;
 
-@Configuration
+//@Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml",
 		"classpath:META-INF/cxf/cxf-extension-soap.xml",
 		"classpath:META-INF/cxf/cxf-servlet.xml" })

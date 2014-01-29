@@ -17,8 +17,11 @@ public interface OrderProcessDS {
 	OrderProcessDto fillinBillingAccount(String orderNo, BillingDto billing,
 			UserDto operator) throws Exception;
 
-	void claimOrderReviewTask(String orderNo, UserDto currentLoginUser)
+	Long claimOrderReviewTask(String orderNo, UserDto currentLoginUser)
 			throws Exception;
+
+	boolean ifCurrentUserHasRightForTask(String orderNo, String taskName,
+			UserDto currentLoginUser) throws Exception;
 
 	OrderProcessDto manualOrderReview(String orderNo,
 			OrderReviewRecordDto reviewRecord) throws Exception;

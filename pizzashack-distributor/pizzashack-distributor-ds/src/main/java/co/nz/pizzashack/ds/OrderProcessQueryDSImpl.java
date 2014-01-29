@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.activiti.engine.task.Task;
 import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class OrderProcessQueryDSImpl implements OrderProcessQueryDS {
 		OrderProcessModel orderProcessModel = orderProcessAccessor
 				.getOrderProcessByOrderNo(orderNo);
 		found = orderProcessConverter.toDto(orderProcessModel);
+		this.buildPendingActivity(found);
 		LOGGER.info("getOrderProcessByOrderNo end:{} ", found);
 		return found;
 	}
@@ -100,8 +102,29 @@ public class OrderProcessQueryDSImpl implements OrderProcessQueryDS {
 					+ orderProcessId + "]");
 		}
 		found = orderProcessConverter.toDto(foundModel);
+		this.buildPendingActivity(found);
 		LOGGER.info("getOrderProcessDtoById end:{} ", found);
 		return found;
+	}
+
+	private void buildPendingActivity(OrderProcessDto orderProcessDto) {
+		LOGGER.info("buildPendingActivity start:{}");
+		String orderNo = orderProcessDto.getOrder().getOrderNo();
+		String processDefinitionId = orderProcessDto
+				.getActiveProcessDefinitionId();
+		ProcessActivityDto pendingActivity = activitiFacade
+				.getExecutionActivityBasicInfo(orderNo, processDefinitionId,
+						orderProcessDto.getActiveProcesssInstanceId(), false,
+						true);
+
+		if (pendingActivity.getType().equals("userTask")) {
+			Task pendingTask = orderProcessAccessor.getPendingTask(
+					pendingActivity.getName(), orderNo);
+			orderProcessAccessor.buildTaskDetails(pendingTask, pendingActivity,
+					processDefinitionId);
+		}
+		orderProcessDto.setPendingActivity(pendingActivity);
+		LOGGER.info("buildPendingActivity end:{}");
 	}
 
 	@Override

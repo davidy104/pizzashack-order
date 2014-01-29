@@ -16,16 +16,14 @@
 	<div id="staff-id" class="hidden">${staff.staffId}</div>
 	<div id="staff-deptIds" class="hidden">${staff.selectedDeptIdsStr}</div>
 
-	<a href="/index" class="btn btn-primary"> <spring:message
-			code="pizza.label.tasks.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
-			code="pizza.label.depts.link" /></a>
-	<a href="/staff/list" class="btn btn-primary"> <spring:message
-			code="pizza.label.staffs.link" /></a>
-	<a href="/user/list" class="btn btn-primary"> <spring:message
-			code="pizza.label.users.link" /></a>
-	<a href="/logout" class="btn btn-primary"> <spring:message
-			code="pizza.label.logout.link" /></a>
+				code="pizza.label.depts.link" /></a> <a href="/staff/list"
+			class="btn btn-primary"> <spring:message
+				code="pizza.label.staffs.link" /></a> <a href="/user/list"
+			class="btn btn-primary"> <spring:message
+				code="pizza.label.users.link" /></a> <a href="/logout"
+			class="btn btn-primary"> <spring:message
+				code="pizza.label.logout.link" /></a>
 	<br>
 	<h3>
 		<spring:message code="staff.update.title" />

@@ -6,6 +6,7 @@ import static co.nz.pizzashack.DistributorConstants.ORDER_SUB_PROCESS_OBJ;
 import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByOrderNo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,12 +28,16 @@ import co.nz.pizzashack.data.dto.OrderDetailsDto;
 import co.nz.pizzashack.data.dto.OrderDto;
 import co.nz.pizzashack.data.dto.OrderProcessDto;
 import co.nz.pizzashack.data.dto.ProcessActivityDto;
+import co.nz.pizzashack.data.model.DepartmentModel;
 import co.nz.pizzashack.data.model.OrderModel;
-import co.nz.pizzashack.data.model.OrderPizzashackModel;
 import co.nz.pizzashack.data.model.OrderModel.OrderStatus;
+import co.nz.pizzashack.data.model.OrderPizzashackModel;
 import co.nz.pizzashack.data.model.OrderProcessModel;
+import co.nz.pizzashack.data.model.UserModel;
+import co.nz.pizzashack.data.repository.DepartmentRepository;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
 import co.nz.pizzashack.data.repository.OrderRepository;
+import co.nz.pizzashack.data.repository.UserRepository;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @Component
@@ -51,6 +56,12 @@ public class OrderProcessAccessor {
 
 	@Resource
 	private OrderRepository orderRepository;
+
+	@Resource
+	private UserRepository userRepository;
+
+	@Resource
+	private DepartmentRepository departmentRepository;
 
 	@Resource
 	private TaskService taskService;
@@ -248,17 +259,44 @@ public class OrderProcessAccessor {
 	public void buildTaskDetails(Task pendingTask,
 			ProcessActivityDto pendingActivity, String processDefinitionId) {
 		String taskDefinitionKey = pendingTask.getTaskDefinitionKey();
-		if (!StringUtils.isEmpty(pendingTask.getAssignee())) {
-			pendingActivity.setAssignee(pendingTask.getAssignee());
+		UserModel userModel = null;
+		DepartmentModel deptModel = null;
+		Set<String> candidataUserNames = null;
+		Set<String> candidataDepNames = null;
+		String assignee = pendingTask.getAssignee();
+		if (!StringUtils.isEmpty(assignee)) {
+			userModel = userRepository.findOne(Long.valueOf(assignee));
+			pendingActivity.setAssignee(userModel.getUsername());
 		} else {
 			Map<String, Set<String>> candidatasInfo = activitiFacade
 					.getActiviteTaskCandidateAssignmentInfo(taskDefinitionKey,
 							processDefinitionId);
 			if (candidatasInfo != null) {
-				pendingActivity.setCandidateUsers(candidatasInfo
-						.get(ActivitiFacade.CANDIDATE_USERS));
-				pendingActivity.setCandidateGroups(candidatasInfo
-						.get(ActivitiFacade.CANDIDATE_GROUPS));
+				Set<String> candidataUsers = candidatasInfo
+						.get(ActivitiFacade.CANDIDATE_USERS);
+				Set<String> candidataGroups = candidatasInfo
+						.get(ActivitiFacade.CANDIDATE_GROUPS);
+
+				if (candidataUsers != null && candidataUsers.size() > 0) {
+					candidataUserNames = new HashSet<String>();
+					for (String candidataUser : candidataUsers) {
+						userModel = userRepository.findOne(Long
+								.valueOf(candidataUser));
+						candidataUserNames.add(userModel.getUsername());
+					}
+				}
+
+				if (candidataGroups != null && candidataGroups.size() > 0) {
+					candidataDepNames = new HashSet<String>();
+					for (String candidataGroup : candidataGroups) {
+						deptModel = departmentRepository.findOne(Long
+								.valueOf(candidataGroup));
+						candidataDepNames.add(deptModel.getDeptName());
+					}
+				}
+
+				pendingActivity.setCandidateUsers(candidataUserNames);
+				pendingActivity.setCandidateGroups(candidataDepNames);
 			}
 		}
 	}

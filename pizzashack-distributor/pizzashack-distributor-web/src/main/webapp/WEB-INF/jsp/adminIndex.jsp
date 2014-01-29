@@ -12,18 +12,14 @@
 		<spring:message code="pizzashack.title" />
 	</h2>
 	<div>
-		<a href="/index" class="btn btn-primary"> <spring:message
-				code="pizza.label.tasks.link" /></a> <a href="/department/list"
-			class="btn btn-primary"> <spring:message
+		<a href="/department/list" class="btn btn-primary"> <spring:message
 				code="pizza.label.depts.link" /></a> <a href="/staff/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.staffs.link" /></a> <a href="/user/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.users.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
-
-	<br>
+				code="pizza.label.logout.link" /></a> <br>
 	</div>
 </body>
 </html>

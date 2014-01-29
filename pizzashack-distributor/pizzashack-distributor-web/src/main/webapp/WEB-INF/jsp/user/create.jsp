@@ -13,8 +13,6 @@
 		<spring:message code="pizzashack.title" />
 	</h2>
 
-	<a href="/index" class="btn btn-primary"> <spring:message
-			code="pizza.label.tasks.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
 			code="pizza.label.depts.link" /></a>
 	<a href="/staff/list" class="btn btn-primary"> <spring:message

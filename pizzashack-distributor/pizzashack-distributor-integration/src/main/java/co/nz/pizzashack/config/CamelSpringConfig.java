@@ -5,39 +5,46 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
+import org.apache.camel.component.sql.SqlComponent;
 import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.spi.ThreadPoolProfile;
 import org.apache.camel.spring.CamelBeanPostProcessor;
 import org.apache.camel.spring.SpringCamelContext;
+import org.apache.camel.spring.spi.SpringTransactionPolicy;
+import org.h2.jdbcx.JdbcDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.jms.connection.JmsTransactionManager;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import co.nz.pizzashack.integration.route.BillingProcessRoute;
+
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.atomikos.jms.AtomikosConnectionFactoryBean;
 
 @Configuration
 @PropertySource("classpath:activitymq-config.properties")
 public class CamelSpringConfig {
 
 	@Autowired
-	private PooledConnectionFactory pooledConnectionFactory;
-
-	@Autowired
 	private JmsComponent jmsComponent;
 
-	@Autowired
-	private CxfEndpoint billingAccountEndpoint;
+	@Resource
+	private JdbcDataSource xaJdbcDataSource;
+
+	@Resource
+	private SqlComponent sqlComponent;
 
 	@Resource
 	private Environment environment;
@@ -47,59 +54,82 @@ public class CamelSpringConfig {
 
 	@Resource
 	private BillingProcessRoute billingProcessRoute;
-	
-	
 
 	// @Resource
 	// private WsBillingProcessRoute wsBillingProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
-	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
-	private static final String ACTIVITYMQ_MAXCONNECTIONS = "activitymq_maxConnections";
+	// private static final String ACTIVITYMQ_TRANSACTED =
+	// "activitymq_transacted";
+	// private static final String ACTIVITYMQ_MAXCONNECTIONS =
+	// "activitymq_maxConnections";
 	private static final String ACTIVITYMQ_SENDTIMEOUT = "activitymq_sendTimeoutInMillis";
 	private static final String ACTIVITYMQ_WATCHTOPICADVISORIES = "activitymq_watchTopicAdvisories";
 
 	@Bean
-	public ActiveMQConnectionFactory activeMQConnectionFactory() {
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
-				environment.getRequiredProperty(ACTIVITYMQ_URL));
-		connectionFactory.setSendTimeout(Integer.valueOf(environment
-				.getRequiredProperty(ACTIVITYMQ_SENDTIMEOUT)));
-		connectionFactory.setMaxThreadPoolSize(5);
-		connectionFactory.setWatchTopicAdvisories(Boolean.valueOf(environment
-				.getRequiredProperty(ACTIVITYMQ_WATCHTOPICADVISORIES)));
-		connectionFactory.setUseDedicatedTaskRunner(false);
-		return connectionFactory;
-	}
-
-	@Bean(initMethod = "start", destroyMethod = "stop")
-	public PooledConnectionFactory pooledConnectionFactory() {
-		PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
-		pooledConnectionFactory.setMaxConnections(Integer.valueOf(environment
-				.getRequiredProperty(ACTIVITYMQ_MAXCONNECTIONS)));
-		pooledConnectionFactory
-				.setConnectionFactory(activeMQConnectionFactory());
-		return pooledConnectionFactory;
+	public AtomikosConnectionFactoryBean atomikosConnectionFactoryBean() {
+		AtomikosConnectionFactoryBean atomikosConnectionFactoryBean = new AtomikosConnectionFactoryBean();
+		atomikosConnectionFactoryBean
+				.setXaConnectionFactory(mqXaConnectionFactory());
+		atomikosConnectionFactoryBean.setUniqueResourceName("xa.activemq");
+		atomikosConnectionFactoryBean.setMaxPoolSize(10);
+		atomikosConnectionFactoryBean.setIgnoreSessionTransactedFlag(false);
+		return atomikosConnectionFactoryBean;
 	}
 
 	@Bean
-	public JmsComponent jmsComponent() {
+	public AtomikosDataSourceBean atomikosDataSourceBean() {
+		AtomikosDataSourceBean atomikosDataSourceBean = new AtomikosDataSourceBean();
+		atomikosDataSourceBean.setXaDataSource(xaJdbcDataSource);
+		atomikosDataSourceBean.setUniqueResourceName("xa.h2");
+		return atomikosDataSourceBean;
+	}
+
+	@Bean
+	@Qualifier("jtaTxManager")
+	public JtaTransactionManager jtaTransactionManager() throws Exception {
+		UserTransactionManager userTransactionManager = new UserTransactionManager();
+		userTransactionManager.setForceShutdown(false);
+		userTransactionManager.init();
+		UserTransactionImp userTransactionImp = new UserTransactionImp();
+		userTransactionImp.setTransactionTimeout(300);
+
+		JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
+		jtaTransactionManager.setTransactionManager(userTransactionManager);
+		jtaTransactionManager.setUserTransaction(userTransactionImp);
+		return jtaTransactionManager;
+	}
+
+	@Bean
+	public SpringTransactionPolicy propagationRequired() throws Exception {
+		SpringTransactionPolicy propagationRequired = new SpringTransactionPolicy();
+		propagationRequired.setTransactionManager(jtaTransactionManager());
+		propagationRequired.setPropagationBehaviorName("PROPAGATION_REQUIRED");
+		return propagationRequired;
+	}
+
+	@Bean
+	public ActiveMQXAConnectionFactory mqXaConnectionFactory() {
+		ActiveMQXAConnectionFactory mqXaConnectionFactory = new ActiveMQXAConnectionFactory(
+				environment.getRequiredProperty(ACTIVITYMQ_URL));
+		mqXaConnectionFactory.setSendTimeout(Integer.valueOf(environment
+				.getRequiredProperty(ACTIVITYMQ_SENDTIMEOUT)));
+		mqXaConnectionFactory.setMaxThreadPoolSize(5);
+		mqXaConnectionFactory.setWatchTopicAdvisories(Boolean
+				.valueOf(environment
+						.getRequiredProperty(ACTIVITYMQ_WATCHTOPICADVISORIES)));
+		mqXaConnectionFactory.setUseDedicatedTaskRunner(false);
+		return mqXaConnectionFactory;
+	}
+
+	@Bean
+	public JmsComponent jmsComponent() throws Exception {
 		JmsComponent jmsComponent = new JmsComponent();
 		JmsConfiguration jmsConfiguration = new JmsConfiguration();
-		jmsConfiguration.setConnectionFactory(pooledConnectionFactory);
-		jmsConfiguration.setTransactionManager(jmsTransactionManager());
-		jmsConfiguration.setTransacted(Boolean.valueOf(environment
-				.getRequiredProperty(ACTIVITYMQ_TRANSACTED)));
-		jmsConfiguration.setCacheLevelName("CACHE_CONSUMER");
+		jmsConfiguration.setConnectionFactory(mqXaConnectionFactory());
+		jmsConfiguration.setTransactionManager(jtaTransactionManager());
 		jmsComponent.setConfiguration(jmsConfiguration);
 		return jmsComponent;
-	}
-
-	@Bean
-	public JmsTransactionManager jmsTransactionManager() {
-		JmsTransactionManager jmsTransactionManager = new JmsTransactionManager();
-		jmsTransactionManager.setConnectionFactory(pooledConnectionFactory);
-		return jmsTransactionManager;
 	}
 
 	@Bean
@@ -115,9 +145,14 @@ public class CamelSpringConfig {
 		camelContext.getExecutorServiceManager().registerThreadPoolProfile(
 				custThreadPoolProfile());
 		camelContext.addComponent("jms", jmsComponent());
-
+		camelContext.addComponent("sql", sqlComponent);
 		SimpleRegistry registry = new SimpleRegistry();
-		registry.put("billingAccountEndpoint", billingAccountEndpoint);
+		registry.put("connectionFactory", mqXaConnectionFactory());
+		registry.put("atomikos.connectionFactory",
+				atomikosConnectionFactoryBean());
+		registry.put("atomikos.dataSource", atomikosDataSourceBean());
+		registry.put("jta.transactionManager", jtaTransactionManager());
+		registry.put("PROPAGATION_REQUIRED", propagationRequired());
 		camelContext.setRegistry(registry);
 		camelContext.addRoutes(billingProcessRoute);
 

@@ -15,8 +15,6 @@
 
 	<div id="dept-id" class="hidden">${dept.deptId}</div>
 
-	<a href="/index" class="btn btn-primary"> <spring:message
-			code="pizza.label.tasks.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
 			code="pizza.label.depts.link" /></a>
 	<a href="/staff/list" class="btn btn-primary"> <spring:message
@@ -30,8 +28,8 @@
 		<spring:message code="dept.update.title" />
 	</h3>
 	<form:errors path="dept" cssClass="errorBlock" element="div" />
-	<form:form action="/department/update" cssClass="well" commandName="dept"
-		method="POST">
+	<form:form action="/department/update" cssClass="well"
+		commandName="dept" method="POST">
 		<form:hidden path="deptId" />
 
 		<div id="control-group-deptName" class="control-group">

@@ -62,7 +62,6 @@ import co.nz.pizzashack.ds.OrderProcessAccessor.PendingActivityBuildOperation;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @Service
-@Transactional(value = "localTxManager", readOnly = true)
 public class OrderProcessDSImpl implements OrderProcessDS {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -310,7 +309,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 
 	@Override
 	@Transactional(value = "localTxManager", readOnly = false)
-	public void claimOrderReviewTask(String orderNo, UserDto currentLoginUser)
+	public Long claimOrderReviewTask(String orderNo, UserDto currentLoginUser)
 			throws Exception {
 		LOGGER.info("claimOrderReviewTask start:{}", orderNo);
 
@@ -340,6 +339,16 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		taskService.setAssignee(taskId, userId);
 		taskService.claim(taskId, userId);
 		LOGGER.info("claimOrderReviewTask end:{}");
+		return orderProcessModel.getOrderProcessId();
+	}
+
+	@Override
+	@Transactional(value = "localTxManager", readOnly = true)
+	public boolean ifCurrentUserHasRightForTask(String orderNo,
+			String taskName, UserDto currentLoginUser) throws Exception {
+		return activitiFacade.checkIfUserHasRightForGivenTask(orderNo,
+				taskName, String.valueOf(currentLoginUser.getUserId()));
+
 	}
 
 	@Override
