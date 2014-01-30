@@ -24,7 +24,8 @@ public interface OrderProcessDS {
 			UserDto currentLoginUser) throws Exception;
 
 	OrderProcessDto manualOrderReview(String orderNo,
-			OrderReviewRecordDto reviewRecord) throws Exception;
+			OrderReviewRecordDto reviewRecord, UserDto currentLoginUser)
+			throws Exception;
 
 	Set<OrderProcessDto> getAllTransTaskForCurrentUser(UserDto currentLoginUser)
 			throws Exception;

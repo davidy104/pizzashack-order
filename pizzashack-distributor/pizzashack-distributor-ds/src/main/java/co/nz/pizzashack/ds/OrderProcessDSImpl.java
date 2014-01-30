@@ -354,7 +354,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	@Override
 	@Transactional(value = "localTxManager", readOnly = false)
 	public OrderProcessDto manualOrderReview(String orderNo,
-			OrderReviewRecordDto reviewRecord) throws Exception {
+			OrderReviewRecordDto reviewRecord, UserDto currentLoginUser)
+			throws Exception {
 		LOGGER.info("manualOrderReview start:{} ", reviewRecord);
 		OrderProcessDto orderProcessDto = null;
 		OrderProcessModel orderProcessModel = orderProcessAccessor
@@ -363,7 +364,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		UserDto operator = userConverter.toDto(operatorModel);
 
 		orderProcessDto = this.doManualOrderReview(orderProcessModel, orderNo,
-				reviewRecord);
+				reviewRecord, currentLoginUser);
 
 		if (!activitiFacade.ifProcessFinishted(orderNo,
 				orderProcessModel.getMainProcessDefinitionId())) {
@@ -384,7 +385,8 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 
 	private OrderProcessDto doManualOrderReview(
 			OrderProcessModel orderProcessModel, String orderNo,
-			OrderReviewRecordDto reviewRecord) throws Exception {
+			OrderReviewRecordDto reviewRecord, UserDto currentLoginUser)
+			throws Exception {
 		LOGGER.info("doManualOrderReview start:{} ");
 		Map<String, Object> variableMap = null;
 		OrderProcessDto orderProcessDto = null;
@@ -394,6 +396,13 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		if (task == null || !task.getName().equals("Manual underwriting")) {
 			throw new NotFoundException("Task[Manual underwriting] not found");
 		}
+
+		if (!activitiFacade.checkIfUserHasRightForGivenTask(orderNo,
+				task.getName(), String.valueOf(currentLoginUser.getUserId()))) {
+			throw new Exception("User[" + currentLoginUser.getUsername()
+					+ "] has no right for [" + task.getName() + "]");
+		}
+
 		orderProcessDto = orderProcessConverter.toDto(orderProcessModel);
 		String reviewResult = reviewRecord.getReviewResult();
 		LOGGER.info("reviewResult:{} ", reviewResult);

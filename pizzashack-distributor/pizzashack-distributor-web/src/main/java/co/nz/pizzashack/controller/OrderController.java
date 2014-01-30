@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import org.drools.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -105,7 +106,7 @@ public class OrderController extends BaseController {
 		reviewOptions.add("accept");
 		reviewOptions.add("reject");
 		reviewOptions.add("pending");
-		model.addAttribute("reviewResult", reviewOptions);
+		model.addAttribute("reviewResults", reviewOptions);
 
 		return SHOW_ORDERPROCESS_VIEW;
 	}
@@ -126,17 +127,19 @@ public class OrderController extends BaseController {
 		return createRedirectViewPath(REQUEST_MAPPING_VIEW_CONFIG);
 	}
 
-	@RequestMapping(value = "/review/{orderNo}", method = RequestMethod.POST)
+	@RequestMapping(value = "/review", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public String reviewOrder(
-			@PathVariable("orderNo") String orderNo,
-			@Valid @ModelAttribute(MODEL_ATTRIBUTE_REVIEW) OrderReviewRecordDto orderReviewRecordDto)
-			throws Exception {
+			@Valid @ModelAttribute(MODEL_ATTRIBUTE_REVIEW) OrderReviewRecordDto orderReviewRecordDto,
+			HttpSession session) throws Exception {
 		LOGGER.info("reviewOrder start: {}");
-		LOGGER.info("orderNo: {}", orderNo);
-		orderProcessDs.manualOrderReview(orderNo, orderReviewRecordDto);
-		return getMessage(FEEDBACK_MESSAGE_KEY_REVIEWTASK_DONE,
-				REVIEW_TASK_ACTIVITY);
+		LOGGER.info("orderNo: {}", orderReviewRecordDto);
+		UserDto loginUser = (UserDto) session
+				.getAttribute(LoginController.MODEL_ATTRIBUTE_USER);
+		orderProcessDs.manualOrderReview(orderReviewRecordDto.getOrderNo(),
+				orderReviewRecordDto, loginUser);
+		return "Review is created for order["
+				+ orderReviewRecordDto.getOrderNo() + "]";
 	}
 
 	private String candidateDisplayConvert(Set<String> candidates) {
