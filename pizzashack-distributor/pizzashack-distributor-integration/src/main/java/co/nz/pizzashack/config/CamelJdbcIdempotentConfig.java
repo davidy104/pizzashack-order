@@ -32,7 +32,7 @@ public class CamelJdbcIdempotentConfig {
 	}
 
 	@Bean
-	public JdbcMessageIdRepository accountJdbcMessageIdRepository() {
+	public JdbcMessageIdRepository orderJdbcMessageIdRepository() {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(
 				jtaTransactionManager);
 		JdbcMessageIdRepository jdbcMessageIdRepository = new JdbcMessageIdRepository(

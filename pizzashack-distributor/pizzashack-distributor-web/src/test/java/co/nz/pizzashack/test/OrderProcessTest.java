@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -19,7 +20,6 @@ import co.nz.pizzashack.data.dto.BillingDto;
 import co.nz.pizzashack.data.dto.DepartmentDto;
 import co.nz.pizzashack.data.dto.OrderDto;
 import co.nz.pizzashack.data.dto.OrderProcessDto;
-import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
 import co.nz.pizzashack.data.dto.ProcessActivityDto;
 import co.nz.pizzashack.data.dto.StaffDto;
 import co.nz.pizzashack.data.dto.UserDto;
@@ -32,7 +32,7 @@ import co.nz.pizzashack.ds.UserDS;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationConfiguration.class })
 @WebAppConfiguration
-//@Ignore("not run all the time")
+@Ignore("not run all the time")
 public class OrderProcessTest {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -40,7 +40,7 @@ public class OrderProcessTest {
 
 	@Resource
 	private OrderProcessDS orderProcessDs;
-	
+
 	@Resource
 	private OrderProcessQueryDS orderProcessQueryDs;
 
@@ -56,6 +56,9 @@ public class OrderProcessTest {
 	private UserDto operator;
 	private StaffDto davidReviewer;
 	private StaffDto bradReviewer;
+
+	@Resource
+	private OrderDataEntryTestSupport orderDataEntryTestSupport;
 
 	@Before
 	public void initialize() throws Exception {
@@ -76,15 +79,15 @@ public class OrderProcessTest {
 
 	@Test
 	public void testStartflow() throws Exception {
-		OrderProcessDto orderProcess = orderProcessDs
-				.startOrderProcess(operator);
+		OrderProcessDto orderProcess = orderDataEntryTestSupport
+				.doStartFlow(operator);
 		LOGGER.info("after start instance:{} ", orderProcess);
 	}
 
 	@Test
 	public void testAutoReviewPassedCase() throws Exception {
-		OrderProcessDto orderProcess = orderProcessDs
-				.startOrderProcess(operator);
+		OrderProcessDto orderProcess = orderDataEntryTestSupport
+				.doStartFlow(operator);
 		String orderNo = orderProcess.getOrder().getOrderNo();
 		LOGGER.info("after start instance:{} ", orderProcess);
 
@@ -93,8 +96,10 @@ public class OrderProcessTest {
 		OrderDto order = OrderTestUtils.mockAutoPassOrder(orderNo);
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
-		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
-		LOGGER.info("after dataentry:{} ", orderProcess);
+		orderProcess = orderDataEntryTestSupport.doDataEntry(orderNo, order,
+				operator);
+		LOGGER.info("***************************after dataentry:{} ",
+				orderProcess);
 		LOGGER.info("current pending activity:{} ",
 				orderProcess.getPendingActivity());
 
@@ -115,19 +120,22 @@ public class OrderProcessTest {
 	@Test
 	public void testManualReviewCase() throws Exception {
 		ProcessActivityDto pendingActivity = null;
-		OrderProcessDto orderProcess = orderProcessDs
-				.startOrderProcess(operator);
+		OrderProcessDto orderProcess = orderDataEntryTestSupport
+				.doStartFlow(operator);
 		String orderNo = orderProcess.getOrder().getOrderNo();
 		LOGGER.info("after start instance:{} ", orderProcess);
-//		printAvailableOrderTasks(operator);
+		// printAvailableOrderTasks(operator);
 		OrderDto order = OrderTestUtils.mockManualUWOrder(orderNo);
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
-		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
+		orderProcess = orderDataEntryTestSupport.doDataEntry(orderNo, order,
+				operator);
 		LOGGER.info("after dataentry:{} ", orderProcess);
-		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess.getOrderProcessId());
-		pendingActivity=orderProcess.getPendingActivity();
-		LOGGER.info("-------------------------------ProcessActivityDto:{}", pendingActivity);
+		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
+				.getOrderProcessId());
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("-------------------------------ProcessActivityDto:{}",
+				pendingActivity);
 		printAvailableOrderTasks(operator);
 		printAvailableOrderTasks(davidReviewer.getUser());
 		printAvailableOrderTasks(bradReviewer.getUser());
@@ -137,24 +145,27 @@ public class OrderProcessTest {
 
 		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
 		LOGGER.info("after david claim task:{} ");
-		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess.getOrderProcessId());
-		pendingActivity=orderProcess.getPendingActivity();
-		LOGGER.info("-------------------------------ProcessActivityDto:{}", pendingActivity);
-		
-//		printAvailableOrderTasks(operator);
-//		printAvailableOrderTasks(davidReviewer.getUser());
-//		printAvailableOrderTasks(bradReviewer.getUser());
-//
-//		OrderReviewRecordDto orderReviewRecordDto = new OrderReviewRecordDto();
-//		orderReviewRecordDto.setContent("review passed");
-//		orderReviewRecordDto.setReviewer(davidReviewer);
-//		orderReviewRecordDto.setReviewResult("accept");
-//		orderProcess = orderProcessDs.manualOrderReview(orderNo,
-//				orderReviewRecordDto);
-//
-//		pendingActivity = orderProcess.getPendingActivity();
-//		LOGGER.info("after manul underwriting pendingActivity:{} ",
-//				pendingActivity);
+		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
+				.getOrderProcessId());
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("-------------------------------ProcessActivityDto:{}",
+				pendingActivity);
+
+		// printAvailableOrderTasks(operator);
+		// printAvailableOrderTasks(davidReviewer.getUser());
+		// printAvailableOrderTasks(bradReviewer.getUser());
+		//
+		// OrderReviewRecordDto orderReviewRecordDto = new
+		// OrderReviewRecordDto();
+		// orderReviewRecordDto.setContent("review passed");
+		// orderReviewRecordDto.setReviewer(davidReviewer);
+		// orderReviewRecordDto.setReviewResult("accept");
+		// orderProcess = orderProcessDs.manualOrderReview(orderNo,
+		// orderReviewRecordDto);
+		//
+		// pendingActivity = orderProcess.getPendingActivity();
+		// LOGGER.info("after manul underwriting pendingActivity:{} ",
+		// pendingActivity);
 
 		// BillingDto billing = OrderTestUtils.mockBilling(orderNo,
 		// orderDto.getTotalPrice());

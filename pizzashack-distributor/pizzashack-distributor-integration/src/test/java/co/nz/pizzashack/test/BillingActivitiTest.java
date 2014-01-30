@@ -28,7 +28,7 @@ import co.nz.pizzashack.wf.ActivitiFacade;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-//@Ignore("execute when billing app is running")
+@Ignore("execute when billing app is running")
 public class BillingActivitiTest {
 
 	private static final Logger LOGGER = LoggerFactory
