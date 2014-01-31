@@ -21,6 +21,9 @@ public class BillingResponse implements Serializable {
 	@XmlElement
 	private String billingMessage;
 
+	public BillingResponse() {
+	}
+
 	public BillingResponse(String orderNo) {
 		super();
 		this.orderNo = orderNo;

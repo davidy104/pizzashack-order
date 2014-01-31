@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
+import org.apache.cxf.transport.servlet.CXFServlet;
 import org.sitemesh.config.ConfigurableSiteMeshFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +19,8 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-
-public class PizzashackDistributorWebInitializer
-		implements
-			WebApplicationInitializer {
+public class PizzashackDistributorWebInitializer implements
+		WebApplicationInitializer {
 
 	private static final String DISPATCHER_SERVLET_NAME = "dispatcher";
 
@@ -66,6 +65,10 @@ public class PizzashackDistributorWebInitializer
 				.addServlet("JerseySpringServlet", JerseySpringServlet.class);
 		jerseyServletDispatcher.setLoadOnStartup(1);
 		jerseyServletDispatcher.addMapping("/rest/*");
+
+		ServletRegistration.Dynamic cxfServletDispatcher = servletContext
+				.addServlet("CXFServlet", CXFServlet.class);
+		cxfServletDispatcher.addMapping("/ws/*");
 
 		servletContext.addListener(new ContextLoaderListener(rootContext));
 	}
