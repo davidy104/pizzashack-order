@@ -208,7 +208,7 @@ public class OrderProcessAccessor {
 							"Receive Billing Result")) {
 				// billing response, it might be bug , receiveTask can not be
 				// triggered automatically by camel route
-				LOGGER.info("***********************************pending on receiveBillingResponse task:{}");
+				LOGGER.info("*************************pending on receiveBillingResponse task:{}");
 				this.signalBillingRecieveTask(resultDto);
 				resultDto = postProcess(resultDto, orderProcessModel,
 						operatorName, loadPendingActivityOperations);

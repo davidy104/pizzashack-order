@@ -9,6 +9,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
+import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.component.sql.SqlComponent;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.JmsTransactionManager;
 
+import co.nz.pizzashack.integration.route.BillingInboundWsRoute;
 import co.nz.pizzashack.integration.route.BillingProcessRoute;
 import co.nz.pizzashack.integration.route.OrderProcessRoute;
 
@@ -43,11 +45,17 @@ public class CamelSpringConfig {
 	@Resource
 	private Environment environment;
 
+	@Resource
+	private CxfEndpoint billingInboundEndpoint;
+
 	@Inject
 	private ApplicationContext context;
 
 	@Resource
 	private BillingProcessRoute billingProcessRoute;
+
+	@Resource
+	private BillingInboundWsRoute billingInboundWsRoute;
 
 	@Resource
 	private OrderProcessRoute orderProcessRoute;
@@ -116,10 +124,11 @@ public class CamelSpringConfig {
 		camelContext.addComponent("jms", jmsComponent());
 		camelContext.addComponent("sql", sqlComponent);
 		SimpleRegistry registry = new SimpleRegistry();
-
+		registry.put("billingInboundEndpoint", billingInboundEndpoint);
 		camelContext.setRegistry(registry);
 		camelContext.addRoutes(billingProcessRoute);
 		camelContext.addRoutes(orderProcessRoute);
+		camelContext.addRoutes(billingInboundWsRoute);
 		return camelContext;
 	}
 

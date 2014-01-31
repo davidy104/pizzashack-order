@@ -106,11 +106,11 @@ public class OrderProcessTest {
 		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
 		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
 
-		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
-				orderDto.getTotalPrice());
-		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
-				operator);
-		LOGGER.info("after billing entry:{} ", orderProcess);
+//		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
+//				orderDto.getTotalPrice());
+//		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
+//				operator);
+//		LOGGER.info("after billing entry:{} ", orderProcess);
 	}
 
 	@Test

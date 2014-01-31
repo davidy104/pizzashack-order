@@ -19,7 +19,7 @@ public class OutOfBillingProcessExecutionListener {
 	public void execute(ExecutionListenerExecution execution) throws Exception {
 		BillingDto billingDto = (BillingDto) execution
 				.getVariable("billingTransOut");
-		LOGGER.info("after billing process, billingDto:{} ", billingDto);
+		LOGGER.info("**********************after billing process, billingDto:{} ", billingDto);
 		execution.setVariable(BILLING_MAIN_PROCESS_OBJ, billingDto);
 
 		OrderProcessDto orderProcess = (OrderProcessDto) execution

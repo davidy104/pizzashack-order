@@ -6,22 +6,30 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
-import co.nz.pizzashack.integration.ws.client.stub.BillingWebServices;
+import co.nz.pizzashack.integration.ws.BillingProcessWebServices;
 
-//@Configuration
+@Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml",
 		"classpath:META-INF/cxf/cxf-extension-soap.xml",
 		"classpath:META-INF/cxf/cxf-servlet.xml" })
 public class CamelCxfConfig {
 
+	// @Bean
+	// public CxfEndpoint billingAccountEndpoint() {
+	// CxfEndpoint cxfEndpoint = new CxfEndpoint();
+	// cxfEndpoint
+	// .setAddress("http://localhost:8112/pizzashackbilling/ws/accountWs");
+	// cxfEndpoint.setServiceClass(BillingWebServices.class);
+	// cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor());
+	// cxfEndpoint.setMtomEnabled(true);
+	// return cxfEndpoint;
+	// }
+
 	@Bean
-	public CxfEndpoint billingAccountEndpoint() {
+	public CxfEndpoint billingInboundEndpoint() {
 		CxfEndpoint cxfEndpoint = new CxfEndpoint();
-		cxfEndpoint
-				.setAddress("http://localhost:8112/pizzashackbilling/ws/accountWs");
-		cxfEndpoint.setServiceClass(BillingWebServices.class);
-		cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor());
-		cxfEndpoint.setMtomEnabled(true);
+		cxfEndpoint.setAddress("/billingWs");
+		cxfEndpoint.setServiceClass(BillingProcessWebServices.class);
 		return cxfEndpoint;
 	}
 
