@@ -5,7 +5,6 @@ import java.util.Properties;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import org.h2.jdbcx.JdbcDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,18 +67,6 @@ public class InfrastructureContextConfiguration {
 		dataSource.setAutoCommitOnClose(Boolean.valueOf(environment
 				.getRequiredProperty(PROPERTY_NAME_AUTO_COMMITONCLOSE)));
 		return dataSource;
-	}
-
-	@Bean
-	public JdbcDataSource xaJdbcDataSource() {
-		JdbcDataSource xaJdbcDataSource = new JdbcDataSource();
-		xaJdbcDataSource.setURL(environment
-				.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
-		xaJdbcDataSource.setUser(environment
-				.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
-		xaJdbcDataSource.setPassword(environment
-				.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
-		return xaJdbcDataSource;
 	}
 
 	@Bean

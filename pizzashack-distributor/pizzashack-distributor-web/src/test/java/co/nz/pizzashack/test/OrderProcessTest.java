@@ -57,9 +57,6 @@ public class OrderProcessTest {
 	private StaffDto davidReviewer;
 	private StaffDto bradReviewer;
 
-	@Resource
-	private OrderDataEntryTestSupport orderDataEntryTestSupport;
-
 	@Before
 	public void initialize() throws Exception {
 		davidReviewer = staffDs
@@ -79,15 +76,15 @@ public class OrderProcessTest {
 
 	@Test
 	public void testStartflow() throws Exception {
-		OrderProcessDto orderProcess = orderDataEntryTestSupport
-				.doStartFlow(operator);
+		OrderProcessDto orderProcess = orderProcessDs
+				.startOrderProcess(operator);
 		LOGGER.info("after start instance:{} ", orderProcess);
 	}
 
 	@Test
 	public void testAutoReviewPassedCase() throws Exception {
-		OrderProcessDto orderProcess = orderDataEntryTestSupport
-				.doStartFlow(operator);
+		OrderProcessDto orderProcess = orderProcessDs
+				.startOrderProcess(operator);
 		String orderNo = orderProcess.getOrder().getOrderNo();
 		LOGGER.info("after start instance:{} ", orderProcess);
 
@@ -96,8 +93,7 @@ public class OrderProcessTest {
 		OrderDto order = OrderTestUtils.mockAutoPassOrder(orderNo);
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
-		orderProcess = orderDataEntryTestSupport.doDataEntry(orderNo, order,
-				operator);
+		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
 		LOGGER.info("***************************after dataentry:{} ",
 				orderProcess);
 		LOGGER.info("current pending activity:{} ",
@@ -120,16 +116,15 @@ public class OrderProcessTest {
 	@Test
 	public void testManualReviewCase() throws Exception {
 		ProcessActivityDto pendingActivity = null;
-		OrderProcessDto orderProcess = orderDataEntryTestSupport
-				.doStartFlow(operator);
+		OrderProcessDto orderProcess = orderProcessDs
+				.startOrderProcess(operator);
 		String orderNo = orderProcess.getOrder().getOrderNo();
 		LOGGER.info("after start instance:{} ", orderProcess);
 		// printAvailableOrderTasks(operator);
 		OrderDto order = OrderTestUtils.mockManualUWOrder(orderNo);
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
-		orderProcess = orderDataEntryTestSupport.doDataEntry(orderNo, order,
-				operator);
+		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
 		LOGGER.info("after dataentry:{} ", orderProcess);
 		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
 				.getOrderProcessId());

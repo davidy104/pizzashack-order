@@ -119,6 +119,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	public static final String CATEGORY = "order";
 
 	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
 	public OrderProcessDto startOrderProcess(UserDto operator) throws Exception {
 		LOGGER.info("startOrderProcess start:{}", operator);
 		OrderProcessDto orderProcessDto = null;
@@ -174,6 +175,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 	}
 
 	@Override
+	@Transactional(value = "localTxManager", readOnly = false)
 	public OrderProcessDto dataEntry(String orderNo, OrderDto order,
 			UserDto operator) throws Exception {
 		LOGGER.info("dataEntry start:{}", orderNo);

@@ -23,6 +23,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.JmsTransactionManager;
 
+import co.nz.pizzashack.client.integration.route.OrderProcessRoute;
+
 @Configuration
 @PropertySource("classpath:activitymq-config.properties")
 public class CamelSpringConfig {
@@ -38,6 +40,9 @@ public class CamelSpringConfig {
 
 	@Inject
 	private ApplicationContext context;
+
+	@Resource
+	private OrderProcessRoute orderProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
@@ -105,6 +110,7 @@ public class CamelSpringConfig {
 		SimpleRegistry registry = new SimpleRegistry();
 		camelContext.setRegistry(registry);
 
+		camelContext.addRoutes(orderProcessRoute);
 		return camelContext;
 	}
 

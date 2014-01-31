@@ -56,6 +56,8 @@ class OrderProcessFormatTransformer {
 		def custEle = orderEle.customer
 		CustomerDto customer = new CustomerDto(customerName:custEle.name.text(),customerEmail:custEle.email.text())
 		order.customer = customer
+
+		return order
 	}
 
 	/**
