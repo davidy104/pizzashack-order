@@ -20,6 +20,7 @@ public class CamelJdbcIdempotentConfig {
 
 	@Resource
 	private DataSource dataSource;
+	
 	@Resource
 	private PlatformTransactionManager transactionManager;
 

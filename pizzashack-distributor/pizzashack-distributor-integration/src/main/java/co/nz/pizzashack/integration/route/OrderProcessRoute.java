@@ -16,7 +16,7 @@ import co.nz.pizzashack.integration.processor.OrderRequestProcessor;
 @Component("orderProcessRoute")
 public class OrderProcessRoute extends RouteBuilder {
 
-	public static final String ENDPOINT = "jms:queue:pizzashackOrderInbound?transacted=true";
+	public static final String ENDPOINT = "jms:queue:pizzashackOrderInbound";
 	public static final String OUTBOUND_END_POINT = "jms:queue:pizzashackOrderOutbound?jmsMessageType=Text";
 	public static final String ROUTEID = "orderProcessRoute";
 
@@ -45,7 +45,6 @@ public class OrderProcessRoute extends RouteBuilder {
 				.handled(true)
 				.end()
 				.log("Received message ${header[messageId]}")
-				.transacted("PROPAGATION_REQUIRED")
 				.idempotentConsumer(header("messageId"),
 						orderJdbcMessageIdRepository).skipDuplicate(false)
 				.choice().when(property(Exchange.DUPLICATE_MESSAGE))

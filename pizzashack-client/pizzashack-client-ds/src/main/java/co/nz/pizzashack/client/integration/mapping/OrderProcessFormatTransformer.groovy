@@ -68,7 +68,14 @@ class OrderProcessFormatTransformer {
 	}
 
 	/**
+	 * <order-process>
+	 * 	<process-id></process-id>
+	 * 	<create-time></create-time>
+	 * 	<complete-time></complete-time>
+	 * 	<operator></operator>
+	 * 
 	 *  <order>
+	 *  	<order-no></order-no>
 	 * 		<address></address>
 	 * 		<quantity></quantity>
 	 * 		<total-price></total-price>
@@ -92,27 +99,40 @@ class OrderProcessFormatTransformer {
 	 * 			<email></email>
 	 * 		</customer>
 	 * 	</order>
+	 * 
+	 * 	<pending-activity>
+	 * 		<name></name>
+	 * 		<type></type>
+	 * 		<assignee></assignee>
+	 * 	</pending-activity>
+	 * </order-process>
 	 * @return
 	 */
 	OrderDto orderRespXmlUnmarshal(String xmlStr){
 		log.info "orderRespXmlUnmarshal start:{} $xmlStr"
-		def orderEle = new XmlSlurper().parseText(xmlStr)
+		def orderProcessEle = new XmlSlurper().parseText(xmlStr)
+		def orderEle = orderProcessEle.order
 
+		String orderNo = orderEle.'order-no'.text()
 		String address = orderEle.address.text()
+		log.info "address:{} $address"
 		String status = orderEle.status.text()
+		String quantity = orderEle.quantity.text()
+		log.info "quantity:{} $quantity"
 		String orderTime = orderEle.'order-time'.text()
 		String deliverTime = orderEle.'deliver-time'.text()
 		String totalPrice = orderEle.'total-price'.text()
+		log.info "totalPrice:{} $totalPrice"
 
-
-		OrderDto orderDto = new OrderDto(address:address,status:status,orderTime:orderTime,deliverTime:deliverTime,
-		totalPrice:new BigDecimal(totalPrice))
+		OrderDto orderDto = new OrderDto(orderNo:orderNo,address:address,status:status,orderTime:orderTime,deliverTime:deliverTime,
+		totalPrice:new BigDecimal(totalPrice),qty:quantity)
 
 		def orderListEle = orderEle."order-list"
 		if(orderListEle && orderListEle."order-details".size()>0){
 			orderListEle."order-details".each {
 				String tPrice = it.'total-price'.text()
-				OrderDetailsDto orderDetailsDto = new OrderDetailsDto(pizzaName:it."pizza-name".text(),qty:it."quantity".text(),
+				String detailQty=it."quantity".text()
+				OrderDetailsDto orderDetailsDto = new OrderDetailsDto(pizzaName:it."pizza-name".text(),qty:Integer.valueOf(detailQty),
 				totalPrice:new BigDecimal(tPrice))
 				orderDto.addOrderDetails(orderDetailsDto)
 			}

@@ -15,7 +15,7 @@ import co.nz.pizzashack.data.dto.BillingDto;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-//@Ignore("execute when billing app is running")
+@Ignore("execute when billing app is running")
 public class BillingSimpleTest {
 
 	@Produce

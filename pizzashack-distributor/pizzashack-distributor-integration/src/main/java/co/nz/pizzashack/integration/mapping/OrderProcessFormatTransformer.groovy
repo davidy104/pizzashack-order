@@ -48,7 +48,9 @@ class OrderProcessFormatTransformer {
 		def orderListEle = orderEle."order-list"
 		if(orderListEle && orderListEle."order-details".size()>0){
 			orderListEle."order-details".each {
-				OrderDetailsDto orderDetailsDto = new OrderDetailsDto(pizzaName:it."pizza-name".text(),qty:it."quantity".text())
+				def detailQty = it.'quantity'.text()
+				OrderDetailsDto orderDetailsDto = new OrderDetailsDto(pizzaName:it.'pizza-name'.text(),qty:Integer.valueOf(detailQty))
+				println "orderDetailsDto: ${orderDetailsDto}"
 				order.addPizzaOrder(orderDetailsDto)
 			}
 		}
@@ -56,7 +58,7 @@ class OrderProcessFormatTransformer {
 		def custEle = orderEle.customer
 		CustomerDto customer = new CustomerDto(customerName:custEle.name.text(),customerEmail:custEle.email.text())
 		order.customer = customer
-
+		log.info "orderReqXmlUnmarshal end:{} $order"
 		return order
 	}
 
@@ -68,6 +70,7 @@ class OrderProcessFormatTransformer {
 	 * 	<operator></operator>
 	 * 
 	 *  <order>
+	 *  	<order-no></order-no>
 	 * 		<address></address>
 	 * 		<quantity></quantity>
 	 * 		<total-price></total-price>
@@ -109,11 +112,13 @@ class OrderProcessFormatTransformer {
 		StringWriter sw = new StringWriter()
 		MarkupBuilder builder = new MarkupBuilder(sw)
 
-		OrderDto order = orderProcessDto.order
+		OrderDto orderDto = orderProcessDto.order
 		ProcessActivityDto pendingActivity = orderProcessDto.pendingActivity
-		Set<OrderDetailsDto> orderDetailsSet = order.orderDetailsSet
-		CustomerDto customerDto = order.customer
-
+		log.info "pendingActivity:{} $pendingActivity"
+		Set<OrderDetailsDto> orderDetailsSet = orderDto.orderDetailsSet
+		CustomerDto customerDto = orderDto.customer
+		log.info "customerDto:{} $customerDto"
+		
 		builder.'order-process'() {
 			'process-id' "${orderProcessDto.orderProcessId}"
 			'create-time' "${orderProcessDto.createTime}"
@@ -121,12 +126,13 @@ class OrderProcessFormatTransformer {
 			'operator' "${orderProcessDto.operator.username}"
 
 			order(){
-				'address' "${order.address}"
-				'quantity' "${order.qty}"
-				'total-price' "${order.totalPrice}"
-				'status' "${order.status}"
-				'order-time' "${order.orderTime}"
-				'deliver-time' "${order.deliverTime}"
+				'order-no' "${orderDto.orderNo}"
+				'address' "${orderDto.address}"
+				'quantity' "${orderDto.qty}"
+				'total-price' "${orderDto.totalPrice}"
+				'status' "${orderDto.status}"
+				'order-time' "${orderDto.orderTime}"
+				'deliver-time' "${orderDto.deliverTime}"
 
 				if(orderDetailsSet && orderDetailsSet.size() > 0){
 					"order-list"(){
@@ -140,7 +146,6 @@ class OrderProcessFormatTransformer {
 					}
 				}
 			}
-
 
 			customer(){
 				'name' "${customerDto.customerName}"

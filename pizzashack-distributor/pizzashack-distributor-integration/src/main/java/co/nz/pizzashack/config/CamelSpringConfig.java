@@ -16,6 +16,7 @@ import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.spi.ThreadPoolProfile;
 import org.apache.camel.spring.CamelBeanPostProcessor;
 import org.apache.camel.spring.SpringCamelContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,14 +28,14 @@ import co.nz.pizzashack.integration.route.BillingProcessRoute;
 import co.nz.pizzashack.integration.route.OrderProcessRoute;
 
 @Configuration
-@PropertySource("classpath:activitymq-config.properties")
+@PropertySource("classpath:mq-config.properties")
 public class CamelSpringConfig {
 
-	@Resource
-	private JmsComponent jmsComponent;
-
-	@Resource
+	@Autowired
 	private PooledConnectionFactory pooledConnectionFactory;
+
+	@Autowired
+	private JmsComponent jmsComponent;
 
 	@Resource
 	private SqlComponent sqlComponent;
@@ -50,9 +51,6 @@ public class CamelSpringConfig {
 
 	@Resource
 	private OrderProcessRoute orderProcessRoute;
-
-	// @Resource
-	// private WsBillingProcessRoute wsBillingProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
 	private static final String ACTIVITYMQ_TRANSACTED = "activitymq_transacted";
@@ -87,7 +85,7 @@ public class CamelSpringConfig {
 	public JmsComponent jmsComponent() {
 		JmsComponent jmsComponent = new JmsComponent();
 		JmsConfiguration jmsConfiguration = new JmsConfiguration();
-		jmsConfiguration.setConnectionFactory(pooledConnectionFactory());
+		jmsConfiguration.setConnectionFactory(pooledConnectionFactory);
 		jmsConfiguration.setTransactionManager(jmsTransactionManager());
 		jmsConfiguration.setTransacted(Boolean.valueOf(environment
 				.getRequiredProperty(ACTIVITYMQ_TRANSACTED)));
@@ -99,7 +97,7 @@ public class CamelSpringConfig {
 	@Bean
 	public JmsTransactionManager jmsTransactionManager() {
 		JmsTransactionManager jmsTransactionManager = new JmsTransactionManager();
-		jmsTransactionManager.setConnectionFactory(pooledConnectionFactory());
+		jmsTransactionManager.setConnectionFactory(pooledConnectionFactory);
 		return jmsTransactionManager;
 	}
 
