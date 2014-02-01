@@ -5,7 +5,8 @@ $(function() {
 			"#review-order-link",
 			function(e) {
 				e.preventDefault();
-				var createReviewTemplate = Handlebars.compile($("#template-create-review-window").html());
+				var createReviewTemplate = Handlebars.compile($(
+						"#template-create-review-window").html());
 				$("#view-holder").append(createReviewTemplate());
 				$("#create-review-window").modal();
 			});
@@ -17,27 +18,25 @@ $(function() {
 		createReviewWindow.remove();
 	});
 
-	$("#view-holder").on("click", "#add-review-button", function(e) {
-		e.preventDefault();
-		console.log('add review start');
-		var $reviewForm = $('#reviewForm');
-		var $responseMsg = $('#actionMsg');
+	$('#reviewForm').bind('submit', function(event) {
+		console.log('submit start');
+		event.preventDefault();
+		var formValues = $(this).serialize();
+		var formURL = $(this).attr("action");
+		console.log('formURL: ' + formURL);
+		console.log('formValues: ' + formValues);
 
-		$reviewForm.bind('submit', function(event) {
-			event.preventDefault();
-			var formValues = $(this).serialize();
-			var formURL = $(this).attr("action");
-
-			$.ajax({
-				url : formURL,
-				type : "POST",
-				data : formValues,
-				success : function(result) {
-					$responseMsg.html(result);
-				}
-			});
-
+		$.ajax({
+			url : formURL,
+			type : "POST",
+			data : formValues,
+			success : function(result) {
+				console.log('result: ' + result);
+				Pizza.storeMessageToCache(result);
+                window.location.href = "/index";
+			}
 		});
+
 	});
 
 });

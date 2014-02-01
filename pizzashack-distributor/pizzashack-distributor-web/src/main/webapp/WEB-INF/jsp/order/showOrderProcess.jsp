@@ -157,7 +157,6 @@
             <h3><spring:message code="create.review.dialog.title"/></h3>
         </div>
         <div class="modal-body">
-			<div id="actionMsg" class="help-inline"></div>
             <form:errors path="review" cssClass="errorBlock" element="div" />
 			<form:form action="/orderProcess/review" id="reviewForm" cssClass="well" commandName="review" method="POST">
 			<form:hidden path="orderNo" />

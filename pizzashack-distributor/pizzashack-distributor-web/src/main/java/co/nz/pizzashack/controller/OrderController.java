@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -138,8 +137,8 @@ public class OrderController extends BaseController {
 				.getAttribute(LoginController.MODEL_ATTRIBUTE_USER);
 		orderProcessDs.manualOrderReview(orderReviewRecordDto.getOrderNo(),
 				orderReviewRecordDto, loginUser);
-		return "Review is created for order["
-				+ orderReviewRecordDto.getOrderNo() + "]";
+		return getMessage(FEEDBACK_MESSAGE_KEY_REVIEWTASK_DONE,
+				orderReviewRecordDto.getOrderNo());
 	}
 
 	private String candidateDisplayConvert(Set<String> candidates) {
