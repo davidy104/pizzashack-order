@@ -96,6 +96,8 @@ public class OrderProcessTest {
 		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
 		LOGGER.info("***************************after dataentry:{} ",
 				orderProcess);
+		
+		
 		LOGGER.info("current pending activity:{} ",
 				orderProcess.getPendingActivity());
 
@@ -106,11 +108,11 @@ public class OrderProcessTest {
 		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
 		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
 
-//		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
-//				orderDto.getTotalPrice());
-//		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
-//				operator);
-//		LOGGER.info("after billing entry:{} ", orderProcess);
+		BillingDto billing = OrderTestUtils.mockBilling(orderNo,
+				orderDto.getTotalPrice());
+		orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
+				operator);
+		LOGGER.info("after billing entry:{} ", orderProcess);
 	}
 
 	@Test
@@ -125,26 +127,26 @@ public class OrderProcessTest {
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
 		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
-		LOGGER.info("after dataentry:{} ", orderProcess);
+		LOGGER.info("**************************after dataentry:{} ", orderProcess);
 		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
 				.getOrderProcessId());
 		pendingActivity = orderProcess.getPendingActivity();
 		LOGGER.info("-------------------------------ProcessActivityDto:{}",
 				pendingActivity);
-		printAvailableOrderTasks(operator);
-		printAvailableOrderTasks(davidReviewer.getUser());
-		printAvailableOrderTasks(bradReviewer.getUser());
+//		printAvailableOrderTasks(operator);
+//		printAvailableOrderTasks(davidReviewer.getUser());
+//		printAvailableOrderTasks(bradReviewer.getUser());
 
 		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
 		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
 
-		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
-		LOGGER.info("after david claim task:{} ");
-		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
-				.getOrderProcessId());
-		pendingActivity = orderProcess.getPendingActivity();
-		LOGGER.info("-------------------------------ProcessActivityDto:{}",
-				pendingActivity);
+//		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
+//		LOGGER.info("after david claim task:{} ");
+//		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
+//				.getOrderProcessId());
+//		pendingActivity = orderProcess.getPendingActivity();
+//		LOGGER.info("-------------------------------ProcessActivityDto:{}",
+//				pendingActivity);
 
 		// printAvailableOrderTasks(operator);
 		// printAvailableOrderTasks(davidReviewer.getUser());

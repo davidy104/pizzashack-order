@@ -195,11 +195,14 @@ public class OrderProcessAccessor {
 					taskService.claim(pendingTask.getId(), operatorName);
 					pendingActivity.setAssignee(operatorName);
 
-					if (pendingActivity.getName().equals("Billing fill in")) {
-						mergeCalculationResult = true;
-					}
+				}
 
-				} else if (loadTaskDetails) {
+				if (pendingActivity.getName().equals("Manual underwriting")
+						|| pendingActivity.getName().equals("Billing fill in")) {
+					mergeCalculationResult = true;
+				}
+
+				if (loadTaskDetails) {
 					this.buildTaskDetails(pendingTask, pendingActivity,
 							activeProcessDefinitionId);
 				}

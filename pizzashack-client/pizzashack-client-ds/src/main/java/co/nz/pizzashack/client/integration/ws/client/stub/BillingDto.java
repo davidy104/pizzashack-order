@@ -49,7 +49,7 @@ public class BillingDto {
 	protected String billingMessage;
 	protected String billingTime;
 	protected String billingAmount;
-	@XmlElement(namespace = "http://ws.integration.pizzashack.nz.co/")
+	@XmlElement
 	protected AccountDto account;
 
 	/**

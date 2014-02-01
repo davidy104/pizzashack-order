@@ -3,8 +3,11 @@ package co.nz.pizzashack.integration.processor;
 import static co.nz.pizzashack.DistributorConstants.BILLING_MAIN_PROCESS_OBJ;
 import static co.nz.pizzashack.data.predicates.UserPredicates.findByUsername;
 
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.Random;
+
 import javax.annotation.Resource;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -21,6 +24,7 @@ import co.nz.pizzashack.data.model.UserModel;
 import co.nz.pizzashack.data.repository.UserRepository;
 import co.nz.pizzashack.ds.OrderProcessDS;
 import co.nz.pizzashack.integration.ws.BillingResponse;
+import co.nz.pizzashack.utils.GeneralUtils;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @Component
@@ -46,6 +50,9 @@ public class BillingInboundProcessor implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		LOGGER.info("BillingInboundProcessor start:{} ");
 		BillingDto billingDto = exchange.getIn().getBody(BillingDto.class);
+		String messageId = String.valueOf(getRandomNumber(5));
+		billingDto.setBillingRequestId(messageId);
+		billingDto.setBillingTime(GeneralUtils.dateToStr(new Date()));
 		String orderNo = billingDto.getOrderNo();
 
 		BillingResponse billingResponse = new BillingResponse(orderNo);
@@ -77,6 +84,19 @@ public class BillingInboundProcessor implements Processor {
 		LOGGER.info("billingResponse:{} ", billingResponse);
 		exchange.getIn().setBody(billingResponse, BillingResponse.class);
 		LOGGER.info("BillingInboundProcessor end:{} ");
+	}
+
+	public static BigInteger getRandomNumber(final int digCount) {
+		return getRandomNumber(digCount, new Random());
+	}
+
+	public static BigInteger getRandomNumber(final int digCount, Random rnd) {
+		final char[] ch = new char[digCount];
+		for (int i = 0; i < digCount; i++) {
+			ch[i] = (char) ('0' + (i == 0 ? rnd.nextInt(9) + 1 : rnd
+					.nextInt(10)));
+		}
+		return new BigInteger(new String(ch));
 	}
 
 }

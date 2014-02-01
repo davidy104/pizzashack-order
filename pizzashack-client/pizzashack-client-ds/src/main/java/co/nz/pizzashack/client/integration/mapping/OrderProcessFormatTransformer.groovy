@@ -121,11 +121,19 @@ class OrderProcessFormatTransformer {
 		log.info "quantity:{} $quantity"
 		String orderTime = orderEle.'order-time'.text()
 		String deliverTime = orderEle.'deliver-time'.text()
-		String totalPrice = orderEle.'total-price'.text()
-		log.info "totalPrice:{} $totalPrice"
+		String totalPriceStr = orderEle.'total-price'.text()
+		log.info "totalPrice:{} $totalPriceStr"
 
-		OrderDto orderDto = new OrderDto(orderNo:orderNo,address:address,status:status,orderTime:orderTime,deliverTime:deliverTime,
-		totalPrice:new BigDecimal(totalPrice),qty:quantity)
+		OrderDto orderDto = new OrderDto(orderNo:orderNo,address:address,status:status,orderTime:orderTime,deliverTime:deliverTime)
+
+		if(totalPriceStr){
+			orderDto.totalPrice = new BigDecimal(totalPriceStr)
+		}
+		if(quantity){
+			orderDto.qty = Integer.valueOf(quantity)
+		}
+
+
 
 		def orderListEle = orderEle."order-list"
 		if(orderListEle && orderListEle."order-details".size()>0){

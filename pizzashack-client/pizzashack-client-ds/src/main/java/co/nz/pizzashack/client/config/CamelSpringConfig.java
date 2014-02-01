@@ -9,6 +9,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ThreadPoolRejectedPolicy;
+import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.impl.SimpleRegistry;
@@ -40,6 +41,9 @@ public class CamelSpringConfig {
 
 	@Inject
 	private ApplicationContext context;
+
+	@Resource
+	private CxfEndpoint billingProcessEndpoint;
 
 	@Resource
 	private OrderProcessRoute orderProcessRoute;
@@ -108,6 +112,7 @@ public class CamelSpringConfig {
 		camelContext.addComponent("jms", jmsComponent());
 
 		SimpleRegistry registry = new SimpleRegistry();
+		registry.put("billingProcessEndpoint", billingProcessEndpoint);
 		camelContext.setRegistry(registry);
 
 		camelContext.addRoutes(orderProcessRoute);

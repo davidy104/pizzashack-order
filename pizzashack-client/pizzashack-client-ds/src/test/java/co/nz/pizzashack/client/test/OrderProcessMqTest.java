@@ -1,8 +1,9 @@
 package co.nz.pizzashack.client.test;
 
+import java.math.BigDecimal;
+
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -13,6 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import co.nz.pizzashack.client.config.ApplicationConfiguration;
 import co.nz.pizzashack.client.data.dto.OrderDto;
 import co.nz.pizzashack.client.integration.route.OrderProcessRoute;
+import co.nz.pizzashack.client.integration.ws.client.stub.BillingDto;
+import co.nz.pizzashack.client.integration.ws.client.stub.BillingResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
@@ -25,14 +28,35 @@ public class OrderProcessMqTest {
 			.getLogger(OrderProcessMqTest.class);
 
 	@Test
-	public void testOrderProcess() {
+	public void testOrderProcessAutoPassed() {
 		OrderDto orderDto = OrderTestUtils.mockAutoPassOrder();
 		LOGGER.info("order request:{} ", orderDto);
 		orderDto = producer.requestBodyAndHeader(
 				OrderProcessRoute.ORDER_INTEGRATION_ENDPOINT, orderDto,
 				"messageId", orderDto.getOrderRequestId(), OrderDto.class);
+		LOGGER.info("get result after dataEntry:{} ", orderDto);
 
-		LOGGER.info("get result:{} ", orderDto);
+		String orderNo = orderDto.getOrderNo();
+		BigDecimal totalPrice = orderDto.getTotalPrice();
+		BillingDto billingDto = OrderTestUtils.mockBilling(orderNo,
+				String.valueOf(totalPrice));
+		LOGGER.info("billingDto:{} ", billingDto);
+		BillingResponse billingResponse = producer.requestBody(
+				"cxf:bean:billingProcessEndpoint?dataFormat=POJO", billingDto,
+				BillingResponse.class);
+
+		LOGGER.info("billingResponse:{} ", billingResponse);
+	}
+
+	@Test
+	public void testOrderProcessManualUWRequired() {
+		OrderDto orderDto = OrderTestUtils.mockManualUWOrder();
+		LOGGER.info("order request:{} ", orderDto);
+		orderDto = producer.requestBodyAndHeader(
+				OrderProcessRoute.ORDER_INTEGRATION_ENDPOINT, orderDto,
+				"messageId", orderDto.getOrderRequestId(), OrderDto.class);
+		LOGGER.info("get result after dataEntry:{} ", orderDto);
+
 	}
 
 }

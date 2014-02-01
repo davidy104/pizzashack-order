@@ -59,9 +59,10 @@ public class LoginController extends BaseController {
 		}
 
 		try {
-			userDs.loginUser(userDto.getUsername(), userDto.getPassword());
-			LOGGER.debug("after login: {}", userDto);
-			session.setAttribute(MODEL_ATTRIBUTE_USER, userDto);
+			UserDto foundUser = userDs.loginUser(userDto.getUsername(),
+					userDto.getPassword());
+			LOGGER.debug("after login: {}", foundUser);
+			session.setAttribute(MODEL_ATTRIBUTE_USER, foundUser);
 			String url = (String) session.getAttribute(REQUESTED_URL);
 			session.removeAttribute(REQUESTED_URL);
 			if (StringUtils.hasText(url) && !url.contains(LOGIN_VIEW)) {

@@ -6,6 +6,8 @@ import java.util.Random;
 import co.nz.pizzashack.client.data.dto.CustomerDto;
 import co.nz.pizzashack.client.data.dto.OrderDetailsDto;
 import co.nz.pizzashack.client.data.dto.OrderDto;
+import co.nz.pizzashack.client.integration.ws.client.stub.AccountDto;
+import co.nz.pizzashack.client.integration.ws.client.stub.BillingDto;
 
 public class OrderTestUtils {
 
@@ -60,6 +62,19 @@ public class OrderTestUtils {
 		customer.setCustomerEmail("david.yuan124@gmail.com");
 		customer.setCustomerName("david");
 		return customer;
+	}
+
+	public static BillingDto mockBilling(String orderNo, String billingAmt) {
+		BillingDto billingDto = new BillingDto();
+		AccountDto account = new AccountDto();
+		account.setAccountNo("111111");
+		account.setSecurityNo("111");
+		account.setPaymode("credit");
+		account.setExpireDate("2019-06-24");
+		billingDto.setAccount(account);
+		billingDto.setBillingAmount(billingAmt);
+		billingDto.setOrderNo(orderNo);
+		return billingDto;
 	}
 
 	public static BigInteger getRandomNumber(final int digCount) {

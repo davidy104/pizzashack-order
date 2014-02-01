@@ -113,8 +113,8 @@ public class OrderController extends BaseController {
 
 	@RequestMapping(value = "/claimReview/{orderNo}", method = RequestMethod.GET)
 	public String claimReviewTask(@PathVariable("orderNo") String orderNo,
-			BindingResult result, RedirectAttributes attributes,
-			HttpSession session) throws Exception {
+			RedirectAttributes attributes, HttpSession session)
+			throws Exception {
 		LOGGER.info("claimReviewTask start:{} ");
 		UserDto loginUser = (UserDto) session
 				.getAttribute(LoginController.MODEL_ATTRIBUTE_USER);
