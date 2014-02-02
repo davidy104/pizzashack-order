@@ -45,8 +45,10 @@ public class OrderMainTransitionExecutionListener {
 			} else if (activityId.equals("billingEntry")) {
 				order.setStatus("pendingOnBilling");
 			}
+			//after change order status,we need to put it back in bpm to overwrite the original one
+			//see serialization
 			orderProcess.setOrder(order);
-			LOGGER.info("order status:{} ",orderProcess.getOrder().getStatus());
+			execution.setVariable(ORDER_MAIN_PROCESS_OBJ, orderProcess);
 		} else if (activityType.equals("callActivity")) {
 			if (activityId.equals("billingCallactivity")) {
 				execution.setVariable("billingIsIndependentProcess", false);
