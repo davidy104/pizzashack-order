@@ -404,6 +404,7 @@ public class OrderProcessDSImpl implements OrderProcessDS {
 		}
 
 		orderProcessDto = orderProcessConverter.toDto(orderProcessModel);
+		LOGGER.info("before manual review flow:{}",orderProcessDto);
 		String reviewResult = reviewRecord.getReviewResult();
 		LOGGER.info("reviewResult:{} ", reviewResult);
 		Integer orderReviewStatus = 0;

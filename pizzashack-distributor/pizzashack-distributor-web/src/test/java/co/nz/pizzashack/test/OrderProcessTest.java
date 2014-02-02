@@ -20,6 +20,7 @@ import co.nz.pizzashack.data.dto.BillingDto;
 import co.nz.pizzashack.data.dto.DepartmentDto;
 import co.nz.pizzashack.data.dto.OrderDto;
 import co.nz.pizzashack.data.dto.OrderProcessDto;
+import co.nz.pizzashack.data.dto.OrderReviewRecordDto;
 import co.nz.pizzashack.data.dto.ProcessActivityDto;
 import co.nz.pizzashack.data.dto.StaffDto;
 import co.nz.pizzashack.data.dto.UserDto;
@@ -32,7 +33,6 @@ import co.nz.pizzashack.ds.UserDS;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationConfiguration.class })
 @WebAppConfiguration
-@Ignore("not run all the time")
 public class OrderProcessTest {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -75,6 +75,7 @@ public class OrderProcessTest {
 	}
 
 	@Test
+	@Ignore
 	public void testStartflow() throws Exception {
 		OrderProcessDto orderProcess = orderProcessDs
 				.startOrderProcess(operator);
@@ -82,6 +83,7 @@ public class OrderProcessTest {
 	}
 
 	@Test
+	@Ignore
 	public void testAutoReviewPassedCase() throws Exception {
 		OrderProcessDto orderProcess = orderProcessDs
 				.startOrderProcess(operator);
@@ -96,8 +98,7 @@ public class OrderProcessTest {
 		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
 		LOGGER.info("***************************after dataentry:{} ",
 				orderProcess);
-		
-		
+
 		LOGGER.info("current pending activity:{} ",
 				orderProcess.getPendingActivity());
 
@@ -116,6 +117,7 @@ public class OrderProcessTest {
 	}
 
 	@Test
+//	@Ignore
 	public void testManualReviewCase() throws Exception {
 		ProcessActivityDto pendingActivity = null;
 		OrderProcessDto orderProcess = orderProcessDs
@@ -127,48 +129,73 @@ public class OrderProcessTest {
 		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
 				.size());
 		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
-		LOGGER.info("**************************after dataentry:{} ", orderProcess);
+		LOGGER.info("**************************after dataentry:{} ",
+				orderProcess);
 		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
 				.getOrderProcessId());
 		pendingActivity = orderProcess.getPendingActivity();
 		LOGGER.info("-------------------------------ProcessActivityDto:{}",
 				pendingActivity);
-//		printAvailableOrderTasks(operator);
-//		printAvailableOrderTasks(davidReviewer.getUser());
-//		printAvailableOrderTasks(bradReviewer.getUser());
+		// printAvailableOrderTasks(operator);
+		// printAvailableOrderTasks(davidReviewer.getUser());
+		// printAvailableOrderTasks(bradReviewer.getUser());
 
 		OrderDto orderDto = orderDs.getOrderByOrderNo(orderNo);
 		LOGGER.info("after dataentry latest order from db:{} ", orderDto);
 
-//		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
-//		LOGGER.info("after david claim task:{} ");
-//		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
-//				.getOrderProcessId());
-//		pendingActivity = orderProcess.getPendingActivity();
-//		LOGGER.info("-------------------------------ProcessActivityDto:{}",
-//				pendingActivity);
+		orderProcessDs.claimOrderReviewTask(orderNo, davidReviewer.getUser());
+		LOGGER.info("after david claim task:{} ");
+		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
+				.getOrderProcessId());
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("-------------------------------ProcessActivityDto:{}",
+				pendingActivity);
 
-		// printAvailableOrderTasks(operator);
-		// printAvailableOrderTasks(davidReviewer.getUser());
-		// printAvailableOrderTasks(bradReviewer.getUser());
-		//
-		// OrderReviewRecordDto orderReviewRecordDto = new
-		// OrderReviewRecordDto();
-		// orderReviewRecordDto.setContent("review passed");
-		// orderReviewRecordDto.setReviewer(davidReviewer);
-		// orderReviewRecordDto.setReviewResult("accept");
-		// orderProcess = orderProcessDs.manualOrderReview(orderNo,
-		// orderReviewRecordDto);
-		//
-		// pendingActivity = orderProcess.getPendingActivity();
-		// LOGGER.info("after manul underwriting pendingActivity:{} ",
-		// pendingActivity);
+//		printAvailableOrderTasks(operator);
+//		printAvailableOrderTasks(davidReviewer.getUser());
+//		printAvailableOrderTasks(bradReviewer.getUser());
+
+		OrderReviewRecordDto orderReviewRecordDto = new OrderReviewRecordDto();
+		orderReviewRecordDto.setContent("review passed");
+		orderReviewRecordDto.setReviewer(davidReviewer);
+		orderReviewRecordDto.setReviewResult("accept");
+		orderProcess = orderProcessDs.manualOrderReview(orderNo,
+				orderReviewRecordDto,davidReviewer.getUser());
+
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("after manul underwriting pendingActivity:{} ",
+				pendingActivity);
+		
+		orderDto = orderDs.getOrderByOrderNo(orderNo);
+		LOGGER.info("********************after review:{} ", orderDto);
 
 		// BillingDto billing = OrderTestUtils.mockBilling(orderNo,
 		// orderDto.getTotalPrice());
 		// orderProcess = orderProcessDs.fillinBillingAccount(orderNo, billing,
 		// operator);
 		// LOGGER.info("after billing entry:{} ", orderProcess);
+	}
+
+	@Test
+	@Ignore
+	public void testRejectCase() throws Exception {
+		ProcessActivityDto pendingActivity = null;
+		OrderProcessDto orderProcess = orderProcessDs
+				.startOrderProcess(operator);
+		String orderNo = orderProcess.getOrder().getOrderNo();
+		LOGGER.info("after start instance:{} ", orderProcess);
+		// printAvailableOrderTasks(operator);
+		OrderDto order = OrderTestUtils.mockRejectOrder(orderNo);
+		LOGGER.info("order pazza type size:{} ", order.getOrderDetailsSet()
+				.size());
+		orderProcess = orderProcessDs.dataEntry(orderNo, order, operator);
+		LOGGER.info("**************************after dataentry:{} ",
+				orderProcess);
+		orderProcess = orderProcessQueryDs.getOrderProcessDtoById(orderProcess
+				.getOrderProcessId());
+		pendingActivity = orderProcess.getPendingActivity();
+		LOGGER.info("-------------------------------ProcessActivityDto:{}",
+				pendingActivity);
 	}
 
 	private void printAvailableOrderTasks(UserDto user) throws Exception {

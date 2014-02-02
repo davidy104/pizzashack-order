@@ -127,18 +127,21 @@ public class OrderController extends BaseController {
 	}
 
 	@RequestMapping(value = "/review", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
+//	@ResponseBody
 	public String reviewOrder(
 			@Valid @ModelAttribute(MODEL_ATTRIBUTE_REVIEW) OrderReviewRecordDto orderReviewRecordDto,
-			HttpSession session) throws Exception {
+			RedirectAttributes attributes, HttpSession session)
+			throws Exception {
 		LOGGER.info("reviewOrder start: {}");
 		LOGGER.info("orderNo: {}", orderReviewRecordDto);
 		UserDto loginUser = (UserDto) session
 				.getAttribute(LoginController.MODEL_ATTRIBUTE_USER);
 		orderProcessDs.manualOrderReview(orderReviewRecordDto.getOrderNo(),
 				orderReviewRecordDto, loginUser);
-		return getMessage(FEEDBACK_MESSAGE_KEY_REVIEWTASK_DONE,
+		addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REVIEWTASK_DONE,
 				orderReviewRecordDto.getOrderNo());
+
+		return createRedirectViewPath("/index");
 	}
 
 	private String candidateDisplayConvert(Set<String> candidates) {

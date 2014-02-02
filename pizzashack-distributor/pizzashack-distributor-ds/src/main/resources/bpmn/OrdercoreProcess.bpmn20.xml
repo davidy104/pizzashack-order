@@ -22,6 +22,7 @@ if(order.qty &gt; 10 &amp;&amp; order.qty &lt;= 30){
 	content="order number is more than 10 but less than 30";
 } else if(order.qty &gt; 30){
 	orderReviewStatus=1;
+	order.status="rejected";
 	reviewResult="reject";
 	content="order number can not more than 30";
 }
@@ -47,7 +48,11 @@ execution.setVariable("orderReviewStatus", orderReviewStatus);
       <terminateEventDefinition></terminateEventDefinition>
     </endEvent>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="calculation"></sequenceFlow>
-    <sequenceFlow id="flow2" sourceRef="calculation" targetRef="autounderwriting"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="calculation" targetRef="autounderwriting">
+      <extensionElements>
+        <activiti:executionListener event="take" expression="#{caculationMergeExecutionListener.execute(execution)}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="autounderwriting" targetRef="exclusivegateway1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="manualunderwriting">
       <extensionElements>

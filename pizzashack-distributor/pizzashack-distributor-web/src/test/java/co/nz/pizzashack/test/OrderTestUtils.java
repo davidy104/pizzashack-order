@@ -61,6 +61,27 @@ public class OrderTestUtils {
 		orderDto.setCustomer(mockCustomer());
 		return orderDto;
 	}
+	
+	public static OrderDto mockRejectOrder(String orderNo) {
+		// Spicy Italian,Chicken Parmesan,Garden Fresh
+		OrderDto orderDto = new OrderDto();
+		orderDto.setOrderNo(orderNo);
+		orderDto.setAddress("25 mavon downs");
+		orderDto.setQty(31);
+
+		OrderDetailsDto orderDetail = new OrderDetailsDto();
+		orderDetail.setPizzaName("Chicken Parmesan");
+		orderDetail.setQty(20);
+		orderDto.addPizzaOrder(orderDetail);
+
+		orderDetail = new OrderDetailsDto();
+		orderDetail.setPizzaName("Garden Fresh");
+		orderDetail.setQty(11);
+		orderDto.addPizzaOrder(orderDetail);
+
+		orderDto.setCustomer(mockCustomer());
+		return orderDto;
+	}
 
 	public static CustomerDto mockCustomer() {
 		CustomerDto customer = new CustomerDto();

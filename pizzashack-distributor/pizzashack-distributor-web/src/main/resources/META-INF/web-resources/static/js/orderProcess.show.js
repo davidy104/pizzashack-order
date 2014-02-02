@@ -1,5 +1,4 @@
 $(function() {
-
 	$("#reviewOptions").on(
 			"click",
 			"#review-order-link",
@@ -32,8 +31,8 @@ $(function() {
 			data : formValues,
 			success : function(result) {
 				console.log('result: ' + result);
-				Pizza.storeMessageToCache(result);
-                window.location.href = "/index";
+//				Pizza.storeMessageToCache(result);
+				window.location.href = "/index";
 			}
 		});
 

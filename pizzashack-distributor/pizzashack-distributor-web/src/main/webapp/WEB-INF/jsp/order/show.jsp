@@ -1,16 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <html>
 <head>
 <script type="text/javascript" src="/static/js/pizza.form.js"></script>
-<script type="text/javascript" src="/static/js/orderProcess.show.js"></script>
+<script type="text/javascript" src="/static/js/orderHistory.show.js"></script>
 <title></title>
 </head>
 <body>
 	<div id="orderProcess-id" class="hidden">${orderProcess.orderProcessId}</div>
-
+	<div id="orderProcess-no" class="hidden">${orderProcess.order.orderNo}</div>
 	<h2>
 		<spring:message code="pizzashack.title" />
 	</h2>
@@ -18,9 +17,9 @@
 		<a href="/index" class="btn btn-primary"> <spring:message
 				code="pizza.label.tasks.link" /></a> <a href="/orderQuery/list"
 			class="btn btn-primary"> <spring:message
-				code="pizza.label.orders.link" /></a><a href="/logout"
+				code="pizza.label.orders.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a> <br> <br>
+				code="pizza.label.logout.link" /></a> <br>
 
 		<div class="well">
 			<c:if test="${not empty orderProcess.order}">
@@ -131,69 +130,31 @@
 		</div>
 
 
-		<div id="reviewOptions">
-			<c:if test="${not empty reviewTaskOptions}">
-				<c:choose>
-					<c:when test="${reviewTaskOptions eq 0}">
-						<a href="/orderProcess/claimReview/${orderProcess.order.orderNo}"
-							class="btn btn-primary"> <spring:message
-								code="claim.button.label" />
-						</a>
-					</c:when>
-					<c:otherwise>
-						<a id="review-order-link" class="btn btn-primary"> <spring:message
-								code="review.button.label" /></a>
-					</c:otherwise>
-				</c:choose>
-			</c:if>
+		<div id="showHistory">
+			<a id="show-history-link" class="btn btn-primary"> <spring:message
+					code="show.history.button.label" /></a>
 		</div>
 
 	</div>
 
 
-	<script id="template-create-review-window"
+	<script id="template-show-histories-window"
 		type="text/x-handlebars-template">
-    <div id="create-review-window" class="modal">
-        <div class="modal-header">
-            <button class="close" data-dismiss="modal">×</button>
-            <h3><spring:message code="create.review.dialog.title"/></h3>
-        </div>
-        <div class="modal-body">
-            <form:errors path="review" cssClass="errorBlock" element="div" />
-			<form:form action="/orderProcess/review" id="reviewForm" cssClass="well" commandName="review" method="POST">
-			<form:hidden path="orderNo" />
-		<div id="control-group-reviewResult" class="control-group">
-			<label for="review-reviewResult"> <spring:message
-					code="view.order.review.reviewResult.label" />:
-			</label>
+    	<div id="show-histories-window" class="modal">
+        	<div class="modal-header">
+            	<button class="close" data-dismiss="modal">×</button>
+            	<h3><spring:message code="show.histories.title"/></h3>
+        	</div>
+        	<div class="modal-body">
+					<div id="history-list" class="pizza-list-item">
+					</div>
+        	</div>
 
-			<div class="controls">
-				<form:select path="reviewResult" items="${reviewResults}" />
-			</div>
-		</div>
+			<div class="modal-footer">
+			 	<a id="cancel-show-histories-button" href="#" class="btn"><spring:message code="cancel.button.label"/></a>
+        	</div>
 
-		<div id="control-group-reviewContent" class="control-group">
-			<label for="review-reviewContent"> <spring:message
-					code="view.order.review.reviewContent.label" />:
-			</label>
-
-			<div class="controls">
-				<form:textarea path="content" rows="5" cols="30" />
-			</div>
-		</div>
-
-		<div class="form-buttons">
-			<button id="close-review-create-button" class="btn">
-				<spring:message code="close.button.label" />
-			</button>
-			<button id="add-review-button" type="submit" class="btn btn-primary">
-				<spring:message code="create.button.label" />
-			</button>
-		</div>
-		</form:form>
-        </div>
-        
-    </div>
+    	</div>
 	</script>
 </body>
 </html>

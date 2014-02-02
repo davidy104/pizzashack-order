@@ -2,6 +2,7 @@ package co.nz.pizzashack.ds;
 
 import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustEmail;
 import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByCustomerEmail;
+import static co.nz.pizzashack.data.predicates.OrderProcessPredicates.findByOrderNo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -9,8 +10,10 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ import co.nz.pizzashack.data.model.CustomerModel;
 import co.nz.pizzashack.data.model.OrderProcessModel;
 import co.nz.pizzashack.data.repository.CustomerRepository;
 import co.nz.pizzashack.data.repository.OrderProcessRepository;
+import co.nz.pizzashack.utils.WorkflowUtils;
 import co.nz.pizzashack.wf.ActivitiFacade;
 
 @Service
@@ -116,22 +120,84 @@ public class OrderProcessQueryDSImpl implements OrderProcessQueryDS {
 				.getExecutionActivityBasicInfo(orderNo, processDefinitionId,
 						orderProcessDto.getActiveProcesssInstanceId(), false,
 						true);
-
-		if (pendingActivity.getType().equals("userTask")) {
-			Task pendingTask = orderProcessAccessor.getPendingTask(
-					pendingActivity.getName(), orderNo);
-			orderProcessAccessor.buildTaskDetails(pendingTask, pendingActivity,
-					processDefinitionId);
+		if (pendingActivity != null) {
+			if (pendingActivity.getType().equals("userTask")) {
+				Task pendingTask = orderProcessAccessor.getPendingTask(
+						pendingActivity.getName(), orderNo);
+				orderProcessAccessor.buildTaskDetails(pendingTask,
+						pendingActivity, processDefinitionId);
+			}
+			orderProcessDto.setPendingActivity(pendingActivity);
 		}
-		orderProcessDto.setPendingActivity(pendingActivity);
+
 		LOGGER.info("buildPendingActivity end:{}");
+	}
+
+	@Override
+	public Set<OrderProcessDto> getAllOrderProcesses() throws Exception {
+		LOGGER.info("getAllOrderProcesses start:{} ");
+		Set<OrderProcessDto> orderProcesses = null;
+		List<OrderProcessModel> resultList = orderProcessRepository.findAll();
+
+		if (resultList != null && resultList.size() > 0) {
+			orderProcesses = new HashSet<OrderProcessDto>();
+			for (OrderProcessModel orderProcessModel : resultList) {
+				orderProcesses.add(orderProcessConverter
+						.toDto(orderProcessModel));
+			}
+		}
+		LOGGER.info("getAllOrderProcesses end:{} ");
+		return orderProcesses;
 	}
 
 	@Override
 	public Set<ProcessActivityDto> getHistoryProcessActivitiesByOrderNo(
 			String orderNo) throws Exception {
+		Set<ProcessActivityDto> processActivities = null;
+		OrderProcessModel orderProcessModel = orderProcessRepository
+				.findOne(findByOrderNo(orderNo));
+		if (orderProcessModel == null) {
+			throw new NotFoundException("OrderProcess not found by no["
+					+ orderNo + "]");
+		}
+		String processDefinitionId = orderProcessModel
+				.getMainProcessDefinitionId();
+		String processInstanceId = orderProcessModel.getMainProcessInstanceId();
 
-		return null;
+		List<HistoricActivityInstance> historicActivityList = activitiFacade
+				.getHistoricActivities(processInstanceId, processDefinitionId);
+
+		if (historicActivityList.size() > 0) {
+			processActivities = new HashSet<ProcessActivityDto>();
+
+			for (HistoricActivityInstance historicActivityInstance : historicActivityList) {
+				ProcessActivityDto processActivity = new ProcessActivityDto();
+				processActivity.setActivityId(historicActivityInstance
+						.getActivityId());
+				processActivity.setName(historicActivityInstance
+						.getActivityName());
+				processActivity.setType(historicActivityInstance
+						.getActivityType());
+				processActivity.setStartTime(historicActivityInstance
+						.getStartTime());
+				processActivity.setEndTime(historicActivityInstance
+						.getEndTime());
+
+				if (!StringUtils
+						.isEmpty(historicActivityInstance.getAssignee())) {
+					processActivity.setAssignee(historicActivityInstance
+							.getAssignee());
+				}
+
+				if (historicActivityInstance.getDurationInMillis() != null) {
+					processActivity.setDuration(WorkflowUtils
+							.formatLongToTimeStr(historicActivityInstance
+									.getDurationInMillis()));
+				}
+				processActivities.add(processActivity);
+			}
+		}
+		return processActivities;
 	}
 
 }

@@ -11,6 +11,8 @@ public interface OrderProcessQueryDS {
 	Set<OrderProcessDto> getOrderProcessesByCustomer(String customerEmail)
 			throws Exception;
 
+	Set<OrderProcessDto> getAllOrderProcesses() throws Exception;
+
 	OrderProcessDto getOrderProcessDtoById(Long orderProcessId)
 			throws Exception;
 

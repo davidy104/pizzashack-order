@@ -44,7 +44,7 @@ public class EmailExecutionListener {
 				OrderReviewRecordDto orderReviewRecord = (OrderReviewRecordDto) execution
 						.getVariable(REVIEW_MAIN_PROCESS_OBJ);
 				content = "Your order is rejected due to ["
-						+ orderReviewRecord.getReviewResult() + "]";
+						+ orderReviewRecord.getContent() + "]";
 				contents = new String[] { content };
 			}
 		} else if (order.getStatus().equals("delivered")) {

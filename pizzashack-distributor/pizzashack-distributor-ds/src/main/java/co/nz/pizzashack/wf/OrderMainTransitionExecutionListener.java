@@ -40,15 +40,13 @@ public class OrderMainTransitionExecutionListener {
 
 		if (activityType.equals("userTask")
 				|| activityType.equals("receiveTask")) {
-
-			if (activityId.equals("dataEntry")
-					|| activityId.equals("externalDataEntry")) {
+			if (activityId.equals("dataEntry")) {
 				order.setStatus("dataEntry");
-
 			} else if (activityId.equals("billingEntry")) {
 				order.setStatus("pendingOnBilling");
-
 			}
+			orderProcess.setOrder(order);
+			LOGGER.info("order status:{} ",orderProcess.getOrder().getStatus());
 		} else if (activityType.equals("callActivity")) {
 			if (activityId.equals("billingCallactivity")) {
 				execution.setVariable("billingIsIndependentProcess", false);

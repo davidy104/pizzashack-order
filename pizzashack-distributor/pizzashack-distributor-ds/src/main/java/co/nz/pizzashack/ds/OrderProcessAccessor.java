@@ -73,8 +73,8 @@ public class OrderProcessAccessor {
 		ACTIVITY_INCOMING, ACTIVITY_OUTGOING, TASK_DETAILS, ALL
 	}
 
-	public void mergeDtoToModelAftProcess(OrderProcessDto dto,
-			OrderProcessModel model, boolean mergeCalculationResult) {
+	public void mergeStatusFromDtoToModelAftProcess(OrderProcessDto dto,
+			OrderProcessModel model) {
 		model.setActiveProcessDefinitionId(dto.getActiveProcessDefinitionId());
 		model.setActiveProcesssInstanceId(dto.getActiveProcesssInstanceId());
 		model.setExecutionId(dto.getExecutionId());
@@ -90,35 +90,37 @@ public class OrderProcessAccessor {
 			orderModel.setStatus(OrderStatus.pendingOnBilling.value());
 		}
 
-		if (mergeCalculationResult) {
-			LOGGER.info("merge calculation result");
-			LOGGER.info("total price:{} ", order.getTotalPrice());
-			LOGGER.info("qty:{} ", order.getQty());
-			orderModel.setTotalPrice(order.getTotalPrice());
-			orderModel.setQuantity(order.getQty());
+		// if (mergeCalculationResult) {
+		// this.mergeCalculationResult(order, orderModel);
+		// }
+	}
 
-			Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
-			LOGGER.info("orderDetailsSet.size():{}", orderDetailsSet.size());
-			List<OrderPizzashackModel> orderPizzashackModels = orderModel
-					.getOrderPizzashackModels();
+	public void mergeCalculationResult(OrderDto order, OrderModel orderModel) {
+		LOGGER.info("merge calculation result");
+		LOGGER.info("total price:{} ", order.getTotalPrice());
+		LOGGER.info("qty:{} ", order.getQty());
+		orderModel.setTotalPrice(order.getTotalPrice());
+		orderModel.setQuantity(order.getQty());
 
-			if (orderDetailsSet != null && orderDetailsSet.size() > 0) {
-				for (OrderDetailsDto orderDetails : orderDetailsSet) {
-					Long dtoId = orderDetails.getOrderDetailId();
-					for (OrderPizzashackModel orderPizzashackModel : orderPizzashackModels) {
-						Long modelId = orderPizzashackModel
-								.getOrderPizzashackId();
-						if (dtoId.longValue() == modelId.longValue()) {
-							orderPizzashackModel.setQty(orderDetails.getQty());
-							orderPizzashackModel.setTotalPrice(orderDetails
-									.getTotalPrice());
-							break;
-						}
+		Set<OrderDetailsDto> orderDetailsSet = order.getOrderDetailsSet();
+		LOGGER.info("orderDetailsSet.size():{}", orderDetailsSet.size());
+		List<OrderPizzashackModel> orderPizzashackModels = orderModel
+				.getOrderPizzashackModels();
+
+		if (orderDetailsSet != null && orderDetailsSet.size() > 0) {
+			for (OrderDetailsDto orderDetails : orderDetailsSet) {
+				Long dtoId = orderDetails.getOrderDetailId();
+				for (OrderPizzashackModel orderPizzashackModel : orderPizzashackModels) {
+					Long modelId = orderPizzashackModel.getOrderPizzashackId();
+					if (dtoId.longValue() == modelId.longValue()) {
+						orderPizzashackModel.setQty(orderDetails.getQty());
+						orderPizzashackModel.setTotalPrice(orderDetails
+								.getTotalPrice());
+						break;
 					}
 				}
 			}
 		}
-
 	}
 
 	public OrderProcessDto postProcess(OrderProcessDto orderProcessDto,
@@ -130,7 +132,7 @@ public class OrderProcessAccessor {
 		OrderDto orderDto = orderProcessDto.getOrder();
 		String orderNo = orderDto.getOrderNo();
 		boolean ifMergeRequired = false;
-		boolean mergeCalculationResult = false;
+		// boolean mergeCalculationResult = false;
 		String mainProcessInstanceId = orderProcessDto
 				.getMainProcessInstanceId();
 		String mainProcessDefinitionId = orderProcessDto
@@ -140,7 +142,6 @@ public class OrderProcessAccessor {
 		String activeProcessInstanceId = orderProcessDto
 				.getActiveProcesssInstanceId();
 
-		LOGGER.info("process pending ");
 		boolean loadincoming = false;
 		boolean loadoutgoing = false;
 		boolean loadTaskDetails = false;
@@ -197,10 +198,10 @@ public class OrderProcessAccessor {
 
 				}
 
-				if (pendingActivity.getName().equals("Manual underwriting")
-						|| pendingActivity.getName().equals("Billing fill in")) {
-					mergeCalculationResult = true;
-				}
+				// if (pendingActivity.getName().equals("Manual underwriting")
+				// || pendingActivity.getName().equals("Billing fill in")) {
+				// mergeCalculationResult = true;
+				// }
 
 				if (loadTaskDetails) {
 					this.buildTaskDetails(pendingTask, pendingActivity,
@@ -219,8 +220,8 @@ public class OrderProcessAccessor {
 
 			resultDto.setPendingActivity(pendingActivity);
 			if (ifMergeRequired) {
-				this.mergeDtoToModelAftProcess(resultDto, orderProcessModel,
-						mergeCalculationResult);
+				this.mergeStatusFromDtoToModelAftProcess(resultDto,
+						orderProcessModel);
 				LOGGER.info("after merge orderProcessModel:{} ",
 						orderProcessModel);
 			}

@@ -67,7 +67,7 @@
 							<br />
 						</c:if>
 
-						<a href="/orderProcess/${orderProcess.orderProcessId}"
+						<a href="/orderQuery/${orderProcess.order.orderNo}"
 							class="btn btn-primary"><spring:message
 								code="pizza.label.show.link" /></a>
 					</div>
