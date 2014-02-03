@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ import co.nz.pizzashack.client.utils.GeneralUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-// @Ignore
+@Ignore("run only when service ready")
 public class OrderProcessMqTest {
 	@Produce
 	private ProducerTemplate producer;

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import co.nz.pizzashack.client.ds.PizzashackDS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-// @Ignore("run when service is ready")
+@Ignore("run when service is ready")
 public class PizzashackRestTest {
 
 	@Resource
