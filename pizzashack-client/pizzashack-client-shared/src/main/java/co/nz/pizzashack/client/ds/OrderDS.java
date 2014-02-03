@@ -2,7 +2,8 @@ package co.nz.pizzashack.client.ds;
 
 import java.util.Set;
 
-import co.nz.pizzashack.client.data.dto.AccountDto;
+import co.nz.pizzashack.client.data.dto.BillingDto;
+import co.nz.pizzashack.client.data.dto.BillingResp;
 import co.nz.pizzashack.client.data.dto.OrderDto;
 
 public interface OrderDS {
@@ -13,5 +14,5 @@ public interface OrderDS {
 
 	Set<OrderDto> getOrdersByCustomer(String customerEmail) throws Exception;
 
-	OrderDto payForOrder(String orderNo, AccountDto account) throws Exception;
+	BillingResp payForOrder(BillingDto billing) throws Exception;
 }

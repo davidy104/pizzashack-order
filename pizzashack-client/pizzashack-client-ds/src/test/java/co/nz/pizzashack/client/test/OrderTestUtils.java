@@ -1,8 +1,5 @@
 package co.nz.pizzashack.client.test;
 
-import java.math.BigInteger;
-import java.util.Random;
-
 import co.nz.pizzashack.client.data.dto.CustomerDto;
 import co.nz.pizzashack.client.data.dto.OrderDetailsDto;
 import co.nz.pizzashack.client.data.dto.OrderDto;
@@ -14,7 +11,6 @@ public class OrderTestUtils {
 	public static OrderDto mockAutoPassOrder() {
 		// Spicy Italian,Chicken Parmesan,Garden Fresh
 		OrderDto orderDto = new OrderDto();
-		orderDto.setOrderRequestId(String.valueOf(getRandomNumber(5)));
 		orderDto.setAddress("25 mavon downs");
 
 		OrderDetailsDto orderDetail = new OrderDetailsDto();
@@ -40,7 +36,6 @@ public class OrderTestUtils {
 	public static OrderDto mockManualUWOrder() {
 		// Spicy Italian,Chicken Parmesan,Garden Fresh
 		OrderDto orderDto = new OrderDto();
-		orderDto.setOrderRequestId(String.valueOf(getRandomNumber(5)));
 		orderDto.setAddress("25 mavon downs");
 
 		OrderDetailsDto orderDetail = new OrderDetailsDto();
@@ -77,16 +72,4 @@ public class OrderTestUtils {
 		return billingDto;
 	}
 
-	public static BigInteger getRandomNumber(final int digCount) {
-		return getRandomNumber(digCount, new Random());
-	}
-
-	public static BigInteger getRandomNumber(final int digCount, Random rnd) {
-		final char[] ch = new char[digCount];
-		for (int i = 0; i < digCount; i++) {
-			ch[i] = (char) ('0' + (i == 0 ? rnd.nextInt(9) + 1 : rnd
-					.nextInt(10)));
-		}
-		return new BigInteger(new String(ch));
-	}
 }

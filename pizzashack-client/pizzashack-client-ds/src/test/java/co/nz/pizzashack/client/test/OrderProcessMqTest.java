@@ -16,6 +16,7 @@ import co.nz.pizzashack.client.data.dto.OrderDto;
 import co.nz.pizzashack.client.integration.route.OrderProcessRoute;
 import co.nz.pizzashack.client.integration.ws.client.stub.BillingDto;
 import co.nz.pizzashack.client.integration.ws.client.stub.BillingResponse;
+import co.nz.pizzashack.client.utils.GeneralUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
@@ -29,11 +30,12 @@ public class OrderProcessMqTest {
 
 	@Test
 	public void testOrderProcessAutoPassed() {
+		String requestId = String.valueOf(GeneralUtils.getRandomNumber(5));
 		OrderDto orderDto = OrderTestUtils.mockAutoPassOrder();
 		LOGGER.info("order request:{} ", orderDto);
 		orderDto = producer.requestBodyAndHeader(
 				OrderProcessRoute.ORDER_INTEGRATION_ENDPOINT, orderDto,
-				"messageId", orderDto.getOrderRequestId(), OrderDto.class);
+				"messageId", requestId, OrderDto.class);
 		LOGGER.info("get result after dataEntry:{} ", orderDto);
 
 		String orderNo = orderDto.getOrderNo();
@@ -50,11 +52,12 @@ public class OrderProcessMqTest {
 
 	@Test
 	public void testOrderProcessManualUWRequired() {
+		String requestId = String.valueOf(GeneralUtils.getRandomNumber(5));
 		OrderDto orderDto = OrderTestUtils.mockManualUWOrder();
 		LOGGER.info("order request:{} ", orderDto);
 		orderDto = producer.requestBodyAndHeader(
 				OrderProcessRoute.ORDER_INTEGRATION_ENDPOINT, orderDto,
-				"messageId", orderDto.getOrderRequestId(), OrderDto.class);
+				"messageId", requestId, OrderDto.class);
 		LOGGER.info("get result after dataEntry:{} ", orderDto);
 
 	}

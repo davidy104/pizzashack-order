@@ -117,7 +117,7 @@ public class OrderProcessTest {
 	}
 
 	@Test
-//	@Ignore
+	@Ignore
 	public void testManualReviewCase() throws Exception {
 		ProcessActivityDto pendingActivity = null;
 		OrderProcessDto orderProcess = orderProcessDs

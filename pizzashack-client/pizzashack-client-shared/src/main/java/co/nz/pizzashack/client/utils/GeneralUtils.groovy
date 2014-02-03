@@ -65,6 +65,22 @@ class GeneralUtils {
 		return errorStr
 	}
 
+	static BigInteger getRandomNumber(int digCount) {
+		return getRandomNumber(digCount, new Random())
+	}
+
+	static BigInteger getRandomNumber(int digCount, Random rnd) {
+		String[] ch = new String[digCount]
+		ch.eachWithIndex{elt, i->
+			if(i == 0){
+				ch[i]=(String)rnd.nextInt(9) + 1
+			}else{
+				ch[i]=(String)rnd.nextInt(10)
+			}
+		}
+		return new BigInteger(ch.join(''))
+	}
+
 	//	static getExceptionInfo = {Exception error->
 	//		def stackStr
 	//		def errorStr

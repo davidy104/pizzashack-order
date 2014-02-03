@@ -76,9 +76,21 @@ public class PizzashackAPIImpl implements PizzashackAPI {
 	}
 
 	@Override
-	public Response getOrdersforCustomer(String customerEmail) {
-
-		return null;
+	@Path("/customerOrderList/{custEmail}")
+	@GET
+	@Produces("application/json")
+	public Response getOrdersforCustomer(
+			@PathParam("custEmail") String customerEmail) {
+		LOGGER.info("getOrdersforCustomer start:{}", customerEmail);
+		GenericAPIError genericAPIError = null;
+		Set<OrderDto> orders = null;
+		try {
+			orders = orderDs.getOrderByCustomer(customerEmail);
+		} catch (Exception e) {
+			genericAPIError = PizzashackAPIUtils.errorHandle(e);
+		}
+		LOGGER.info("getOrdersforCustomer end:{}");
+		return PizzashackAPIUtils.buildResponse(orders, genericAPIError);
 	}
 
 	@Override

@@ -6,11 +6,11 @@ import groovy.transform.ToString
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["orderNo"])
 class OrderDto implements Serializable {
-	String orderRequestId
+	Long orderId
 	String orderNo
 	Set<OrderDetailsDto> orderDetailsSet
-	Integer qty
-	BigDecimal totalPrice
+	Integer qty = 0
+	BigDecimal totalPrice=BigDecimal.ZERO
 	@Delegate
 	CustomerDto customer = new CustomerDto();
 	String status

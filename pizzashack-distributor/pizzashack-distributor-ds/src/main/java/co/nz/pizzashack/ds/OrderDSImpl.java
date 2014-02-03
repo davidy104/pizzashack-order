@@ -1,11 +1,15 @@
 package co.nz.pizzashack.ds;
 
+import static co.nz.pizzashack.data.predicates.OrderPredicates.findByCustomerEmail;
 import static co.nz.pizzashack.data.predicates.OrderPredicates.findByOrderNo;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -49,11 +53,24 @@ public class OrderDSImpl implements OrderDS {
 		return found;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<OrderDto> getOrderByCustomer(String customerEmail)
 			throws Exception {
-
-		return null;
+		LOGGER.info("getOrderByCustomer start:{} ", customerEmail);
+		Set<OrderDto> orders = null;
+		Iterable<OrderModel> iterable = orderRepository
+				.findAll(findByCustomerEmail(customerEmail));
+		List<OrderModel> resultList = IteratorUtils.toList(iterable.iterator());
+		if (resultList != null && resultList.size() > 0) {
+			orders = new HashSet<OrderDto>();
+			for (OrderModel model : resultList) {
+				orders.add(orderConverter.toDto(model,
+						OrderLoadStrategies.LOAD_CUSTOMER));
+			}
+		}
+		LOGGER.info("getOrderByCustomer end:{} ");
+		return orders;
 	}
 
 	@Override
