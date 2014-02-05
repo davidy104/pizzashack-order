@@ -32,12 +32,14 @@
 	</licenses>
 
 	<distributionManagement>
+	<!-- 
 		<site>
 			<id>pizzashackDistributor</id>
-			<!--  
+			 
 			<url>http://www.pizzashack.co.nz/distributor</url>
-			-->
+			
 		</site>
+		-->
 		<repository>
 			<id>pizzashack-distributor-release</id>
 			<url>http://localhost:8081/nexus/content/repositories/pizzashack-distributor-release</url>

@@ -4,7 +4,7 @@
 
 	<groupId>co.nz.pizzashack</groupId>
 	<artifactId>pizzashack-distributor</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>pizzashack-distributor</name>
