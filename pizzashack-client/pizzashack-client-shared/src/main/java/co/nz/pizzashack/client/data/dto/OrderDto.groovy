@@ -13,6 +13,8 @@ class OrderDto implements Serializable {
 	BigDecimal totalPrice=BigDecimal.ZERO
 	@Delegate
 	CustomerDto customer = new CustomerDto();
+	
+	//dataEntry,pendingOnBilling,pendingOnReview,rejected,delivered
 	String status
 	String address
 	String orderTime

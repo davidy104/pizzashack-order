@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <html>
 <head>
 <script type="text/javascript" src="/static/js/pizza.form.js"></script>
@@ -67,36 +68,39 @@
             <h3><spring:message code="add.cart.dialog.title"/></h3>
         </div>
         <div class="modal-body">
-            
-		<div id="control-group-pizzaName" class="control-group">
-			<label for="pizzaName"> <spring:message
+            <form:errors path="addToCartReq" cssClass="errorBlock" element="div" />
+			<form:form action="/cart/add" id="cartAddForm" cssClass="well" commandName="addToCartReq" method="POST">
+			<form:hidden path="pizzashackId" />
+		<div id="control-group-pizzaname" class="control-group">
+			<label> <spring:message
 					code="view.pizza.name.label" />
 			</label>
 
 			<div class="controls">
-				<c:out value="${pizza.pizzaName}" />
+				${pizza.pizzaName}
 			</div>
 		</div>
 
-		<div id="control-group-orderAmount" class="control-group">
-			<label for="orderAmount"> <spring:message
+		<div id="control-group-amount" class="control-group">
+			<label for="addToCartReq-amount"> <spring:message
 					code="view.pizza.order.amount.label" />
 			</label>
 
 			<div class="controls">
-				<input id="amount" type="text" />
+				<form:input id="addToCartReq-amount" path="amount" />
 			</div>
 		</div>
 
 		<div class="form-buttons">
 			<button id="cancel-cart-add-button" class="btn">
-				<spring:message code="cancel.button.label" />
+				<spring:message code="close.button.label" />
 			</button>
 			<button id="add-cart-button" type="submit" class="btn btn-primary">
-				<spring:message code="add.button.label" />
+				<spring:message code="create.button.label" />
 			</button>
 		</div>
-	
+		</form:form>
+
         </div>
         
     </div>

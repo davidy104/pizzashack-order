@@ -1,5 +1,7 @@
 package co.nz.pizzashack.client.controller;
 
+import static co.nz.pizzashack.client.controller.CartController.MODEL_ATTRIBUTE_ADDCARTREQ;
+
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import co.nz.pizzashack.client.data.dto.AddToCartRequest;
 import co.nz.pizzashack.client.data.dto.PizzashackDto;
 import co.nz.pizzashack.client.ds.PizzashackDS;
 
@@ -43,8 +46,12 @@ public class PizzashackController extends BaseController {
 			Model model) throws Exception {
 		LOGGER.info("show start: {}", pizzashackId);
 		PizzashackDto found = pizzashackDs.getPizzashackDtoById(pizzashackId);
-
 		LOGGER.info("Found Pizzashack: {}", found);
+
+		AddToCartRequest addToCartRequest = new AddToCartRequest();
+		addToCartRequest.setPizzashackId(pizzashackId);
+		model.addAttribute(MODEL_ATTRIBUTE_ADDCARTREQ, addToCartRequest);
+
 		model.addAttribute(MODEL_ATTRIBUTE_PIZZA, found);
 		return SHOW_VIEW;
 	}

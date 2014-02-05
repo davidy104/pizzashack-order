@@ -30,7 +30,7 @@
 				<c:otherwise>
 					<c:forEach items="${pizzas}" var="pizza">
 						<div class="well pizza-list-item">
-							<c:if test="${not empty pizza.name}">
+							<c:if test="${not empty pizza.pizzaName}">
 								<abbr title="<spring:message code="view.pizza.name.title"/>">
 									<spring:message code="view.pizza.name.label" />
 								</abbr>

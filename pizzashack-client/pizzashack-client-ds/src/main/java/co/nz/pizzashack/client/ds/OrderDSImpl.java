@@ -1,5 +1,7 @@
 package co.nz.pizzashack.client.ds;
 
+import static co.nz.pizzashack.client.ds.PizzashackDSImpl.BASE_URL;
+
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -10,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.ClientResponse.Status;
-
+import co.nz.pizzashack.client.data.dto.AccountDto;
 import co.nz.pizzashack.client.data.dto.BillingDto;
 import co.nz.pizzashack.client.data.dto.BillingResp;
 import co.nz.pizzashack.client.data.dto.OrderDto;
@@ -23,7 +22,9 @@ import co.nz.pizzashack.client.utils.GeneralUtils;
 import co.nz.pizzashack.client.utils.JerseyClientSupport;
 import co.nz.pizzashack.client.utils.PizzashackJSONTransformer;
 
-import static co.nz.pizzashack.client.ds.PizzashackDSImpl.BASE_URL;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.WebResource;
 
 @Service
 public class OrderDSImpl extends JerseyClientSupport implements OrderDS {
@@ -93,10 +94,22 @@ public class OrderDSImpl extends JerseyClientSupport implements OrderDS {
 	@Override
 	public BillingResp payForOrder(BillingDto billing) throws Exception {
 		LOGGER.info("payForOrder start:{} ", billing);
+		AccountDto accountDto = billing.getAccount();
 		BillingResp billingResp = null;
+		co.nz.pizzashack.client.integration.ws.client.stub.BillingDto billingRequest = new co.nz.pizzashack.client.integration.ws.client.stub.BillingDto();
+		co.nz.pizzashack.client.integration.ws.client.stub.AccountDto account = new co.nz.pizzashack.client.integration.ws.client.stub.AccountDto();
+		account.setAccountNo(accountDto.getAccountNo());
+		account.setExpireDate(accountDto.getExpireDate());
+		account.setPaymode(accountDto.getPaymode());
+		account.setSecurityNo(accountDto.getSecurityNo());
+
+		billingRequest.setAccount(account);
+		billingRequest.setBillingAmount(billing.getBillingAmount().toString());
+		billingRequest.setOrderNo(billing.getOrderNo());
+
 		BillingResponse billingResponse = producer.requestBody(
-				"cxf:bean:billingProcessEndpoint?dataFormat=POJO", billing,
-				BillingResponse.class);
+				"cxf:bean:billingProcessEndpoint?dataFormat=POJO",
+				billingRequest, BillingResponse.class);
 		billingResp = new BillingResp();
 		billingResp.setBillingCode(billingResponse.getBillingCode());
 		billingResp.setBillingMessage(billingResponse.getBillingMessage());
