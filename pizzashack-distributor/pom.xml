@@ -11,6 +11,49 @@
 	<name>pizzashack-distributor</name>
 	<url>http://pizzashack.co.nz</url>
 
+	<description>
+		Pizzashack Distributor
+    </description>
+
+	<developers>
+		<developer>
+			<name>David Yuan</name>
+			<email>david.yuan124@gmail.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>MIT license</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+
+	<distributionManagement>
+		<site>
+			<id>pizzashackDistributor</id>
+			<url>scp://www.pizzashack.co.nz/distributor</url>
+		</site>
+		<repository>
+			<id>pizzashack-distributor-release</id>
+			<url>http://localhost:8081/nexus/content/repositories/pizzashack-distributor-release</url>
+		</repository>
+		<snapshotRepository>
+			<id>pizzashack-distributor-snapshots</id>
+			<url>http://localhost:8081/nexus/content/repositories/pizzashack-distributor-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/davidy104/pizzashack-order.git</connection>
+		<url>http://davidy104@github.com/davidy104/pizzashack-order.git</url>
+		<developerConnection>scm:git:https://github.com/davidy104/pizzashack-order.git</developerConnection>
+	</scm>
+
+
 	<properties>
 		<activiti.version>5.14</activiti.version>
 		<drools.version>5.5.0.Final</drools.version>
@@ -329,13 +372,6 @@
 				<version>${activemq.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-core</artifactId>
-				<version>${activemq.version}</version>
-				<scope>test</scope>
-			</dependency>
-
 			<!-- camel dependencies -->
 			<dependency>
 				<groupId>org.apache.camel</groupId>
@@ -389,13 +425,6 @@
 				<artifactId>camel-quartz</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.apache.camel</groupId>
-				<artifactId>camel-bundle</artifactId>
-				<version>${camel.version}</version>
-			</dependency>
-
 
 
 			<dependency>
@@ -918,6 +947,54 @@
 		</pluginManagement>
 
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.7</version>
+				<reportSets>
+					<reportSet>
+						<id>aggregate-project-info</id>
+						<inherited>false</inherited>
+						<reports>
+							<report>index</report>
+							<report>license</report>
+							<report>project-team</report>
+							<report>dependency-info</report>
+							<report>scm</report>
+							<report>distribution-management</report>
+							<report>issue-tracking</report>
+							<report>summary</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<modules>
 		<module>pizzashack-distributor-shared</module>
 		<module>pizzashack-distributor-repository</module>

@@ -83,7 +83,7 @@ public class OrderProcessTest {
 	}
 
 	@Test
-//	@Ignore
+	@Ignore
 	public void testAutoReviewPassedCase() throws Exception {
 		OrderProcessDto orderProcess = orderProcessDs
 				.startOrderProcess(operator);

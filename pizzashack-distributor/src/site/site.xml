@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.3.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
+    <body>
+        <links>
+            <item name="Pizzashack Distributor" position="right" href="${project.url}"/>
+        </links>
+        <menu name="Overview">
+			<item name="History of Mastermind"  href="history.html"/>
+			<item name="Sample program"  href="sample.html"/>
+			<item name="FAQ"  href="faq.html"/> 
+        </menu>
+        <menu ref="modules" />
+        <menu ref="reports" inherit="bottom"/>
+    </body>
+    
+    <skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-stylus-skin</artifactId>
+		<version>1.5</version>
+    </skin>
+
+</project>

@@ -11,7 +11,11 @@
 
 	<artifactId>pizzashack-distributor-ds</artifactId>
 	<name>pizzashack-distributor-ds</name>
-	<url>http://maven.apache.org</url>
+	<url>http://pizzashack.co.nz</url>
+
+	<description>
+		Pizzashack Distributor Domain Services Module.
+    </description>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

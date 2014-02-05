@@ -11,7 +11,11 @@
 
 	<artifactId>pizzashack-distributor-repository</artifactId>
 	<name>pizzashack-distributor-repository</name>
-	<url>http://maven.apache.org</url>
+	<url>http://pizzashack.co.nz</url>
+
+	<description>
+		Pizzashack Distributor Repository Module.
+    </description>
 	<dependencies>
 		<!-- testing -->
 		<dependency>
@@ -62,4 +66,18 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

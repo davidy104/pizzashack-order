@@ -15,7 +15,13 @@ class CustomerConverter implements GeneralConverter<CustomerDto, CustomerModel> 
 	@Override
 	CustomerDto toDto(CustomerModel model, Object... loadStrategies){
 		log.info "toDto start:{} $model"
-		CustomerDto dto = new CustomerDto(custId:model.custId,customerName:model.customerName,customerEmail:model.email)
+		if(!model){
+			return null
+		}
+		CustomerDto dto = new CustomerDto(customerName:model.customerName,customerEmail:model.email)
+		if(model.custId){
+			dto.custId=model.custId
+		}
 		Integer credits = model.credits
 		switch(credits){
 			case 0..50 :

@@ -12,7 +12,11 @@
 	<artifactId>pizzashack-distributor-web</artifactId>
 	<packaging>war</packaging>
 	<name>pizzashack-distributor-web Maven Webapp</name>
-	<url>http://maven.apache.org</url>
+	<url>http://pizzashack.co.nz</url>
+
+	<description>
+		Pizzashack Distributor Web Module.
+    </description>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

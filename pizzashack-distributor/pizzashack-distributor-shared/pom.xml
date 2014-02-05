@@ -11,6 +11,12 @@
 
 	<artifactId>pizzashack-distributor-shared</artifactId>
 	<name>pizzashack-distributor-shared</name>
+	
+	<url>http://pizzashack.co.nz</url>
+
+	<description>
+		Pizzashack Distributor Shared Module.
+    </description>
 
 	<dependencies>
 		<!-- Activiti 5 -->

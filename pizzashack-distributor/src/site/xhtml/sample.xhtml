@@ -1,0 +1,48 @@
+<html>
+<head>
+<title>Codebreaker: Sample Program</title>
+</head>
+<body>
+<div class="section">
+    <h2>A Sample Program</h2>
+
+<p>The following program uses the Codebreaker library to run a simple game. The user is responsible for knowing how to
+evaluate guesses and respond with results.</p>
+
+<div class="source">
+<pre>
+<b>package</b> com.packtpub.maven;
+
+<b>import</b> com.meterware.codebreaker.Codebreaker;
+<b>import</b> com.meterware.codebreaker.Color;
+<b>import</b> com.meterware.codebreaker.Result;
+
+<b>import</b> java.io.BufferedReader;
+<b>import</b> java.io.IOException;
+<b>import</b> java.io.InputStreamReader;
+<b>import</b> java.util.Arrays;
+
+<b>public</b> <b>class</b> CodebreakerGame {
+    <b>public</b> <b>static</b> <b>void</b> main(String... args) <b>throws</b> IOException {
+        Codebreaker guesser = <b>new</b> Codebreaker(5, false);
+        BufferedReader in = <b>new</b> BufferedReader(new InputStreamReader(System.in));
+        <b>while</b> (guesser.numCombinationsLeft() > 1) {
+            Color[] guess = guesser.getNextGuess();
+            System.out.print("My guess: " + Arrays.toString(guess) + " (enter result as num matches, num mismatches): ");
+            String line = in.readLine();
+            String[] strings = line.split(",");
+            int numMatches = Integer.parseInt(strings[0].trim());
+            int numMismatches = Integer.parseInt(strings[1].trim());
+            guesser.addResult(guess, new Result(numMatches, numMismatches));
+        }
+        System.out.println("Final guess: " + Arrays.toString(guesser.getNextGuess()));
+    }
+
+}
+</pre>
+</div>
+
+<h3>More to come</h3>
+</div>
+</body>
+</html>
