@@ -9,7 +9,50 @@
 	<packaging>pom</packaging>
 
 	<name>pizzashack-client</name>
-	<url>http://maven.apache.org</url>
+	<url>http://pizzashack-client.co.nz</url>
+
+	<description>
+		Pizzashack Client
+    </description>
+
+	<developers>
+		<developer>
+			<name>David Yuan</name>
+			<email>david.yuan124@gmail.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>MIT license</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+
+	<distributionManagement>
+		<site>
+			<id>www.pizzashackclient.co.nz</id>
+			<url>file:///site/pizzashack-client</url>
+		</site>
+		<repository>
+			<id>pizzashack-client-release</id>
+			<url>http://localhost:8081/nexus/content/repositories/pizzashack-client-release</url>
+		</repository>
+		<snapshotRepository>
+			<id>pizzashack-client-snapshots</id>
+			<url>http://localhost:8081/nexus/content/repositories/pizzashack-client-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/davidy104/pizzashack-order.git</connection>
+		<url>http://davidy104@github.com/davidy104/pizzashack-order.git</url>
+		<developerConnection>scm:git:https://github.com/davidy104/pizzashack-order.git</developerConnection>
+		<tag>pizzashack-distributor-1.0.1</tag>
+	</scm>
 
 	<properties>
 		<activiti.version>5.14</activiti.version>
@@ -914,6 +957,53 @@
 		</pluginManagement>
 
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.7</version>
+				<reportSets>
+					<reportSet>
+						<id>aggregate-project-info</id>
+						<inherited>false</inherited>
+						<reports>
+							<report>index</report>
+							<report>license</report>
+							<report>project-team</report>
+							<report>dependency-info</report>
+							<report>scm</report>
+							<report>distribution-management</report>
+							<report>issue-tracking</report>
+							<report>summary</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<modules>
 		<module>pizzashack-client-shared</module>
 		<module>pizzashack-client-web</module>

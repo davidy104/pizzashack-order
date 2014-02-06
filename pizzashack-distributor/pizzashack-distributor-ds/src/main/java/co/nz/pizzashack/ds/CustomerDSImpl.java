@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.nz.pizzashack.DuplicatedException;
 import co.nz.pizzashack.NotFoundException;
 import co.nz.pizzashack.data.converter.CustomerConverter;
 import co.nz.pizzashack.data.dto.CustomerDto;
@@ -61,6 +62,11 @@ public class CustomerDSImpl implements CustomerDS {
 	public CustomerDto createCustomer(CustomerDto customer) throws Exception {
 		LOGGER.info("createCustomer start:{} ", customer);
 		CustomerDto added = null;
+		String custEmail = customer.getCustomerEmail();
+		if (this.ifCustomerExisted(custEmail)) {
+			throw new DuplicatedException(
+					"Customer already existed with email[" + custEmail + "]");
+		}
 		CustomerModel addedModel = customerConverter.toModel(customer);
 		addedModel = customerRepository.save(addedModel);
 		added = customerConverter.toDto(addedModel);

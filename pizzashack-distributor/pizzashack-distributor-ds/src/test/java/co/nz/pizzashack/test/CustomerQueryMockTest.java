@@ -1,6 +1,7 @@
 package co.nz.pizzashack.test;
 
 import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustEmail;
+import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustName;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -21,7 +22,7 @@ import co.nz.pizzashack.data.repository.CustomerRepository;
 import co.nz.pizzashack.ds.CustomerDSImpl;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CustomerMockTest {
+public class CustomerQueryMockTest {
 
 	@Mock
 	private CustomerRepository customerRepositoryMock;
@@ -48,7 +49,28 @@ public class CustomerMockTest {
 		verifyNoMoreInteractions(customerRepositoryMock);
 		CustomerTestUtils.assertCustomer(actual, foundModel);
 	}
-	
-	
+
+	@Test
+	public void testGetCustomerById() throws Exception {
+		CustomerModel foundModel = new CustomerModel();
+		when(customerRepositoryMock.findOne(1L)).thenReturn(foundModel);
+		CustomerDto actual = customerDSImpl.getCustomerById(1L);
+		verify(customerRepositoryMock, times(1)).findOne(1L);
+		verifyNoMoreInteractions(customerRepositoryMock);
+		CustomerTestUtils.assertCustomer(actual, foundModel);
+	}
+
+	@Test
+	public void testGetCustomerByName() throws Exception {
+		String custName = "david";
+		CustomerModel foundModel = new CustomerModel();
+		when(customerRepositoryMock.findOne(findByCustName(custName)))
+				.thenReturn(foundModel);
+		CustomerDto actual = customerDSImpl.getCustomerByName(custName);
+		verify(customerRepositoryMock, times(1)).findOne(
+				findByCustName(custName));
+		verifyNoMoreInteractions(customerRepositoryMock);
+		CustomerTestUtils.assertCustomer(actual, foundModel);
+	}
 
 }

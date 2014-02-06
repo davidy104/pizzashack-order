@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>co.nz.pizzashack</groupId>
@@ -32,14 +33,10 @@
 	</licenses>
 
 	<distributionManagement>
-	<!-- 
 		<site>
-			<id>pizzashackDistributor</id>
-			 
-			<url>http://www.pizzashack.co.nz/distributor</url>
-			
+			<id>www.pizzashackdistributor.co.nz</id>
+			<url>file:///site/pizzashack-distributor</url>
 		</site>
-		-->
 		<repository>
 			<id>pizzashack-distributor-release</id>
 			<url>http://localhost:8081/nexus/content/repositories/pizzashack-distributor-release</url>
@@ -835,6 +832,7 @@
 					<argLine>-Xmx1024m</argLine>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 		<pluginManagement>
 			<plugins>
