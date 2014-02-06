@@ -381,13 +381,6 @@
 				<version>${activemq.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-core</artifactId>
-				<version>${activemq.version}</version>
-				<scope>test</scope>
-			</dependency>
-
 			<!-- camel dependencies -->
 			<dependency>
 				<groupId>org.apache.camel</groupId>
@@ -441,14 +434,6 @@
 				<artifactId>camel-quartz</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.apache.camel</groupId>
-				<artifactId>camel-bundle</artifactId>
-				<version>${camel.version}</version>
-			</dependency>
-
-
 
 			<dependency>
 				<groupId>org.apache.camel</groupId>
