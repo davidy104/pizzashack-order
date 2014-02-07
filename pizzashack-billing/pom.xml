@@ -4,7 +4,7 @@
 
 	<groupId>co.nz.pizzashack.billing</groupId>
 	<artifactId>pizzashack-billing</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>pizzashack-billing</name>
@@ -34,7 +34,7 @@
 	<distributionManagement>
 		<site>
 			<id>www.pizzashackbilling.co.nz</id>
-			<url>file:///site/pizzashack-billing</url>
+			<url>file:///home/david/study/activiti5/code/site/pizzashack-billing</url>
 		</site>
 		<repository>
 			<id>pizzashack-billing-release</id>
