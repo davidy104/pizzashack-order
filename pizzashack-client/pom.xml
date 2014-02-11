@@ -35,7 +35,7 @@
 	<distributionManagement>
 		<site>
 			<id>www.pizzashackclient.co.nz</id>
-			<url>file:///site/pizzashack-client</url>
+			<url>file:///home/david/study/activiti5/code/site/pizzashack-client</url>
 		</site>
 		<repository>
 			<id>pizzashack-client-release</id>

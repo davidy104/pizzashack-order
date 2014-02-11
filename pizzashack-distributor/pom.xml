@@ -35,7 +35,7 @@
 	<distributionManagement>
 		<site>
 			<id>www.pizzashackdistributor.co.nz</id>
-			<url>file:///site/pizzashack-distributor</url>
+			<url>file:///home/david/study/activiti5/code/site/pizzashack-distributor</url>
 		</site>
 		<repository>
 			<id>pizzashack-distributor-release</id>
@@ -832,7 +832,7 @@
 					<argLine>-Xmx1024m</argLine>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 		<pluginManagement>
 			<plugins>

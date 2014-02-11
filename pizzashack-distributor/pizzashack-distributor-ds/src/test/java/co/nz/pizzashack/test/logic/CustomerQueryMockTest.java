@@ -1,4 +1,4 @@
-package co.nz.pizzashack.test;
+package co.nz.pizzashack.test.logic;
 
 import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustEmail;
 import static co.nz.pizzashack.data.predicates.CustomerPredicates.findByCustName;
@@ -13,13 +13,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import co.nz.pizzashack.data.converter.CustomerConverter;
 import co.nz.pizzashack.data.dto.CustomerDto;
 import co.nz.pizzashack.data.model.CustomerModel;
 import co.nz.pizzashack.data.repository.CustomerRepository;
 import co.nz.pizzashack.ds.CustomerDSImpl;
+import co.nz.pizzashack.test.CustomerTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CustomerQueryMockTest {
@@ -27,26 +27,34 @@ public class CustomerQueryMockTest {
 	@Mock
 	private CustomerRepository customerRepositoryMock;
 
+	@Mock
+	private CustomerConverter customerConverterMock;
+
 	@InjectMocks
 	private CustomerDSImpl customerDSImpl;
 
 	@Before
 	public void setUp() {
-		CustomerConverter customerConverter = new CustomerConverter();
-		ReflectionTestUtils.setField(customerDSImpl, "customerConverter",
-				customerConverter);
+		// CustomerConverter customerConverter = new CustomerConverter();
+		// ReflectionTestUtils.setField(customerDSImpl, "customerConverter",
+		// customerConverter);
 	}
 
 	@Test
 	public void testGetCustomerByEmail() throws Exception {
 		String custEmail = "david.yuan@yellow.co.nz";
 		CustomerModel foundModel = new CustomerModel();
+		CustomerDto custDto = new CustomerDto();
 		when(customerRepositoryMock.findOne(findByCustEmail(custEmail)))
 				.thenReturn(foundModel);
+		when(customerConverterMock.toDto(foundModel)).thenReturn(custDto);
+
 		CustomerDto actual = customerDSImpl.getCustomerByEmail(custEmail);
 		verify(customerRepositoryMock, times(1)).findOne(
 				findByCustEmail(custEmail));
+		verify(customerConverterMock, times(1)).toDto(foundModel);
 		verifyNoMoreInteractions(customerRepositoryMock);
+		verifyNoMoreInteractions(customerConverterMock);
 		CustomerTestUtils.assertCustomer(actual, foundModel);
 	}
 

@@ -1,4 +1,4 @@
-package co.nz.pizzashack.test;
+package co.nz.pizzashack.test.integration;
 
 import javax.annotation.Resource;
 
@@ -12,8 +12,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import co.nz.pizzashack.config.ApplicationConfiguration;
 import co.nz.pizzashack.data.dto.CustomerDto;
 import co.nz.pizzashack.ds.CustomerDS;
+import co.nz.pizzashack.test.CustomerTestUtils;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationConfiguration.class })
@@ -30,6 +32,21 @@ public class CustomerDbTest {
 		CustomerDto customer = CustomerTestUtils.createDto();
 		customer = customerDs.createCustomer(customer);
 		assertNotNull(customer.getCustId());
+	}
+
+	@Test
+	public void testUpdateCustomer() throws Exception {
+		CustomerDto customer = CustomerTestUtils.createDto();
+		customer = customerDs.createCustomer(customer);
+		assertNotNull(customer);
+		Long custId = customer.getCustId();
+		customer.setCustomerName("test01");
+		customer.setCustomerEmail("test01@gmail.com");
+		customerDs.updateCustomer(custId, customer);
+
+		customer = customerDs.getCustomerById(custId);
+		assertNotNull(customer);
+		assertEquals("test01@gmail.com", customer.getCustomerEmail());
 	}
 
 }
