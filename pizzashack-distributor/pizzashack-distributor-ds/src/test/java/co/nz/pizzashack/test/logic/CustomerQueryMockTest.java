@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,7 @@ import co.nz.pizzashack.ds.CustomerDSImpl;
 import co.nz.pizzashack.test.CustomerTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore
 public class CustomerQueryMockTest {
 
 	@Mock

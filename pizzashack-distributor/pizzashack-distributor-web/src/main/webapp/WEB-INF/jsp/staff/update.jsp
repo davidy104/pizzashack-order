@@ -15,15 +15,16 @@
 
 	<div id="staff-id" class="hidden">${staff.staffId}</div>
 	<div id="staff-deptIds" class="hidden">${staff.selectedDeptIdsStr}</div>
-
+	<a href="/workflow/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.workflows.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
-				code="pizza.label.depts.link" /></a> <a href="/staff/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.staffs.link" /></a> <a href="/user/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.users.link" /></a> <a href="/logout"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
+			code="pizza.label.depts.link" /></a>
+	<a href="/staff/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.staffs.link" /></a>
+	<a href="/user/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.users.link" /></a>
+	<a href="/logout" class="btn btn-primary"> <spring:message
+			code="pizza.label.logout.link" /></a>
 	<br>
 	<h3>
 		<spring:message code="staff.update.title" />
@@ -107,7 +108,7 @@
 			</div>
 		</div>
 
-			<div id="control-group-depts" class="control-group">
+		<div id="control-group-depts" class="control-group">
 			<label for="staff-depts"> <spring:message
 					code="view.staff.selectedDepts.label" />:
 			</label>
@@ -126,7 +127,8 @@
 			<button id="cancel-staff-udpate-button" class="btn">
 				<spring:message code="cancel.button.label" />
 			</button>
-			<button id="update-staff-button" type="submit" class="btn btn-primary">
+			<button id="update-staff-button" type="submit"
+				class="btn btn-primary">
 				<spring:message code="update.button.label" />
 			</button>
 		</div>

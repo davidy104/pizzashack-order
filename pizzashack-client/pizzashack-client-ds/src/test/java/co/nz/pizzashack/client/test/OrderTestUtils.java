@@ -65,7 +65,7 @@ public class OrderTestUtils {
 		account.setAccountNo("111111");
 		account.setSecurityNo("111");
 		account.setPaymode("credit");
-		account.setExpireDate("2019-06-24");
+		account.setExpireDate("2020-01-24");
 		billingDto.setAccount(account);
 		billingDto.setBillingAmount(billingAmt);
 		billingDto.setOrderNo(orderNo);

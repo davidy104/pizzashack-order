@@ -3,6 +3,7 @@ package co.nz.pizzashack.ds;
 import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByNameAndCategory;
 import static co.nz.pizzashack.data.predicates.WorkflowPredicates.findByProcessDefinitionKeyAndCategory;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.drools.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import co.nz.pizzashack.data.converter.WorkflowConverter;
 import co.nz.pizzashack.data.dto.WorkflowDto;
 import co.nz.pizzashack.data.model.WorkflowModel;
 import co.nz.pizzashack.data.repository.WorkflowRepository;
+import co.nz.pizzashack.utils.GeneralUtils;
 
 @Service
 @Transactional(value = "localTxManager", readOnly = true)
@@ -83,7 +86,7 @@ public class WorkflowDSImpl implements WorkflowDS {
 	@Override
 	@Transactional(value = "localTxManager", readOnly = false)
 	public WorkflowDto deployWorkflow(String name, String category,
-			String... classpathResources) throws Exception {
+			String flowImgPath, String... classpathResources) throws Exception {
 		LOGGER.info("deployWorkflow start:{}");
 		WorkflowDto deployed = null;
 		WorkflowModel model = workflowRepository.findOne(findByNameAndCategory(
@@ -91,7 +94,7 @@ public class WorkflowDSImpl implements WorkflowDS {
 		if (model != null) {
 			throw new DuplicatedException("Workflow already existed");
 		}
-		model = WorkflowModel.getBuilder(name, category).build();
+		model = WorkflowModel.getBuilder(name, category, flowImgPath).build();
 		model.setCreateTime(new Date());
 
 		DeploymentBuilder builder = repositoryService.createDeployment()
@@ -119,11 +122,7 @@ public class WorkflowDSImpl implements WorkflowDS {
 	@Transactional(value = "localTxManager", readOnly = false)
 	public void undeployWorkflow(Long workflowId) throws Exception {
 		LOGGER.info("undeployWorkflow start:{}", workflowId);
-		WorkflowModel model = workflowRepository.findOne(workflowId);
-		if (model == null) {
-			throw new NotFoundException("workflow not existed by id["
-					+ workflowId + "");
-		}
+		WorkflowModel model = this.getModelById(workflowId);
 		repositoryService.deleteDeployment(model.getDeployId(), true);
 		LOGGER.info("undeployWorkflow end:{}");
 	}
@@ -148,14 +147,35 @@ public class WorkflowDSImpl implements WorkflowDS {
 	public WorkflowDto getWorkflowById(Long workflowId) throws Exception {
 		LOGGER.info("getWorkflowById start:{}");
 		WorkflowDto found = null;
+		WorkflowModel model = this.getModelById(workflowId);
+		found = workflowConverter.toDto(model);
+		LOGGER.info("getWorkflowById end:{}", found);
+		return found;
+	}
+
+	@Override
+	public byte[] getFLowImageBytes(Long workflowId, String imgRootPath)
+			throws Exception {
+		LOGGER.info("getFLowImageBytes start:{} ", workflowId);
+		LOGGER.info("imgRootPath:{} ", imgRootPath);
+		WorkflowModel model = this.getModelById(workflowId);
+		String imgPath = model.getImgPath();
+		if (!StringUtils.isEmpty(imgPath)) {
+			imgPath = imgRootPath + imgPath;
+			LOGGER.info("imgPath:{} ", imgPath);
+			return GeneralUtils.fileToBytes(new File(imgPath));
+		}
+		return null;
+	}
+
+	private WorkflowModel getModelById(Long workflowId)
+			throws NotFoundException {
 		WorkflowModel model = workflowRepository.findOne(workflowId);
 		if (model == null) {
 			throw new NotFoundException("workflow not existed by id["
 					+ workflowId + "");
 		}
-		found = workflowConverter.toDto(model);
-		LOGGER.info("getWorkflowById end:{}", found);
-		return found;
+		return model;
 	}
 
 }

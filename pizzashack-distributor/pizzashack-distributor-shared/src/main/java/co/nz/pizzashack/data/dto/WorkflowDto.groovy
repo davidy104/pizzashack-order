@@ -12,4 +12,5 @@ class WorkflowDto implements Serializable{
 	String processDefinitionKey
 	String processDefinitionId
 	String createTime
+	String imgPath
 }

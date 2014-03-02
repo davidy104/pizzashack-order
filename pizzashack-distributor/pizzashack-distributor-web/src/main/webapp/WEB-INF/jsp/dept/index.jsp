@@ -14,15 +14,16 @@
 	<h2>
 		<spring:message code="pizzashack.title" />
 	</h2>
-
+	<a href="/workflow/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.workflows.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
-				code="pizza.label.depts.link" /></a> <a href="/staff/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.staffs.link" /></a> <a href="/user/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.users.link" /></a> <a href="/logout"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
+			code="pizza.label.depts.link" /></a>
+	<a href="/staff/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.staffs.link" /></a>
+	<a href="/user/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.users.link" /></a>
+	<a href="/logout" class="btn btn-primary"> <spring:message
+			code="pizza.label.logout.link" /></a>
 	<br>
 	<h3>
 		<spring:message code="deptsearch.title" />
@@ -46,12 +47,11 @@
 					class="btn btn-primary">
 					<spring:message code="search.button.label" />
 				</button>
-				<a href="/department/create" class="btn btn-primary"> <spring:message
-						code="pizza.label.create.link" /></a>
 			</div>
 		</form:form>
 
-		<br>
+		<a href="/department/create" class="btn btn-primary"> <spring:message
+				code="pizza.label.create.link" /></a> <br>
 
 		<div id="pizza-list">
 			<c:choose>

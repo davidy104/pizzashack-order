@@ -45,7 +45,8 @@ public class WorkflowModel implements Serializable {
 	@Temporal(value = TemporalType.TIME)
 	private Date createTime;
 
-
+	@Column(name = "IMG_PATH")
+	private String imgPath;
 
 	public Long getWfId() {
 		return wfId;
@@ -103,6 +104,14 @@ public class WorkflowModel implements Serializable {
 		this.createTime = createTime;
 	}
 
+	public String getImgPath() {
+		return imgPath;
+	}
+
+	public void setImgPath(String imgPath) {
+		this.imgPath = imgPath;
+	}
+
 	public static Builder getBuilder(String name, String category,
 			String deployId, String processDefinitionId) {
 		return new Builder(name, category, deployId, processDefinitionId);
@@ -110,6 +119,11 @@ public class WorkflowModel implements Serializable {
 
 	public static Builder getBuilder(String name, String category) {
 		return new Builder(name, category);
+	}
+
+	public static Builder getBuilder(String name, String category,
+			String imgPath) {
+		return new Builder(name, category, imgPath);
 	}
 
 	public static class Builder {
@@ -130,6 +144,13 @@ public class WorkflowModel implements Serializable {
 			built.category = category;
 		}
 
+		public Builder(String name, String category, String imgPath) {
+			built = new WorkflowModel();
+			built.name = name;
+			built.category = category;
+			built.imgPath = imgPath;
+		}
+
 		public WorkflowModel build() {
 			return built;
 		}
@@ -142,7 +163,8 @@ public class WorkflowModel implements Serializable {
 				.append("deployId", deployId)
 				.append("processDefinitionKey", processDefinitionKey)
 				.append("processDefinitionId", processDefinitionId)
-				.append("createTime", createTime).toString();
+				.append("createTime", createTime).append("imgPath", imgPath)
+				.toString();
 	}
 
 	@Override

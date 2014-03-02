@@ -84,15 +84,16 @@ public class WorkflowInitialDataSetup {
 		staffDs.createStaff(staff, deptIds);
 
 		WorkflowDto workflow = workflowDs.deployWorkflow("orderBillingProcess",
-				"order", "bpmn/OrderBillingProcess.bpmn20.xml");
+				"order", "OrderBillingProcess.png",
+				"bpmn/OrderBillingProcess.bpmn20.xml");
 		LOGGER.info("deploy billing process, workflow:{} ", workflow);
 
 		workflow = workflowDs.deployWorkflow("orderCoreProcess", "order",
-				"bpmn/OrdercoreProcess.bpmn20.xml");
+				"OrdercoreProcess.png", "bpmn/OrdercoreProcess.bpmn20.xml");
 		LOGGER.info("deploy core process, workflow:{} ", workflow);
 
 		workflow = workflowDs.deployWorkflow("orderlocalProcess", "order",
-				"bpmn/OrderlocalProcess.bpmn20.xml");
+				"OrderlocalProcess.png", "bpmn/OrderlocalProcess.bpmn20.xml");
 		LOGGER.info("deploy local main process, workflow:{} ", workflow);
 	}
 }

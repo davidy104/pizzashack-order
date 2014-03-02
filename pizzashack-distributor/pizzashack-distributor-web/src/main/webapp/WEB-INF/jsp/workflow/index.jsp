@@ -14,8 +14,10 @@
 	<h2>
 		<spring:message code="pizzashack.title" />
 	</h2>
+
 	<a href="/workflow/list" class="btn btn-primary"> <spring:message
 			code="pizza.label.workflows.link" /></a>
+
 	<a href="/department/list" class="btn btn-primary"> <spring:message
 			code="pizza.label.depts.link" /></a>
 	<a href="/staff/list" class="btn btn-primary"> <spring:message
@@ -24,64 +26,44 @@
 			code="pizza.label.users.link" /></a>
 	<a href="/logout" class="btn btn-primary"> <spring:message
 			code="pizza.label.logout.link" /></a>
-
 	<br>
-	<h3>
-		<spring:message code="userlist.title" />
-	</h3>
 
 	<div>
-		<form:errors path="user" cssClass="errorBlock" element="div" />
-		<form:form action="/user/search" cssClass="well" commandName="user"
-			method="POST">
-			<div id="control-group-username" class="control-group">
-				<label for="user-username"><spring:message
-						code="user.label.username" />:</label>
-				<div class="controls">
-					<form:input id="user-username" path="username" />
-					<form:errors id="error-username" path="username"
-						cssClass="help-inline" />
-				</div>
-			</div>
-			<div class="form-buttons">
-				<button id="search-user-button" type="submit"
-					class="btn btn-primary">
-					<spring:message code="search.button.label" />
-				</button>
-			</div>
-		</form:form>
-
-		<a href="/user/create" class="btn btn-primary"> <spring:message
-				code="pizza.label.create.link" /></a>
-		<br>
-
 		<div id="pizza-list">
 			<c:choose>
-				<c:when test="${empty users}">
+				<c:when test="${empty workflows}">
 					<p>
-						<spring:message code="pizza.list.label.no.users" />
+						<spring:message code="pizza.list.label.no.workflows" />
 					</p>
 				</c:when>
 				<c:otherwise>
-					<c:forEach items="${users}" var="user">
+					<c:forEach items="${workflows}" var="workflow">
 						<div class="well pizza-list-item">
-							<c:if test="${not empty user.username}">
-								<abbr title="<spring:message code="view.user.username.title"/>">
-									<spring:message code="view.user.username.label" />
+							<c:if test="${not empty workflow.name}">
+								<abbr title="<spring:message code="view.workflow.name.title"/>">
+									<spring:message code="view.workflow.name.label" />
 								</abbr>
-								<c:out value="${user.username}" />
+								<c:out value="${workflow.name}" />
+								<br />
+							</c:if>
+							
+							<c:if test="${not empty workflow.category}">
+								<abbr title="<spring:message code="view.workflow.category.title"/>">
+									<spring:message code="view.workflow.category.label" />
+								</abbr>
+								<c:out value="${workflow.category}" />
 								<br />
 							</c:if>
 
-							<c:if test="${not empty user.createTime}">
+							<c:if test="${not empty workflow.createTime}">
 								<abbr title="<spring:message code="createtime.title"/>">
 									<spring:message code="createtime.label" />
 								</abbr>
-								<c:out value="${user.createTime}" />
+								<c:out value="${workflow.createTime}" />
 								<br />
 							</c:if>
 
-							<a href="/user/${user.userId}" class="btn btn-primary"><spring:message
+							<a href="/workflow/${workflow.wfId}" class="btn btn-primary"><spring:message
 									code="pizza.label.show.link" /></a>
 						</div>
 					</c:forEach>

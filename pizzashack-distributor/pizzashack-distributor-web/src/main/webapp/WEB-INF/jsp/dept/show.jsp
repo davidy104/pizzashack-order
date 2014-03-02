@@ -13,15 +13,16 @@
 		<spring:message code="pizzashack.title" />
 	</h2>
 	<div>
-		<a href="/department/list" class="btn btn-primary"> <spring:message
+		<a href="/workflow/list" class="btn btn-primary"> <spring:message
+				code="pizza.label.workflows.link" /></a> <a href="/department/list"
+			class="btn btn-primary"> <spring:message
 				code="pizza.label.depts.link" /></a> <a href="/staff/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.staffs.link" /></a> <a href="/user/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.users.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
-		<br>
+				code="pizza.label.logout.link" /></a> <br>
 
 		<div class="well">
 			<user> <abbr
@@ -38,8 +39,8 @@
 			</c:if> </user>
 
 			<div>
-				<a href="/department/update/${dept.deptId}" class="btn btn-primary"> <spring:message
-						code="update.button.label" />
+				<a href="/department/update/${dept.deptId}" class="btn btn-primary">
+					<spring:message code="update.button.label" />
 				</a> <a id="delete-dept-link" class="btn btn-primary"> <spring:message
 						code="delete.button.label" /></a>
 			</div>

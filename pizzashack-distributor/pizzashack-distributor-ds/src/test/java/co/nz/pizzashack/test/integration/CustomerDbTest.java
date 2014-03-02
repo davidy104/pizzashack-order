@@ -1,7 +1,11 @@
 package co.nz.pizzashack.test.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import javax.annotation.Resource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -14,11 +18,9 @@ import co.nz.pizzashack.data.dto.CustomerDto;
 import co.nz.pizzashack.ds.CustomerDS;
 import co.nz.pizzashack.test.CustomerTestUtils;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationConfiguration.class })
+@Ignore
 public class CustomerDbTest {
 
 	@Resource

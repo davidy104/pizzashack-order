@@ -65,6 +65,10 @@ class GeneralUtils {
 		return errorStr
 	}
 
+	static byte[] fileToBytes(File file){
+		return file.bytes
+	}
+
 	//	static getExceptionInfo = {Exception error->
 	//		def stackStr
 	//		def errorStr

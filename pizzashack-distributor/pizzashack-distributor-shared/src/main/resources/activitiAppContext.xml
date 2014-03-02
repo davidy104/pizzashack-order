@@ -39,6 +39,7 @@
 		<property name="mailServerUsername" value="${activiti.mailServerUsername}" />
 		<property name="mailServerPassword" value="${activiti.mailServerPassword}" />
 		<property name="mailServerUseSSL" value="${activiti.mailServerUseSSL}" />
+		<property name="mailServerDefaultFrom" value="${activiti.mailServerDefaultFrom}"/>
 		<property name="customPostDeployers">
 			<list>
 				<bean class="org.activiti.engine.impl.rules.RulesDeployer" />

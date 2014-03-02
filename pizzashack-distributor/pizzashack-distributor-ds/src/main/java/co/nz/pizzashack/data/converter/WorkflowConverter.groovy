@@ -19,7 +19,7 @@ GeneralConverter<WorkflowDto, WorkflowModel> {
 	WorkflowDto toDto(WorkflowModel model, Object... loadStrategies) {
 		log.info "toDto start:{} $model"
 		WorkflowDto dto = new WorkflowDto(name:model.name,category:model.category,deployId:model.deployId,
-		processDefinitionKey:model.processDefinitionKey,processDefinitionId:model.processDefinitionId);
+		processDefinitionKey:model.processDefinitionKey,processDefinitionId:model.processDefinitionId,imgPath:model.imgPath);
 		if(model.createTime){
 			dto.createTime = GeneralUtils.dateToStr(model.createTime)
 		}
@@ -32,7 +32,7 @@ GeneralConverter<WorkflowDto, WorkflowModel> {
 	WorkflowModel toModel(WorkflowDto dto,Object... additionalMappingSource)  {
 		log.info "toModel start:{} $dto"
 		WorkflowModel model = WorkflowModel.getBuilder(dto.name,
-				dto.category).build();
+				dto.category,dto.imgPath).build();
 		if (dto.createTime) {
 			model.createTime = GeneralUtils.strToDate(dto.createTime)
 		}

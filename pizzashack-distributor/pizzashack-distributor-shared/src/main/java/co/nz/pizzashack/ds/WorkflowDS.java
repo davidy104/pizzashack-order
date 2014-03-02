@@ -7,7 +7,7 @@ import co.nz.pizzashack.data.dto.WorkflowDto;
 public interface WorkflowDS {
 
 	WorkflowDto deployWorkflow(String name, String category,
-			String... classpathResources) throws Exception;
+			String flowImgPath, String... classpathResources) throws Exception;
 
 	void undeployWorkflow(Long workflowId) throws Exception;
 
@@ -20,4 +20,6 @@ public interface WorkflowDS {
 
 	WorkflowDto getWorkflowDtoByProcessDefinitionKey(
 			String processDefinitionKey, String category) throws Exception;
+	
+	byte[] getFLowImageBytes(Long workflowId,String imgRootPath)throws Exception;
 }

@@ -13,95 +13,77 @@
 		<spring:message code="pizzashack.title" />
 	</h2>
 	<div>
-		<a href="/department/list" class="btn btn-primary"> <spring:message
+		<a href="/workflow/list" class="btn btn-primary"> <spring:message
+				code="pizza.label.workflows.link" /></a> <a href="/department/list"
+			class="btn btn-primary"> <spring:message
 				code="pizza.label.depts.link" /></a> <a href="/staff/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.staffs.link" /></a> <a href="/user/list"
 			class="btn btn-primary"> <spring:message
 				code="pizza.label.users.link" /></a> <a href="/logout"
 			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
-	<br>
+				code="pizza.label.logout.link" /></a> <br>
 
 		<div class="well">
-			<staff>
-			<c:if test="${not empty staff.individual.firstName}">
-			<abbr
-				title="<spring:message code="view.staff.firstName.title"/>">
-				<spring:message
-					code="view.staff.firstName.label" />:
-			</abbr> <c:out value="${staff.individual.firstName}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.individual.lastName}">
-			<abbr
-				title="<spring:message code="view.staff.lastName.title"/>">
-				<spring:message
-					code="view.staff.lastName.label" />:
-			</abbr> <c:out value="${staff.individual.lastName}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.individual.email}">
-			<abbr
-				title="<spring:message code="view.staff.email.title"/>">
-				<spring:message
-					code="view.staff.email.label" />:
-			</abbr> <c:out value="${staff.individual.email}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.individual.identity}">
-			<abbr
-				title="<spring:message code="view.staff.identity.title"/>">
-				<spring:message
-					code="view.staff.identity.label" />:
-			</abbr> <c:out value="${staff.individual.identity}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.role}">
-			<abbr
-				title="<spring:message code="view.staff.role.title"/>">
-				<spring:message
-					code="view.staff.role.label" />:
-			</abbr> <c:out value="${staff.role}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.level}">
-			<abbr
-				title="<spring:message code="view.staff.level.title"/>">
-				<spring:message
-					code="view.staff.level.label" />:
-			</abbr> <c:out value="${staff.level}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.createDate}">
-			<abbr
-				title="<spring:message code="view.staff.createDate.title"/>">
-				<spring:message
-					code="view.staff.createDate.label" />:
-			</abbr> <c:out value="${staff.createDate}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.user.username}">
-			<abbr
-				title="<spring:message code="view.user.username.title"/>">
-				<spring:message
-					code="view.user.username.label" />:
-			</abbr> <c:out value="${staff.user.username}" /> <br />
-			</c:if>
-
-			<c:if test="${not empty staff.selectedDeptIdsStr}">
-			<abbr
-				title="<spring:message code="view.dept.deptName.title"/>">
-				<spring:message
-					code="view.dept.deptName.label" />:
-			</abbr> <c:out value="${staff.selectedDeptIdsStr}" /> <br />
-			</c:if>
-
-			</staff>
+			<staff> <c:if test="${not empty staff.individual.firstName}">
+				<abbr title="<spring:message code="view.staff.firstName.title"/>">
+					<spring:message code="view.staff.firstName.label" />:
+				</abbr>
+				<c:out value="${staff.individual.firstName}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.individual.lastName}">
+				<abbr title="<spring:message code="view.staff.lastName.title"/>">
+					<spring:message code="view.staff.lastName.label" />:
+				</abbr>
+				<c:out value="${staff.individual.lastName}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.individual.email}">
+				<abbr title="<spring:message code="view.staff.email.title"/>">
+					<spring:message code="view.staff.email.label" />:
+				</abbr>
+				<c:out value="${staff.individual.email}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.individual.identity}">
+				<abbr title="<spring:message code="view.staff.identity.title"/>">
+					<spring:message code="view.staff.identity.label" />:
+				</abbr>
+				<c:out value="${staff.individual.identity}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.role}">
+				<abbr title="<spring:message code="view.staff.role.title"/>">
+					<spring:message code="view.staff.role.label" />:
+				</abbr>
+				<c:out value="${staff.role}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.level}">
+				<abbr title="<spring:message code="view.staff.level.title"/>">
+					<spring:message code="view.staff.level.label" />:
+				</abbr>
+				<c:out value="${staff.level}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.createDate}">
+				<abbr title="<spring:message code="view.staff.createDate.title"/>">
+					<spring:message code="view.staff.createDate.label" />:
+				</abbr>
+				<c:out value="${staff.createDate}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.user.username}">
+				<abbr title="<spring:message code="view.user.username.title"/>">
+					<spring:message code="view.user.username.label" />:
+				</abbr>
+				<c:out value="${staff.user.username}" />
+				<br />
+			</c:if> <c:if test="${not empty staff.selectedDeptIdsStr}">
+				<abbr title="<spring:message code="view.dept.deptName.title"/>">
+					<spring:message code="view.dept.deptName.label" />:
+				</abbr>
+				<c:out value="${staff.selectedDeptIdsStr}" />
+				<br />
+			</c:if> </staff>
 
 			<div>
-				<a href="/staff/update/${staff.staffId}" class="btn btn-primary"> <spring:message
-						code="update.button.label" />
+				<a href="/staff/update/${staff.staffId}" class="btn btn-primary">
+					<spring:message code="update.button.label" />
 				</a> <a id="delete-staff-link" class="btn btn-primary"> <spring:message
 						code="delete.button.label" /></a>
 			</div>

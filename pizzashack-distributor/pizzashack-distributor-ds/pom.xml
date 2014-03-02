@@ -16,6 +16,7 @@
 		Pizzashack Distributor Domain Services Module.
     </description>
 	<dependencies>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

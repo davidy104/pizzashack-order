@@ -13,15 +13,16 @@
 	<h2>
 		<spring:message code="pizzashack.title" />
 	</h2>
-
+	<a href="/workflow/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.workflows.link" /></a>
 	<a href="/department/list" class="btn btn-primary"> <spring:message
-				code="pizza.label.depts.link" /></a> <a href="/staff/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.staffs.link" /></a> <a href="/user/list"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.users.link" /></a> <a href="/logout"
-			class="btn btn-primary"> <spring:message
-				code="pizza.label.logout.link" /></a>
+			code="pizza.label.depts.link" /></a>
+	<a href="/staff/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.staffs.link" /></a>
+	<a href="/user/list" class="btn btn-primary"> <spring:message
+			code="pizza.label.users.link" /></a>
+	<a href="/logout" class="btn btn-primary"> <spring:message
+			code="pizza.label.logout.link" /></a>
 
 	<br>
 	<h3>
@@ -36,9 +37,10 @@
 				<label for="staff-individual-firstName"><spring:message
 						code="individual.label.firstName" />:</label>
 				<div class="controls">
-					<form:input id="staff-individual-firstName" path="individual.firstName" />
-					<form:errors id="error-individual-firstName" path="individual.firstName"
-						cssClass="help-inline" />
+					<form:input id="staff-individual-firstName"
+						path="individual.firstName" />
+					<form:errors id="error-individual-firstName"
+						path="individual.firstName" cssClass="help-inline" />
 				</div>
 			</div>
 			<div class="form-buttons">
@@ -46,12 +48,11 @@
 					class="btn btn-primary">
 					<spring:message code="search.button.label" />
 				</button>
-				<a href="/staff/create" class="btn btn-primary"> <spring:message
-						code="pizza.label.create.link" /></a>
+
 			</div>
 		</form:form>
-
-		<br>
+		<a href="/staff/create" class="btn btn-primary"> <spring:message
+				code="pizza.label.create.link" /></a> <br>
 
 		<div id="pizza-list">
 			<c:choose>
