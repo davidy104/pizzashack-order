@@ -24,6 +24,7 @@ import co.nz.pizzashack.integration.api.GenericAPIError;
 import co.nz.pizzashack.integration.api.PizzashackAPI;
 import co.nz.pizzashack.integration.api.PizzashackAPIUtils;
 
+//http://localhost:8111/rest/v1/
 @Component
 @Path("/v1")
 public class PizzashackAPIImpl implements PizzashackAPI {
@@ -72,6 +73,24 @@ public class PizzashackAPIImpl implements PizzashackAPI {
 			genericAPIError = PizzashackAPIUtils.errorHandle(e);
 		}
 		LOGGER.info("getPizzashackById end:{}");
+		return PizzashackAPIUtils.buildResponse(pizzashack, genericAPIError);
+	}
+
+	@Override
+	@Path("/pizzashack/pizzashackName/{pizzashackName}")
+	@GET
+	@Produces("application/json")
+	public Response getPizzashackByName(
+			@PathParam("pizzashackName") String pizzashackName) {
+		LOGGER.info("getPizzashackByName start:{}");
+		GenericAPIError genericAPIError = null;
+		PizzashackDto pizzashack = null;
+		try {
+			pizzashack = pizzashackDs.getPizzashackByName(pizzashackName);
+		} catch (Exception e) {
+			genericAPIError = PizzashackAPIUtils.errorHandle(e);
+		}
+		LOGGER.info("getPizzashackByName end:{}");
 		return PizzashackAPIUtils.buildResponse(pizzashack, genericAPIError);
 	}
 

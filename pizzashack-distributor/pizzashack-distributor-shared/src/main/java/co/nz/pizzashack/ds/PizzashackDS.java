@@ -9,4 +9,6 @@ public interface PizzashackDS {
 	Set<PizzashackDto> getAllItems() throws Exception;
 
 	PizzashackDto getPizzashackById(Long pizzashackId) throws Exception;
+
+	PizzashackDto getPizzashackByName(String pizzashackName) throws Exception;
 }

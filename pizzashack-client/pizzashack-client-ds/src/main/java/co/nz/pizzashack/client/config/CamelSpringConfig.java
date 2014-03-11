@@ -46,6 +46,9 @@ public class CamelSpringConfig {
 	private CxfEndpoint billingProcessEndpoint;
 
 	@Resource
+	private CxfEndpoint pizzashackEndpoint;
+
+	@Resource
 	private OrderProcessRoute orderProcessRoute;
 
 	private static final String ACTIVITYMQ_URL = "activitymq_url";
@@ -113,6 +116,7 @@ public class CamelSpringConfig {
 
 		SimpleRegistry registry = new SimpleRegistry();
 		registry.put("billingProcessEndpoint", billingProcessEndpoint);
+		registry.put("pizzashackEndpoint", pizzashackEndpoint);
 		camelContext.setRegistry(registry);
 
 		camelContext.addRoutes(orderProcessRoute);

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 import co.nz.pizzashack.integration.ws.BillingProcessWebServices;
+import co.nz.pizzashack.integration.ws.PizzashackWs;
 
 @Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml",
@@ -14,28 +15,32 @@ import co.nz.pizzashack.integration.ws.BillingProcessWebServices;
 		"classpath:META-INF/cxf/cxf-servlet.xml" })
 public class CamelCxfConfig {
 
-	// @Bean
-	// public CxfEndpoint billingAccountEndpoint() {
-	// CxfEndpoint cxfEndpoint = new CxfEndpoint();
-	// cxfEndpoint
-	// .setAddress("http://localhost:8112/pizzashackbilling/ws/accountWs");
-	// cxfEndpoint.setServiceClass(BillingWebServices.class);
-	// cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor());
-	// cxfEndpoint.setMtomEnabled(true);
-	// return cxfEndpoint;
-	// }
+	// http://localhost:8111/ws/pizzashackWs
+	@Bean
+	public CxfEndpoint pizzashackEndpoint() {
+		CxfEndpoint cxfEndpoint = new CxfEndpoint();
+		cxfEndpoint.setAddress("/pizzashackWs");
+		cxfEndpoint.setServiceClass(PizzashackWs.class);
+		cxfEndpoint.getOutInterceptors().add(new LoggingOutInterceptor());
+		cxfEndpoint.setMtomEnabled(true);
+		return cxfEndpoint;
+	}
 
+	// http://localhost:8111/ws/billingWs?wsdl
 	@Bean
 	public CxfEndpoint billingInboundEndpoint() {
 		CxfEndpoint cxfEndpoint = new CxfEndpoint();
 		cxfEndpoint.setAddress("/billingWs");
 		cxfEndpoint.setServiceClass(BillingProcessWebServices.class);
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		loggingOutInterceptor.setPrettyLogging(true);
+		cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor);
 		return cxfEndpoint;
 	}
 
-	@Bean
-	public LoggingOutInterceptor loggingOutInterceptor() {
-		return new LoggingOutInterceptor("target/write");
-	}
+	// @Bean
+	// public LoggingOutInterceptor loggingOutInterceptor() {
+	// return new LoggingOutInterceptor("target/write");
+	// }
 
 }

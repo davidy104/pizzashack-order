@@ -18,6 +18,8 @@ import co.nz.pizzashack.data.model.PizzashackModel;
 import co.nz.pizzashack.data.repository.PizzashackRepository;
 import co.nz.pizzashack.support.PizzashackCaculator;
 
+import static co.nz.pizzashack.data.predicates.PizzashackPredicates.findByPizzashackName;
+
 @Service
 @Transactional(value = "localTxManager", readOnly = true)
 public class PizzashackDSImpl implements PizzashackDS {
@@ -58,6 +60,23 @@ public class PizzashackDSImpl implements PizzashackDS {
 		}
 		found = this.toPizzashackDto(pizzashackModel);
 		LOGGER.info("getPizzashackById end:{} ", found);
+		return found;
+	}
+
+	@Override
+	public PizzashackDto getPizzashackByName(String pizzashackName)
+			throws Exception {
+		LOGGER.info("getPizzashackByName start:{} ", pizzashackName);
+		PizzashackDto found = null;
+		PizzashackModel pizzashackModel = pizzashackRepository
+				.findOne(findByPizzashackName(pizzashackName));
+		if (pizzashackModel == null) {
+			throw new NotFoundException(
+					"Pizzashack not found by pizzashackName[" + pizzashackName
+							+ "]");
+		}
+		found = this.toPizzashackDto(pizzashackModel);
+		LOGGER.info("getPizzashackByName end:{} ", found);
 		return found;
 	}
 

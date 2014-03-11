@@ -28,6 +28,7 @@ import org.springframework.jms.connection.JmsTransactionManager;
 import co.nz.pizzashack.integration.route.BillingInboundWsRoute;
 import co.nz.pizzashack.integration.route.BillingProcessRoute;
 import co.nz.pizzashack.integration.route.OrderProcessRoute;
+import co.nz.pizzashack.integration.route.PizzashackWsRoute;
 
 @Configuration
 @PropertySource("classpath:mq-config.properties")
@@ -48,6 +49,9 @@ public class CamelSpringConfig {
 	@Resource
 	private CxfEndpoint billingInboundEndpoint;
 
+	@Resource
+	private CxfEndpoint pizzashackEndpoint;
+
 	@Inject
 	private ApplicationContext context;
 
@@ -56,6 +60,9 @@ public class CamelSpringConfig {
 
 	@Resource
 	private BillingInboundWsRoute billingInboundWsRoute;
+
+	@Resource
+	private PizzashackWsRoute pizzashackWsRoute;
 
 	@Resource
 	private OrderProcessRoute orderProcessRoute;
@@ -125,10 +132,12 @@ public class CamelSpringConfig {
 		camelContext.addComponent("sql", sqlComponent);
 		SimpleRegistry registry = new SimpleRegistry();
 		registry.put("billingInboundEndpoint", billingInboundEndpoint);
+		registry.put("pizzashackEndpoint", pizzashackEndpoint);
 		camelContext.setRegistry(registry);
 		camelContext.addRoutes(billingProcessRoute);
 		camelContext.addRoutes(orderProcessRoute);
 		camelContext.addRoutes(billingInboundWsRoute);
+		camelContext.addRoutes(pizzashackWsRoute);
 		return camelContext;
 	}
 

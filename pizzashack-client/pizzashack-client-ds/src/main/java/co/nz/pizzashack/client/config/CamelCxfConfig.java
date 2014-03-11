@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
+import co.nz.pizzashack.client.integration.ws.client.pizzashack.stub.PizzashackWs;
 import co.nz.pizzashack.client.integration.ws.client.stub.BillingProcessWebServices;
 
 @Configuration
@@ -21,6 +22,15 @@ public class CamelCxfConfig {
 		cxfEndpoint.setServiceClass(BillingProcessWebServices.class);
 		cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor());
 		cxfEndpoint.setMtomEnabled(true);
+		return cxfEndpoint;
+	}
+
+	@Bean
+	public CxfEndpoint pizzashackEndpoint() {
+		CxfEndpoint cxfEndpoint = new CxfEndpoint();
+		cxfEndpoint.setAddress("http://localhost:8111/ws/pizzashackWs");
+		cxfEndpoint.setServiceClass(PizzashackWs.class);
+		// cxfEndpoint.getOutInterceptors().add(loggingOutInterceptor());
 		return cxfEndpoint;
 	}
 

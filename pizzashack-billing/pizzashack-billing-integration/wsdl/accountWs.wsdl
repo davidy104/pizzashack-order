@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.integration.billing.pizzashack.nz.co/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+	name="BillingWebServicesService" targetNamespace="http://ws.integration.billing.pizzashack.nz.co/">
+	<wsdl:types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:tns="http://ws.integration.billing.pizzashack.nz.co/"
+			elementFormDefault="unqualified" targetNamespace="http://ws.integration.billing.pizzashack.nz.co/"
+			version="1.0">
+
+			<xs:element name="account" type="tns:accountDto" />
+
+			<xs:element name="account-transaction" type="tns:accountTransactionRespDto" />
+
+			<xs:element name="accountAuthentication" type="tns:accountAuthentication" />
+
+			<xs:element name="accountAuthenticationResponse" type="tns:accountAuthenticationResponse" />
+
+			<xs:element name="billing" type="tns:billingTransactionDto" />
+
+			<xs:element name="billingProcess" type="tns:billingProcess" />
+
+			<xs:element name="billingProcessResponse" type="tns:billingProcessResponse" />
+
+			<xs:element name="fault">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="reason" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="getAllTransactionsForAccount" type="tns:getAllTransactionsForAccount" />
+
+			<xs:element name="getAllTransactionsForAccountResponse"
+				type="tns:getAllTransactionsForAccountResponse" />
+
+			<xs:complexType name="accountAuthentication">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="arg0" type="tns:accountDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="accountDto">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="accountId" type="xs:long" />
+					<xs:element minOccurs="0" name="account-type" type="xs:string" />
+					<xs:element minOccurs="0" name="account-no" type="xs:string" />
+					<xs:element minOccurs="0" name="balance" type="xs:string" />
+					<xs:element minOccurs="0" name="expire-date" type="xs:string" />
+					<xs:element minOccurs="0" name="security-no" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="accountAuthenticationResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="return"
+						type="tns:accountTransactionRespDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="accountTransactionRespDto">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="accountId" type="xs:long" />
+					<xs:element minOccurs="0" name="transaction-no" type="xs:string" />
+					<xs:element minOccurs="0" name="account-no" type="xs:string" />
+					<xs:element minOccurs="0" name="code" type="xs:string" />
+					<xs:element minOccurs="0" name="reasons" type="xs:string" />
+					<xs:element minOccurs="0" name="create-time" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="getAllTransactionsForAccount">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="arg0" type="tns:accountDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="getAllTransactionsForAccountResponse">
+				<xs:sequence>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="return"
+						type="tns:billingTransactionDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="billingTransactionDto">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="account-transaction-no"
+						type="xs:string" />
+					<xs:element minOccurs="0" ref="tns:account" />
+					<xs:element minOccurs="0" name="transaction-type" type="xs:string" />
+					<xs:element minOccurs="0" name="billing-amount" type="xs:string" />
+					<xs:element minOccurs="0" name="create-time" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="billingProcess">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="arg0"
+						type="tns:billingTransactionDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="billingProcessResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="return"
+						type="tns:accountTransactionRespDto" />
+				</xs:sequence>
+			</xs:complexType>
+
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="getAllTransactionsForAccount">
+		<wsdl:part element="tns:getAllTransactionsForAccount" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="accountAuthenticationResponse">
+		<wsdl:part element="tns:accountAuthenticationResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="accountAuthentication">
+		<wsdl:part element="tns:accountAuthentication" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="billingProcess">
+		<wsdl:part element="tns:billingProcess" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getAllTransactionsForAccountResponse">
+		<wsdl:part element="tns:getAllTransactionsForAccountResponse"
+			name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="billingProcessResponse">
+		<wsdl:part element="tns:billingProcessResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="FaultMessage">
+		<wsdl:part element="tns:fault" name="FaultMessage">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="BillingWebServices">
+		<wsdl:operation name="accountAuthentication">
+			<wsdl:input message="tns:accountAuthentication" name="accountAuthentication">
+			</wsdl:input>
+			<wsdl:output message="tns:accountAuthenticationResponse"
+				name="accountAuthenticationResponse">
+			</wsdl:output>
+			<wsdl:fault message="tns:FaultMessage" name="FaultMessage">
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="getAllTransactionsForAccount">
+			<wsdl:input message="tns:getAllTransactionsForAccount"
+				name="getAllTransactionsForAccount">
+			</wsdl:input>
+			<wsdl:output message="tns:getAllTransactionsForAccountResponse"
+				name="getAllTransactionsForAccountResponse">
+			</wsdl:output>
+			<wsdl:fault message="tns:FaultMessage" name="FaultMessage">
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="billingProcess">
+			<wsdl:input message="tns:billingProcess" name="billingProcess">
+			</wsdl:input>
+			<wsdl:output message="tns:billingProcessResponse" name="billingProcessResponse">
+			</wsdl:output>
+			<wsdl:fault message="tns:FaultMessage" name="FaultMessage">
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="BillingWebServicesServiceSoapBinding"
+		type="tns:BillingWebServices">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="accountAuthentication">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="accountAuthentication">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="accountAuthenticationResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="FaultMessage">
+				<soap:fault name="FaultMessage" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="getAllTransactionsForAccount">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="getAllTransactionsForAccount">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="getAllTransactionsForAccountResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="FaultMessage">
+				<soap:fault name="FaultMessage" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="billingProcess">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="billingProcess">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="billingProcessResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="FaultMessage">
+				<soap:fault name="FaultMessage" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="BillingWebServicesService">
+		<wsdl:port binding="tns:BillingWebServicesServiceSoapBinding"
+			name="BillingWebServicesPort">
+			<soap:address location="http://localhost:8112/pizzashackbilling/ws/accountWs" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

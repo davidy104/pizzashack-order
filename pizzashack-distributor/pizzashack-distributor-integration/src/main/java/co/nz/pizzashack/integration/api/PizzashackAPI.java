@@ -8,6 +8,8 @@ public interface PizzashackAPI {
 
 	Response getPizzashackById(Long pizzashackId);
 
+	Response getPizzashackByName(String pizzashackName);
+
 	Response getOrderProcessesByCustomer(String customerEmail);
 
 	Response getOrderProcessByOrderNo(String orderNo);
@@ -15,4 +17,5 @@ public interface PizzashackAPI {
 	Response getOrdersforCustomer(String customerEmail);
 
 	Response getOrderByOrderNo(String orderNo);
+
 }
