@@ -21,7 +21,7 @@ import co.nz.pizzashack.client.utils.GeneralUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfiguration.class)
-@Ignore("run only when service ready")
+//@Ignore("run only when service ready")
 public class OrderProcessMqTest {
 	@Produce
 	private ProducerTemplate producer;
